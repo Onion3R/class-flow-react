@@ -1,8 +1,24 @@
 
-import { Calendar, Home, CalendarCog , Library, Users } from "lucide-react"
+import { 
+  Calendar,
+  Home, 
+  CalendarCog ,
+  Library, 
+  Users,   
+  AudioWaveform,
+  BookOpen,
+  Bot,
+  Command,
+  Frame,
+  GalleryVerticalEnd,
+  Map,
+  PieChart,
+  Settings2,
+  SquareTerminal,} from "lucide-react"
 import { Link } from "react-router-dom";
 import {
   Sidebar,
+  SidebarHeader,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
@@ -14,78 +30,44 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSub
 } from  "@/Components/ui/sidebar";
-import Schedule from "@/Schedule";
- 
-// Menu items.
-const SidbarItems = [
-  {
-    label: 'Application',
-    items: [
-        {
-            title: "Home",
-            url: "/",
-            icon: Home,
-          },
-          {
-            title: "Team",
-            url: "/page1",
-            icon: Users,
-          },
-          {
-            title: "Subjects",
-            url: "/subject",
-            icon: Library,
-        }    
-      ]
-  },
-  {
-    label: 'Schedule',
-    items: [
-       {
-    title: "Generate Schedule",
-    url: "#",
-    icon: CalendarCog,
-    },
-    {
-      title: "Scedules",
-      url: "#",
-      icon: Calendar,
-      subLink: [
-        {
-          title: 'Freshmen',
-          url: "/page2",
-        },
-        {
-          title: 'Sophomore',
-          url: "/page2",
-        },
-        {
-          title: 'Junior',
-          url: "/page2",
-        },
-        {
-          title: 'Senior',
-          url: "/page2",
-        },
 
-      ]
-    },
-    ]
-  }
-  
- 
-]
+
+ const sidebarItems = [
+      {
+        label: 'Application',
+        items: [
+            {
+                title: "Home",
+                url: "#",
+                icon: Home,
+              },
+              {
+                title: "Team",
+                url: "#",
+                icon: Users,
+              },
+              {
+                title: "Subjects",
+                url: "#",
+                icon: Library,
+            }    
+          ]
+      },
+  ]
  
 export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
+      <SidebarHeader>
+
+      </SidebarHeader>
       <SidebarContent>
-          {SidbarItems.map((sidebarItems) => (
-            <SidebarGroup key={sidebarItems.label}>
-              <SidebarGroupLabel>{sidebarItems.label}</SidebarGroupLabel>
+          {sidebarItems.map((sidebarItem) => (
+            <SidebarGroup key={sidebarItem.label}>
+              <SidebarGroupLabel>{sidebarItem.label}</SidebarGroupLabel>
                 <SidebarGroupContent>
                   <SidebarMenu>
-                    {sidebarItems.items.map((item) => (
+                    {sidebarItem.items.map((item) => (
                       <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton asChild>
                           <Link to={item.url}>

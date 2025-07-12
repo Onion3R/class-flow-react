@@ -2,6 +2,7 @@
 import {actions} from "./actions"
 import { MoreHorizontal, ArrowUpDown } from "lucide-react"
 import { Button } from "@/Components/ui/button"
+import { Checkbox } from "@Components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,8 +10,32 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu"
+import { useNavigate } from "react-router-dom"
 import { Fragment } from "react"
 export const getColumns = ( {setOpenDialog, setOpenAlertDialog} ) => [
+  
+   {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: "name",
     header: "Name",
@@ -69,8 +94,9 @@ export const getColumns = ( {setOpenDialog, setOpenAlertDialog} ) => [
     header: "Actions",
     id: "actions",
     cell: ({ row }) => {
+      const navigate = useNavigate()
       const rowData = row.original;
-      const menuActions = actions(setOpenDialog, setOpenAlertDialog); 
+      const menuActions = actions(navigate ,setOpenDialog, setOpenAlertDialog); 
       
 
       return (

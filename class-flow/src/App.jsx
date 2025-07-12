@@ -1,26 +1,21 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./Pages/home";
-import Page1 from "./Pages/Page1/page1";
-import Subject from "./Pages/Subject/subject";
-import Layout from "./Layout";
+import { BrowserRouter as Router } from "react-router-dom";
+import { ThemeProvider } from "./Components/theme-provider";
 import { Toaster } from "sonner";
+import { AuthProvider } from "@/context/authContext"
+import AppRoutes from "./AppRoutes";
 
 const App = () => {
   return (
-    <div>
-    <Router>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/page1" element={<Page1 />} />
-          <Route path="/subject" element={<Subject />} />
-        </Route>
-      </Routes>
-    </Router>
-      <Toaster position="top-right" richColors closeButton />
-    </div>
-    
+    <AuthProvider>
+      <ThemeProvider>
+        <Router>
+          <AppRoutes />
+          <Toaster position="top-right" richColors closeButton />
+        </Router>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
+
 
 export default App;

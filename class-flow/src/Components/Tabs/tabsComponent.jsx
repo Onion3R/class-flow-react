@@ -5,8 +5,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import  TableComponent  from '@/Components/Table/tableComponent'
-import { Card, CardContent } from "../ui/card";
+import  DataTableComponent  from '@/Components/DataTable/dataTableComponent'
 
 const levels = ["Freshmen", "Sophomore","Junior", "Senior"];
 
@@ -16,21 +15,20 @@ export default function TabsComponent({data, getColumns, filteredData, comboFilt
   return (
     <div className="flex w-full">
       <Tabs defaultValue="Sophomore" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList>
-          {levels.map((level) => (
-            <TabsTrigger key={level} value={level}>{level}</TabsTrigger>
-          ))}
-        </TabsList>
-
+        <div className="container mx-auto">
+          <TabsList className=" my-2 ">
+            {levels.map((level) => (
+              <TabsTrigger key={level} value={level}>{level}</TabsTrigger>
+            ))}
+          </TabsList>
+      </div>
        {levels.map((level) => (
         <TabsContent key={level} value={level}>
-          <Card>
-            <CardContent>
-              <TableComponent
+          <div>
+              <DataTableComponent
                data={data[level]} getColumns={getColumns} filteredData={filteredData} comboFilteredData={comboFilteredData}
               />
-            </CardContent>
-          </Card>
+            </div>
         </TabsContent>
       ))}
       </Tabs>

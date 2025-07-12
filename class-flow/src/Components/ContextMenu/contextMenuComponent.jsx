@@ -4,7 +4,7 @@ import {
   ContextMenuItem,
   ContextMenuSeparator,
 } from "@/Components/ui/context-menu"
-
+import { Trash2 } from "lucide-react"
 import { useState, useEffect } from "react"
 
 export function ContextMenuComponent({ selectedRows, allRowsCount,selectAllRows, deselectAllRows}) {
@@ -21,18 +21,27 @@ export function ContextMenuComponent({ selectedRows, allRowsCount,selectAllRows,
       {/* <ContextMenuItem disabled={selectedCount === 0}>
         Bulk View ({selectedCount})
       </ContextMenuItem> */}
-      <ContextMenuItem onClick={()=> (selectAllRows())} disabled={selectedCount === allRowsCount}>
-        Select All ({allCount})
+      <ContextMenuItem
+        onClick={() => selectAllRows()}
+        disabled={selectedCount === allRowsCount}
+        className="flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+      >
+        <span>  Select All </span> <span className="text-[12px] font-medium"> {allCount} </span>
       </ContextMenuItem>
-      <ContextMenuItem disabled={selectedCount === 0} onClick={()=> deselectAllRows()}>
-       Deselect All ({selectedCount})
+      <ContextMenuItem
+        disabled={selectedCount === 0}
+        onClick={() => deselectAllRows()}
+        className="flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+      >
+        <span> Deselect All </span> <span className="text-[12px] font-medium">{selectedCount} </span>
       </ContextMenuItem>
       <ContextMenuSeparator />
       <ContextMenuItem
         disabled={selectedCount === 0}
-        className="text-red-600" 
+        className="p-0 cursor-pointer"
       >
-        Delete
+        <span className=" h-full w-full px-[8px] py-[6px] hover:bg-red-100 dark:hover:bg-red-950/50 text-red-500 rounded-sm flex items-center justify-between">Delete <Trash2 className="text-red-400 h-[10px] w-[10px] " /></span>
+        
       </ContextMenuItem>
     </ContextMenuContent>
   )

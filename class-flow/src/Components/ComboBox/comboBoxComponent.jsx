@@ -27,37 +27,7 @@ export function ComboBox({data, setComboBoxHasSelectedItem, setFilterValue ,comb
   const [comboFilters, setComboFilters] = useState([])
   const [open, setOpen] = useState(false)
   const [selectedItems, setSelectedItems] = useState([])
-  // const [filteredSubjects, setFilteredSubjects] = useState([])
   
-      // useEffect(() => {
-      // if (data && data.length > 0) {
-      //   setSubjects(data.flatMap(({ subject }) => subject || []));
-      // }
-      // }, [data]); 
-
-      // useEffect(() => {
-      //   if (subjects && subjects.length > 0) {
-      //     const unique = subjects.filter(
-      //       (item, index, self) =>
-      //         index === self.findIndex((t) => t.label === item.label)
-      //     )
-      //     setFilteredSubjects(unique)
-      //   }
-      // }, [subjects])
-
-      // useEffect(() => {
-      //    setFilterValue(selectedItems);
-      // }, [selectedItems ])
-
-      // const toggle = (value) => {
-      //   setSelectedItems((prev) =>
-      //     prev.includes(value)
-      //       ? prev.filter((v) => v !== value)
-      //       : [...prev, value]
-      //   )
-       
-      
-         //
        useEffect(() => {
       
       if (data && data.length > 0) {

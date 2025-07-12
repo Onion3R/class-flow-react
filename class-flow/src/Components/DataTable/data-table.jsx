@@ -18,9 +18,11 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu"
-import { ComboBox } from "../ComboBox/comboBox"
+import { ComboBox } from "../ComboBox/comboBoxComponent"
 import { ContextMenu, ContextMenuTrigger } from "@/Components/ui/context-menu"
 import { ContextMenuComponent } from "../ContextMenu/contextMenuComponent"
 import {
@@ -84,8 +86,8 @@ const activeColumn = table
           : "Email" // fallback if it's a React component or function
   
   return (
-    <div >
-      <div className="mb-4 sm:flex justify-between sm:flex-row">
+    <div className="">
+      <div className="mb-4 sm:flex justify-between sm:flex-row ">
           <div  className="w-full mr-2.5 sm:max-w-sm ">
           <Input
               placeholder={`Filter ${headerLabel}...`}
@@ -115,6 +117,8 @@ const activeColumn = table
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+            <DropdownMenuLabel className="font-medium text-sm" >Togge Columns</DropdownMenuLabel>
+            <DropdownMenuSeparator />
               {table
                 .getAllColumns()
                 .filter(
@@ -125,7 +129,7 @@ const activeColumn = table
                     <DropdownMenuCheckboxItem
                       key={column.id}
                       value={column.header}
-                      className="capitalize"
+                      className="capitalize text-sm"
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) =>
                         column.toggleVisibility(!!value)
@@ -150,13 +154,13 @@ const activeColumn = table
           </div>
           </div>
       </div>
-      <div className="rounded-md border">
+      <div className="overflow-hidden border rounded-md">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-muted/70 !hover:bg-none">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} >
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="!font-[500]">
                     {header.isPlaceholder
                       ? null
                       : flexRender(

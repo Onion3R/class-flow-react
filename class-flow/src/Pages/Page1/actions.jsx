@@ -1,8 +1,14 @@
-export const actions = (setOpenDialog , setOpenAlertDialog) => [
+import { href } from "react-router-dom";
+
+export const actions = (navigate,setOpenDialog , setOpenAlertDialog) => [
   { 
     id: 1,
     label: "View Details",
-    action: (row) => console.log("View", row),
+     action: (row) => {
+      const id = row.id; // or rowData.id depending on your structure
+     navigate(`/admin/team/instructor-detail/${id}`); 
+    }
+
   },
   {
     id: 2,
