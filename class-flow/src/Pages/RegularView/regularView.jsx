@@ -71,7 +71,7 @@ function RegularView() {
               </TabsList>
                 </div>
               </div>
-              <div className='h-[100%] container mx-auto py-3  sm:p-0  p-5'>
+              <div className='h-full container mx-auto py-3  sm:p-0  p-5'>
               <TabsContent value="schedule">
                  <h3 className='text-2xl'>Class today</h3>
                  <div className='mt-7'>
@@ -81,19 +81,22 @@ function RegularView() {
               <TabsContent value="students" >
                 <h3 className='text-2xl mt-5'>Schedule</h3>
                 <div className="mt-7  rounded-md shadow-sm overflow-auto">
-                  <div className=' '>
-                    <div className='flex mb-3.5 justify-between '>
-                      <div className='flex gap-7 '>
-                      <SelectComponent items={items.year} label="Year level"/>
-                      <SelectComponent items={items.section} label="Sections"/>
-                      <SelectComponent items={items.semester} label="Semester"/>
-                      <div className='gap-2 flex'>
-                      <Button variant="outline" className="border border-dashed"> <Search/>Filter</Button>
-                      <Button  variant="outline" className="border border-dashed"> <Trash/>Delete</Button>
-                      </div>
-                    </div>
-                      <Button   className="border border-dashed "> <Printer/>Print</Button>
-                    </div>
+                  <div>
+                     <div className='bg-white dark:bg-accent p-4 rounded-lg shadow-md mb-4    justify-between  lg:flex relative '>
+                       <div className="gap-[2%] mb-2 lg:mb-0 w-full   lg:flex align-start justify-start  ">
+
+                          <div className='flex gap-5 justify-between lg:just mb-2 sm:mb-0  '>
+                          <SelectComponent items={items.year} label="Year"/>
+                          <SelectComponent items={items.section} label="Sections"/>
+                          <SelectComponent items={items.semester} label="Semester"/>
+                          </div>
+                          <div className='gap-2  lg:mt-0 mt-2 flex'>
+                            <Button variant="outline" className="border border-dashed"> <Search/><span className='hidden sm:block'>Filter</span></Button>
+                            <Button  variant="outline" className="border border-dashed"> <Trash/><span className='hidden sm:block'>Delete</span></Button>
+                          </div>
+                        </div>
+                          <Button   className="border  absolute right-4 bottom-6 lg:relative lg:right-0 lg:bottom-0 "> <Printer/><span>Print</span></Button>
+                        </div>
                       <ScheduleTableComponent/>
                   </div>
                 

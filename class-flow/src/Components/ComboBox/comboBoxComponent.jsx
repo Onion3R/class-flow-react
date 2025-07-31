@@ -72,6 +72,7 @@ export function ComboBox({data, setComboBoxHasSelectedItem, setFilterValue ,comb
               selectedItems.length > 0 && selectedItems.length <= 3 ? selectedItems.map((value, index) => (
                
               <span className="mx-0.5 text-[13px] p-1 bg-secondary rounded" key={index}>{value}</span> 
+              
              
             )) : selectedItems.length >= 3 ? 
               (<span className="mx-0.5 text-[13px] p-1 bg-secondary rounded">{selectedItems.length} selected</span>)

@@ -15,7 +15,7 @@ function UserLayoutContent() {
   const { isMobile } = useSidebar();
 
   return (
-    <div className="min-h-screen h-screen w-screen bg-white">
+    <div className="min-h-screen h-full w-full bg-white">
       {isMobile ? <AppSidebar /> : null}
       <main className="p-4">
         <Outlet />

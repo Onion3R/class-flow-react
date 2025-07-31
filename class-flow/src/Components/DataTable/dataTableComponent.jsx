@@ -1,23 +1,37 @@
-import React, { useEffect, useState } from "react"
-// import { getColumns } from "../../Pages/Page1/column"
-import { DataTable } from "./data-table"
-import DialogComponent from "../Dialog/diaglogComponent"
-import AlertDialogComponent from "../AlertDialog/alertDialog"
+// src/Components/DataTable/dataTableComponent.jsx
+import React, { useEffect, useState } from "react";
+import { DataTable } from "./data-table"; // This is your shadcn-ui DataTable (Adjust path)
+import DialogComponent from "../Dialog/diaglogComponent"; // (Adjust path)
+import AlertDialogComponent from "../AlertDialog/alertDialog"; // (Adjust path)
 
-export default function DataTableComponent({ data, getColumns, filteredData, comboFilteredData}) {
-  const [tableData, setTableData] = useState([])
-  const [openDialog, setOpenDialog] = useState(false)
-  const [openAlertDialog, setOpenAlertDialog] = useState(false)
+// This component acts as a wrapper, passing props from TabsComponent down to DataTable
+export default function DataTableComponent({
+  data,
+  getColumns,
+  filteredData,
+  filterComboBoxes = [], // Expect the new prop here, default to empty array
+  addComponent,
+}) {
+  const [tableData, setTableData] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [openAlertDialog, setOpenAlertDialog] = useState(false);
 
   useEffect(() => {
-    setTableData(data)
-  }, [data])
+    setTableData(data);
+  }, [data]);
 
-  const columns = getColumns({ setOpenDialog, setOpenAlertDialog })
+  const columns = getColumns({ setOpenDialog, setOpenAlertDialog });
 
   return (
     <div className="container mx-auto">
-      <DataTable columns={columns} data={tableData} filteredData={filteredData}  comboFilteredData={comboFilteredData}/>
+      <DataTable
+        columns={columns}
+        data={tableData}
+        filteredData={filteredData}
+        // IMPORTANT: Pass the new prop here
+        filterComboBoxes={filterComboBoxes}
+        addComponent={addComponent}
+      />
       <DialogComponent
         open={openDialog}
         onOpenChange={setOpenDialog}
@@ -28,6 +42,5 @@ export default function DataTableComponent({ data, getColumns, filteredData, com
         onOpenChange={setOpenAlertDialog}
       />
     </div>
-  )
+  );
 }
-

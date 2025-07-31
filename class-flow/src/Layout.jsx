@@ -21,7 +21,6 @@ import { Outlet } from "react-router-dom";
 import AvatarPopUpComponent from "./Components/AvatarPopUp/avatarPopUpComponent";
 import BreadCrumbComponent from "@Components/BreadCrumb/breadCrumbComponent"
 import { Separator } from "@Components/ui/separator";
-import { ModeToggle } from "./Components/mode-toggle";
 import { Button } from "./Components/ui/button";
 import { MessageSquare } from "lucide-react";
 export default function Layout() {

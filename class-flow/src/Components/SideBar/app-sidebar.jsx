@@ -7,7 +7,9 @@ import {
   Users,   
   AudioWaveform,
   MessageSquare,
-  GalleryVerticalEnd} from "lucide-react"
+  GalleryVerticalEnd,
+  ChartNoAxesGantt,
+  LayoutGrid} from "lucide-react"
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import {
@@ -60,13 +62,23 @@ const data2 = {
               },
               {
                 title: "Team",
-                url: "/admin/team",
+                url: "team",
                 icon: Users,
               },
               {
                 title: "Subjects",
-                url: "/admin/subject",
+                url: "subject",
                 icon: Library,
+            },   
+            {
+                title: "Programs",
+                url: "programs",
+                icon: ChartNoAxesGantt,
+            } ,
+            {
+                title: "Rooms",
+                url: "room",
+                icon: LayoutGrid,
             }    
           ]
       },
@@ -75,7 +87,7 @@ const data2 = {
         items: [
             {
                 title: "Generate Schedule",
-                url: "#",
+                url: "generate-schedule",
                 icon: CalendarCog,
               },
               {
@@ -83,10 +95,8 @@ const data2 = {
                 url: "schedules",
                 icon: Calendar,
                 subLink: [
-                  { title: "Freshmen", url: `${baseUrl}/freshmen` },
-                  { title: "Sophomore", url: `${baseUrl}/sophomore` },
-                  { title: "Junior", url: `${baseUrl}/junior` },
-                  { title: "Senior", url: `${baseUrl}/senior` },
+                  { title: "Grade 11", url: `${baseUrl}/junior` },
+                  { title: "Grade 12", url: `${baseUrl}/senior` },
                 ]
             },
         ]

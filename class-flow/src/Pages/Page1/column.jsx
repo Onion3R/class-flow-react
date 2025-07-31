@@ -85,10 +85,10 @@ export const getColumns = ( {setOpenDialog, setOpenAlertDialog} ) => [
   );
   },
   },
-  {
-    accessorKey: "maxLoad",
-    header: "Max Load",
-  },
+  // {
+  //   accessorKey: "maxLoad",
+  //   header: "Max Load",
+  // },
   {
     accessorKey: "actions",
     header: "Actions",

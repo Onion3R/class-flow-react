@@ -13,17 +13,10 @@ import { useLocation } from "react-router-dom";
 function   BreadCrumbComponent() {
      let location = useLocation();
   const [breadcrumbItem, setBreadcrumbItem] = useState([])
-// const path = [
-//   {
-//     url: "/admin/hello",
-//     path: "Subject"
-//   }
-// ]
- console.log(breadcrumbItem.length)
   useEffect(() => {
     setBreadcrumbItem(formatPath(location.pathname))
   }, [location])
-console.log(breadcrumbItem)
+
   function formatPath(pathname) {
 
   let path = []
