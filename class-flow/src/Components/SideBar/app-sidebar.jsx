@@ -3,6 +3,7 @@ import {
   Calendar,
   Home, 
   CalendarCog ,
+  CalendarPlus,
   Library, 
   Users,   
   AudioWaveform,
@@ -85,6 +86,11 @@ const data2 = {
       {
         label: 'Schedule',
         items: [
+            {
+                title: "Create Schedule",
+                url: "create-schedule",
+                icon: CalendarPlus,
+              },
             {
                 title: "Generate Schedule",
                 url: "generate-schedule",

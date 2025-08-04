@@ -1,9 +1,9 @@
 // src/columns.jsx
-"use client"; // Add this if you are using Next.js App Router and this is a client component
+"use client";
 
 import { MoreHorizontal, ArrowUpDown } from "lucide-react";
 import { Button } from "@/Components/ui/button";
-import { Checkbox } from "@/Components/ui/checkbox"; // Ensure this path is correct
+import { Checkbox } from "@/Components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,24 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
-import { useNavigate } from "react-router-dom"; // Assuming you are using react-router-dom
-import { Fragment } from "react"; // For conditionally rendering separators
-
-// IMPORTANT: This now imports from the generic 'actions.js'
+import { useNavigate } from "react-router-dom";
+import { Fragment } from "react";
 import { actions } from "./actions";
-
-/**
- * Defines the columns for the DataTable.
- * This is now a generic column definition that can be used for programs
- * or other data by adjusting the accessorKeys.
- *
- * @param {Object} props - Props for the columns.
- * @param {function} props.setOpenDialog - Function to open an edit/view dialog.
- * @param {function} props.setOpenAlertDialog - Function to open a delete confirmation dialog.
- * @returns {Array<Object>} An array of column definitions.
- */
-export const getColumns = ({ setOpenDialog, setOpenAlertDialog }) => [
-  // Checkbox Column for Row Selection
+export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow }) => [
   {
     id: "select",
     header: ({ table }) => (
@@ -51,8 +37,6 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog }) => [
     enableSorting: false,
     enableHiding: false,
   },
-  // ID Column
-  // Program/Strand Name Column
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -60,7 +44,7 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog }) => [
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        Program/Strand Name
+        Track Name
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
@@ -68,7 +52,6 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog }) => [
     enableSorting: true,
     enableColumnFilter: true,
   },
-  // Program/Strand Code Column
   {
     accessorKey: "code",
     header: ({ column }) => (
@@ -84,24 +67,8 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog }) => [
     enableSorting: true,
     enableColumnFilter: true,
   },
-  // Track Name Column (accessing nested 'track.name')
-  {
-    accessorKey: "trackName",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Track
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
-    accessorFn: (row) => row.track?.name || "Unknown Track",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("trackName")}</div>,
-    enableSorting: true,
-    enableColumnFilter: true,
-  },
-  // Actions Column
+  
+  // --- END NEW COLUMN ---
   {
     accessorKey: "actions",
     id: "actions",
@@ -109,8 +76,7 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog }) => [
     cell: ({ row }) => {
       const navigate = useNavigate();
       const rowData = row.original;
-      // Get the actions from the generic 'actions.js'
-      const menuActions = actions(navigate, setOpenDialog, setOpenAlertDialog);
+      const menuActions = actions(navigate, setOpenDialog, setOpenAlertDialog, setSelectedRow);
 
       return (
         <DropdownMenu>

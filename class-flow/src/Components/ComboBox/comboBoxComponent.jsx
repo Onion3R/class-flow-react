@@ -23,20 +23,28 @@ import {
 
 
 
-export function ComboBox({data, setComboBoxHasSelectedItem, setFilterValue ,comboFilteredData}) {
+export function ComboBox({data,label, setComboBoxHasSelectedItem, setFilterValue ,comboFilteredData}) {
   const [comboFilters, setComboFilters] = useState([])
   const [open, setOpen] = useState(false)
   const [selectedItems, setSelectedItems] = useState([])
   
-       useEffect(() => {
-      
-      if (data && data.length > 0) {
-      const raw = data.flatMap((item) => item[comboFilteredData] || []);
-      const unique = Array.from(new Map(raw.map((opt) => [opt.value, opt])).values());
-          setComboFilters(unique);
+      useEffect(() => {
+      
+      if (data && data.length > 0) {
+        // --- FIX WAS MADE HERE ---
+        // Changed from: const raw = data.flatMap((item) => item[comboFilteredData] || []);
+        // Changed from: const unique = Array.from(new Map(raw.map((opt) => [opt.value, opt])).values());
+        const formattedData = data.map(item => ({
+            ...item,
+            value: String(item.value) // Ensure value is a string for consistent comparison
+        }));
+          setComboFilters(formattedData);
+        } else {
+            // Added this else block to clear filters if data is empty
+            setComboFilters([]);
         }
-      
-      }, [data, comboFilteredData]); 
+
+      }, [data]); 
 
       useEffect(() => {
          setFilterValue(selectedItems);
@@ -76,7 +84,7 @@ export function ComboBox({data, setComboBoxHasSelectedItem, setFilterValue ,comb
              
             )) : selectedItems.length >= 3 ? 
               (<span className="mx-0.5 text-[13px] p-1 bg-secondary rounded">{selectedItems.length} selected</span>)
-             : comboFilteredData
+             : label
             }
             </div>
             <div className="flex sm:hidden">
@@ -90,7 +98,7 @@ export function ComboBox({data, setComboBoxHasSelectedItem, setFilterValue ,comb
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0 rounded-lg">
           <Command>
-            <CommandInput placeholder={`Search ${comboFilteredData}...`} />
+            <CommandInput placeholder={`Search ${label}...`} />
             <CommandList>
               <CommandEmpty>No subjects found.</CommandEmpty>
               <CommandGroup>

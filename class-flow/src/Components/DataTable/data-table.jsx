@@ -34,18 +34,7 @@ import {
 } from "@/Components/ui/table";
 import { Button } from "../ui/button";
 
-/**
- * DataTable Component
- * @param {object} props - Component props
- * @param {Array<object>} props.columns - Array of column definitions for React Table.
- * @param {Array<object>} props.data - The data array to display in the table.
- * @param {string} props.filteredData - The accessorKey of the column for the main search input.
- * @param {Array<object>} [props.filterComboBoxes=[]] - Optional. An array of objects defining dynamic ComboBox filters.
- * Each object should have:
- * - {string} columnId: The accessorKey/ID of the column this ComboBox will filter.
- * - {function} [labelFormatter]: Optional. A function (value) => string to format the display label.
- * @param {React.ReactNode} props.addComponent - React node for the add component (e.g., a dialog trigger).
- */
+
 export function DataTable({
   columns,
   data,
@@ -55,14 +44,19 @@ export function DataTable({
 }) {
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState({});
-  const [filteredColumn, setFilteredColumn] = useState('email'); // For the main search input
+  const [filteredColumn, setFilteredColumn] = useState('');
+  const [headerLabel, setHeaderLabel] = useState('Search'); // New state for header label
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [comboBoxHasSelectedItem, setComboBoxHasSelectedItem] = useState(false); // Consider refining if multiple combo boxes
 
   useEffect(() => {
-    if (filteredData) {
-      setFilteredColumn(filteredData);
+    if (filteredData && filteredData.columnId) {
+      setFilteredColumn(filteredData.columnId);
+      setHeaderLabel(filteredData.label || 'Search'); // Use the provided label or a default
+    } else {
+      setFilteredColumn(''); // Reset if no valid filteredData prop
+      setHeaderLabel('Search');
     }
   }, [filteredData]);
 
@@ -117,15 +111,6 @@ export function DataTable({
     table.resetRowSelection();
   }, [table.getState().columnFilters, table]);
 
-  const activeColumn = useMemo(() => {
-    return table.getAllColumns().find((col) => col.id === filteredColumn);
-  }, [table, filteredColumn]);
-
-  const headerLabel = useMemo(() => {
-    return typeof activeColumn?.columnDef.header === "string"
-      ? activeColumn.columnDef.header
-      : activeColumn?.id || "Search"; // Fallback to column ID or generic "Search"
-  }, [activeColumn]);
 
   return (
     <div className="">
@@ -149,6 +134,7 @@ export function DataTable({
                   <ComboBox
                     key={filterDef.columnId || index} // Use columnId as key, fallback to index
                     data={options}
+                    label = {filterDef.label}
                     setComboBoxHasSelectedItem={setComboBoxHasSelectedItem} // Might need more granular state if multiple
                     comboFilteredData={filterDef.columnId} // Pass the column ID to the ComboBox
                     setFilterValue={(value) => {

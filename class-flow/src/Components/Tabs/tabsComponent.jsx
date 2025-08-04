@@ -13,6 +13,7 @@ import DataTableComponent from '@/Components/DataTable/dataTableComponent'; // Y
 export default function TabsComponent({
   data,
   getColumns,
+  dialogData,
   tabList,
   filteredData,
   // IMPORTANT: Add filterComboBoxes to props destructuring here!
@@ -67,6 +68,7 @@ export default function TabsComponent({
                 <DataTableComponent
                   data={data}
                   getColumns={getColumns}
+                  dialogData={dialogData}
                   filteredData={filteredData}
                   // Pass the new prop down to the DataTableComponent
                   filterComboBoxes={filterComboBoxes}

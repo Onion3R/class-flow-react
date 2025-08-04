@@ -15,6 +15,11 @@ export const getTracks = async () => {
   return response.data;
 };
 
+export const getSections = async () => {
+  const response = await api.get('sections/');
+  return response.data;
+};
+
 
 export const getSubjectStrand = async () => {
   const response = await api.get('strand-subjects/');
@@ -133,6 +138,155 @@ export const sendGenerateRequest = async (override, scheduleId, yearLevel, sched
     throw error;
   }
 };
+
+
+export const createSubjectWithAssignments = async (payload) => {
+  try {
+   
+    console.log("Sending subject and assignment data:", payload);
+    
+    // Using api.post to send the combined payload to the specified endpoint.
+    const response = await api.post('subjects/create_with_strand_assignment/', payload);
+    
+    return response;
+  } catch (error) {
+    // Log the full error response from the server if available.
+    console.error("Error creating subject and assignments:", error.response?.payload || error.message);
+    throw error;
+  }
+};
+
+export const createTrack = async (data) => {
+  try {
+   
+    console.log("Sending subject and assignment data:", data);
+    
+    // Using api.post to send the combined payload to the specified endpoint.
+    const response = await api.post('tracks/', data);
+    
+    return response;
+  } catch (error) {
+    // Log the full error response from the server if available.
+    console.error("Error creating subject and assignments:", error.response?.payload || error.message);
+    throw error;
+  }
+};
+
+export const deleteTrack = async (trackIds) => {
+  try {
+    // Log the ID of the strand we are about to delete for debugging.
+    console.log("Deleting strand with ID:", trackIds);
+    
+    // Use api.delete to send a DELETE request to the 'strands' endpoint
+    // with the specific strand's ID appended to the URL.
+    const response = await api.delete(`tracks/${trackIds}/`);
+    
+    // Return the response from the server.
+    return response;
+  } catch (error) {
+    // Log the full error response from the server if available.
+    console.error("Error deleting strand:", error.response?.strandId || error.message);
+    
+    // Re-throw the error so it can be handled by the calling function.
+    throw error;
+  }
+};
+
+
+export const createStrand = async (data) => {
+  try {
+   
+    console.log("Sending subject and assignment data:", data);
+    
+    // Using api.post to send the combined payload to the specified endpoint.
+    const response = await api.post('strands/', data);
+    
+    return response;
+  } catch (error) {
+    // Log the full error response from the server if available.
+    console.error("Error creating subject and assignments:", error.response?.payload || error.message);
+    throw error;
+  }
+};
+
+export const deleteStrand = async (strandId) => {
+  try {
+    // Log the ID of the strand we are about to delete for debugging.
+    console.log("Deleting strand with ID:", strandId);
+    
+    // Use api.delete to send a DELETE request to the 'strands' endpoint
+    // with the specific strand's ID appended to the URL.
+    const response = await api.delete(`strands/${strandId}/`);
+    
+    // Return the response from the server.
+    return response;
+  } catch (error) {
+    // Log the full error response from the server if available.
+    console.error("Error deleting strand:", error.response?.strandId || error.message);
+    
+    // Re-throw the error so it can be handled by the calling function.
+    throw error;
+  }
+};
+
+
+export const createSection = async (data) => {
+  try {
+   
+    console.log("Sending subject and assignment data:", data);
+    
+    // Using api.post to send the combined payload to the specified endpoint.
+    const response = await api.post('sections/', data);
+    
+    return response;
+  } catch (error) {
+    // Log the full error response from the server if available.
+    console.error("Error creating subject and assignments:", error.response?.payload || error.message);
+    throw error;
+  }
+};
+
+
+export const deleteSection = async (sectionId) => {
+  try {
+    // Log the ID of the strand we are about to delete for debugging.
+    console.log("Deleting strand with ID:", sectionId);
+    
+    // Use api.delete to send a DELETE request to the 'strands' endpoint
+    // with the specific strand's ID appended to the URL.
+    const response = await api.delete(`sections/${sectionId}/`);
+    
+    // Return the response from the server.
+    return response;
+  } catch (error) {
+    // Log the full error response from the server if available.
+    console.error("Error deleting strand:", error.response?.strandId || error.message);
+    
+    // Re-throw the error so it can be handled by the calling function.
+    throw error;
+  }
+};
+
+export const deleteSubject = async (subjectId) => {
+  try {
+    // Log the ID of the strand we are about to delete for debugging.
+    console.log("Deleting strand with ID:", subjectId);
+    
+    // Use api.delete to send a DELETE request to the 'strands' endpoint
+    // with the specific strand's ID appended to the URL.
+    const response = await api.delete(`subjects/${subjectId}/`);
+    
+    // Return the response from the server.
+    return response;
+  } catch (error) {
+    // Log the full error response from the server if available.
+    console.error("Error deleting strand:", error.response?.strandId || error.message);
+    
+    // Re-throw the error so it can be handled by the calling function.
+    throw error;
+  }
+};
+
 
 
 

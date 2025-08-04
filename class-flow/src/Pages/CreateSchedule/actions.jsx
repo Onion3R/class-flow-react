@@ -1,4 +1,3 @@
-// src/programs/program-actions.js
 
 export const actions = (navigate, setOpenDialog, setOpenAlertDialog, setSelectedRow) => [
   {

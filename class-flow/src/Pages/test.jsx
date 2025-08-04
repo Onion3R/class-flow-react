@@ -230,7 +230,7 @@
 // }
 
 import React, { useState, useEffect } from 'react';
-import subjectGetter from './Subject/useSubject'; // Assuming useSubject.js is in the same directory
+import subjectGetter from '../lib/hooks/useSubjectStrand'; // Assuming useSubject.js is in the same directory
 
 function Test() {
   // Get the raw data and loading state from your custom hook

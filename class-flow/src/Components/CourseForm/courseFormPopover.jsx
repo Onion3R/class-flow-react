@@ -19,22 +19,30 @@ import SelectComponent from '../Select/selectComponent';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash } from "lucide-react";
+import { PulseLoader } from "react-spinners";
 
- const semester = [
-    { id: '1', value: '1st Semester' },
-    { id: '2', value: '2nd Semester' },
-  ];
+// Import the data fetching hooks
+import yearLevelsGetter from '@/lib/hooks/useYearLevels';
+import semesterGetter from '@/lib/hooks/useSemester';
+import { createSubjectWithAssignments } from '@/services/apiService';
+import { triggerSubjectStrandRefresh } from '@/lib/hooks/useSubjectStrand';
 
-  const levels = ['Junior' ,' Senior']
-function CourseFormDialog({track, strand}) {
+// Import the API function provided by you
+function SubjectWithAssignmentFormPopover({ track, strand, strandId }) {
+  // Use the new data fetching hooks
+  const { data: allYearLevelData, isLoading: yearLevelIsLoading } = yearLevelsGetter();
+  const { data: allSemesterData, isLoading: semesterIsLoading } = semesterGetter();
+
   const [selectedSemester, setSelectedSemester] = useState('');
   const [selectedYearLevel, setSelectedYearLevel] = useState('');
-  const [activeAccordion, setActiveAccordion] = useState(""); // added
-
- 
+  const [activeAccordion, setActiveAccordion] = useState("");
   const [entries, setEntries] = useState([
-    { courseNumber: '', courseDescription: '', semester: '', lecHours: '', labHours: '' },
+    { subjectCode: '', subjectTitle: '', minutesPerWeek: '' },
   ]);
+  
+  // State for API call feedback
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (index, e) => {
     const { name, value } = e.target;
@@ -48,20 +56,108 @@ function CourseFormDialog({track, strand}) {
   const handleAddEntry = () => {
     setEntries((prev) => [
       ...prev,
-      { courseNumber: '', courseDescription: '', semester: '', lecHours: '', labHours: '' },
+      { subjectCode: '', subjectTitle: '', minutesPerWeek: '' },
     ]);
   };
 
-  const handleSubmit = (e) => {
+  const handleFillingSubjectInfo = (index, e) => {
     e.preventDefault();
-    console.log('Submitted Entries:', entries);
-    // Add your API or state logic here
+    setActiveAccordion("");
+  };
+
+  // The main function to collect and send all data
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    // Find the semester and year level IDs from the data fetched by the hooks
+    const semesterId = allSemesterData.find(s => s.name === selectedSemester)?.id;
+    const yearLevelId = allYearLevelData.find(yl => yl.name === selectedYearLevel)?.id;
+
+    // Log the values for debugging before the API call
+    console.log("Values from form selections:", {
+      selectedSemester,
+      selectedYearLevel,
+      strandId
+    });
+
+    console.log("Resulting IDs from data hooks:", {
+      semesterId,
+      yearLevelId,
+      strandId
+    });
+
+    if (!strandId || !semesterId || !yearLevelId) {
+      const errorMessage = "Invalid or missing IDs for assignments. Please ensure all selections are made and valid data is being passed.";
+      console.error(errorMessage);
+      setError({ message: errorMessage });
+      setIsLoading(false);
+      return;
+    }
+    
+    // Check if subject entries are valid before sending
+    for (const entry of entries) {
+      if (!entry.subjectCode || !entry.subjectTitle || !entry.minutesPerWeek || isNaN(parseInt(entry.minutesPerWeek))) {
+        setError({ message: "All subject fields must be filled out correctly." });
+        setIsLoading(false);
+        return;
+      }
+    }
+
+
+    // Loop through all entries and create a request for each subject
+    for (const entry of entries) {
+      // 1. Format the subject data from the form entry
+      const subjectData = {
+        code: entry.subjectCode,
+        title: entry.subjectTitle,
+        minutes_per_week: parseInt(entry.minutesPerWeek),
+      };
+
+      // 2. Create a single assignment object for this subject
+      const assignmentsData = [{
+        strand_id: strandId,
+        year_level_id: yearLevelId,
+        semester_id: semesterId,
+        is_required: true,
+      }];
+
+      // 3. Create a single payload object that combines subject and assignments data
+      const payload = {
+        subject: subjectData,
+        assignments: assignmentsData
+      };
+
+      // Log the single payload object to be sent for debugging
+      console.log("Payload being sent to API:", payload);
+
+      try {
+        // Now pass the single combined payload object to the API function
+        await createSubjectWithAssignments(payload);
+        triggerSubjectStrandRefresh()
+        setEntries([ { subjectCode: '', subjectTitle: '', minutesPerWeek: '' }])
+        // Success is handled by the component.
+      } catch (err) {
+        console.error("Failed to submit one or more subjects:", err);
+        // Log the detailed API error response for better debugging
+        console.error("API Response Data:", err.response?.data);
+        setError(err.response?.data || { message: "An unexpected error occurred." });
+        // Stop the process if an error occurs and handle it
+        setIsLoading(false);
+        return;
+      }
+    }
+    
+    // Log success after all entries are processed
+    console.log('All subjects submitted successfully!');
+    setIsLoading(false);
   };
 
   const handleDeleteEntry = (index, e) => {
     e.preventDefault();
     setEntries((prev) => prev.filter((_, i) => i !== index));
-    setActiveAccordion(""); // close after delete
+    setActiveAccordion("");
   };
 
   return (
@@ -75,9 +171,17 @@ function CourseFormDialog({track, strand}) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Subjects</DialogTitle>
-              <DialogDescription>You are about to add the track <u>{track}</u>, categorized under the strand <u>{strand}</u>.</DialogDescription>
+            <DialogDescription>You are about to add the track <u>{track}</u>, categorized under the strand <u>{strand}</u>.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="flex flex-col w-full">
+            {/* Display error message if present */}
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                <strong className="font-bold">Error: </strong>
+                <span className="block sm:inline">{error.message}</span>
+              </div>
+            )}
+            
             {entries.map((entry, idx) => {
               const itemId = `entry-${idx}`;
               return (
@@ -95,49 +199,57 @@ function CourseFormDialog({track, strand}) {
                       <div className="gap-2 flex flex-col items-center justify-center w-[95%]">
                         <div className="flex gap-6 items-center justify-between mt-2">
                           <Input
-                            name="courseNumber"
-                            value={entry.courseNumber}
+                            name="subjectCode"
+                            value={entry.subjectCode}
                             onChange={(e) => handleChange(idx, e)}
-                            placeholder="Course Number"
+                            placeholder="Subject code"
                             required
                           />
                           <Input
-                            name="lecHours"
+                            name="minutesPerWeek"
                             type="number"
-                            value={entry.lecHours}
+                            value={entry.minutesPerWeek}
                             min="0"
                             onChange={(e) => handleChange(idx, e)}
-                            placeholder="Class Hours"
+                            placeholder="Minutes per week"
                           />
                         </div>
                         <Input
-                          name="courseDescription"
-                          value={entry.courseDescription}
+                          name="subjectTitle"
+                          value={entry.subjectTitle}
                           onChange={(e) => handleChange(idx, e)}
-                          placeholder="Description"
+                          placeholder="Subject title"
                           className="my-4"
                           required
                         />
                         <div className='flex w-full gap-6'>
-                        <SelectComponent
-                          items={semester.map((s) => s.value)}
-                          label="Semester"
-                          value={selectedSemester}
-                          onChange={setSelectedSemester}
-                          className="!max-w-none !w-full !min-w-none"
-                        />
-                        <SelectComponent
-                          items={levels.map((s) => s)}
-                          label="level"
-                          value={selectedYearLevel}
-                          onChange={setSelectedYearLevel}
-                          className="!max-w-none !w-full !min-w-none"
-                        />
+                          {semesterIsLoading ? (
+                            <div>Loading semesters...</div>
+                          ) : (
+                            <SelectComponent
+                              items={allSemesterData.map((s) => s.name)}
+                              label="Semester"
+                              value={selectedSemester}
+                              onChange={setSelectedSemester}
+                              className="!max-w-none !w-full !min-w-none"
+                            />
+                          )}
+                          {yearLevelIsLoading ? (
+                            <div>Loading year levels...</div>
+                          ) : (
+                            <SelectComponent
+                              items={allYearLevelData.map((s) => s.name)}
+                              label="Year Level"
+                              value={selectedYearLevel}
+                              onChange={setSelectedYearLevel}
+                              className="!max-w-none !w-full !min-w-none"
+                            />
+                          )}
                         </div>
                         <div className="flex w-full items-center justify-center mt-4 gap-7">
                           <Button
                             variant="outline"
-                            onClick={() => setActiveAccordion("")}
+                            onClick={(e) => handleFillingSubjectInfo(idx, e)}
                             className="flex-1 w-full"
                           >
                             Done
@@ -175,8 +287,12 @@ function CourseFormDialog({track, strand}) {
                 </Button>
               </DialogClose>
               <DialogClose asChild>
-                <Button type="submit" variant="default">
-                  Submit All
+                <Button type="submit" variant="default" disabled={isLoading}>
+                  {isLoading ? (
+                    <PulseLoader size={8} color="#ffffff" />
+                  ) : (
+                    'Submit All'
+                  )}
                 </Button>
               </DialogClose>
             </DialogFooter>
@@ -187,4 +303,4 @@ function CourseFormDialog({track, strand}) {
   );
 }
 
-export default CourseFormDialog;
+export default SubjectWithAssignmentFormPopover;

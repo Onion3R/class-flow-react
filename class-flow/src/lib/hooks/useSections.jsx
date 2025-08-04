@@ -1,19 +1,19 @@
-// trackStore.js
+// sectionStore.js
 import { useState, useEffect } from 'react';
-import { getTracks } from '@/services/apiService';
+import { getSections } from '@/services/apiService';
 
 let refreshCallback = () => {};
 
-export const triggerTrackRefresh = () => {
+export const triggerSectionRefresh = () => {
   refreshCallback(); // triggers the actual refetch inside the hook
 };
 
-export default function trackGetter() {
+export default function sectionGetters() {
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({});
   const [refreshToken, setRefreshToken] = useState(0);
 
-  // Register the callback globally
+  // Register global refresh trigger
   useEffect(() => {
     refreshCallback = () => setRefreshToken((prev) => prev + 1);
     return () => {
@@ -21,20 +21,16 @@ export default function trackGetter() {
     };
   }, []);
 
+  // Fetch data when component mounts or when refresh is triggered
   useEffect(() => {
     setIsLoading(true);
-    getTracks()
-      .then((apiData) => {
-        if (Array.isArray(apiData)) {
-          setData(apiData);
-        } else {
-          setData([]);
-          console.warn('getTracks did not return an array. Received:', apiData);
-        }
+    getSections()
+      .then((fetchedData) => {
+        setData(fetchedData);
       })
       .catch((err) => {
-        console.error('Failed to fetch tracks:', err);
-        setData([]);
+        console.error('Failed to fetch sections:', err);
+        setData({});
       })
       .finally(() => setIsLoading(false));
   }, [refreshToken]);

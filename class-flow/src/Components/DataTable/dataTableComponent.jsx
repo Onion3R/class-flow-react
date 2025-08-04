@@ -8,6 +8,7 @@ import AlertDialogComponent from "../AlertDialog/alertDialog"; // (Adjust path)
 export default function DataTableComponent({
   data,
   getColumns,
+  dialogData,
   filteredData,
   filterComboBoxes = [], // Expect the new prop here, default to empty array
   addComponent,
@@ -15,12 +16,12 @@ export default function DataTableComponent({
   const [tableData, setTableData] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
-
+  const [selectedRow, setSelectedRow] = useState()
   useEffect(() => {
     setTableData(data);
   }, [data]);
 
-  const columns = getColumns({ setOpenDialog, setOpenAlertDialog });
+  const columns = getColumns({ setOpenDialog, setOpenAlertDialog, setSelectedRow  });
 
   return (
     <div className="container mx-auto">
@@ -39,6 +40,8 @@ export default function DataTableComponent({
       />
       <AlertDialogComponent
         open={openAlertDialog}
+        selectedRow = {selectedRow}
+        data={ dialogData }
         onOpenChange={setOpenAlertDialog}
       />
     </div>

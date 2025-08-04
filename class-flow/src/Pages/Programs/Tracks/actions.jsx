@@ -1,13 +1,5 @@
-// src/programs/program-actions.js
 
-/**
- * Defines the actions available for a Program row in the DataTable.
- * @param {function} navigate - react-router-dom's navigate function.
- * @param {function} setOpenDialog - State setter for an edit/view dialog.
- * @param {function} setOpenAlertDialog - State setter for a confirmation dialog (e.g., delete).
- * @returns {Array<Object>} An array of action objects.
- */
-export const actions = (navigate, setOpenDialog, setOpenAlertDialog) => [
+export const actions = (navigate, setOpenDialog, setOpenAlertDialog, setSelectedRow ) => [
   {
     id: 'view', // Unique ID for the action
     label: "View Details",
@@ -36,8 +28,7 @@ export const actions = (navigate, setOpenDialog, setOpenAlertDialog) => [
       console.log("Deleting program:", rowData.name);
       // Example: Open a confirmation dialog before deleting
       setOpenAlertDialog(true);
-      // Similarly, pass rowData or its ID to the alert dialog for context
-      // E.g., context.setProgramToDelete(rowData.id);
+     setSelectedRow(rowData)
     },
   },
   // Add more program-specific actions here

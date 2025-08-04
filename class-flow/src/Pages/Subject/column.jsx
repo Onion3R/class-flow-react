@@ -11,8 +11,9 @@ import {
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu"
 import { Fragment } from "react"
+import { useNavigate } from "react-router-dom"; 
 
-export const getColumns = ({ setOpenDialog, setOpenAlertDialog }) => [
+export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow}) => [
     {
         id: "select",
         header: ({ table }) => (
@@ -36,8 +37,8 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog }) => [
         enableHiding: false,
     },
     {
-        // Accessing nested subject.code
-        accessorKey: "subject.code",
+        // Now using the flattened key: subjectCode
+        accessorKey: "subjectCode",
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -48,13 +49,13 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog }) => [
             </Button>
         ),
         cell: ({ row }) => {
-            const subjectCode = row.original.subject?.code; // Safely access nested property
+            const subjectCode = row.original.subjectCode;
             return <div className="font-medium">{subjectCode}</div>;
         },
     },
     {
-        // Accessing nested subject.title
-        accessorKey: "subject.title",
+        // Now using the flattened key: subjectTitle
+        accessorKey: "subjectTitle",
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -65,13 +66,13 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog }) => [
             </Button>
         ),
         cell: ({ row }) => {
-            const subjectTitle = row.original.subject?.title; // Safely access nested property
+            const subjectTitle = row.original.subjectTitle;
             return <div>{subjectTitle}</div>;
         },
     },
     {
-        // Accessing nested year_level.name
-        accessorKey: "year_level.name",
+        // Now using the flattened key: yearLevelName
+        accessorKey: "yearLevelName",
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -82,13 +83,13 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog }) => [
             </Button>
         ),
         cell: ({ row }) => {
-            const yearLevelName = row.original.year_level?.name; // Safely access nested property
+            const yearLevelName = row.original.yearLevelName;
             return <div>{yearLevelName}</div>;
         },
     },
     {
-        // Accessing nested semester.name
-        accessorKey: "semester.name",
+        // Now using the flattened key: semesterName
+        accessorKey: "semesterName",
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -99,31 +100,26 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog }) => [
             </Button>
         ),
         cell: ({ row }) => {
-            const semesterName = row.original.semester?.name; // Safely access nested property
+            const semesterName = row.original.semesterName;
             return <div>{semesterName}</div>;
         },
-        // This `filterFn` can be useful if you're using React Table's built-in filtering
-        // and want to filter by the semester's name or ID.
-        // For the ComboBox, it will directly use the accessorKey and the filter value.
     },
     {
-        // Accessing nested subject.minutes_per_week as Lec/Lab Hours (adjust as needed)
-        // You might need to derive these if 'minutes_per_week' is the only field
-        // or check your API for separate Lec/Lab hour fields.
-        // For now, let's display minutes_per_week and you can map it to your needs.
-        accessorKey: "subject.minutes_per_week",
-        header: "Minutes Per Week", // Consider renaming this to reflect the data
+        // Now using the flattened key: minutesPerWeek
+        accessorKey: "minutesPerWeek",
+        header: "Minutes Per Week",
         cell: ({ row }) => {
-            const minutes = row.original.subject?.minutes_per_week;
-            return <div>{minutes || 'N/A'}</div>; // Display value or 'N/A'
+            const minutes = row.original.minutesPerWeek;
+            return <div>{minutes || 'N/A'}</div>;
         }
     },
     {
         id: "actions",
         cell: ({ row }) => {
+            const navigate = useNavigate();
             const rowData = row.original;
-            const menuActions = actions(setOpenDialog, setOpenAlertDialog);
-
+            // Get the actions from the generic 'actions.js'
+            const menuActions = actions(navigate, setOpenDialog, setOpenAlertDialog, setSelectedRow);
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

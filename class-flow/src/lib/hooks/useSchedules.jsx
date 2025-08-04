@@ -1,49 +1,42 @@
-// strandStore.js
-import { getStrands } from '@/services/apiService';
+// useSchedule.js
 import { useState, useEffect } from 'react';
+import { getSchedules } from '@/services/apiService';
 
 let refreshCallback = () => {};
 
-export const triggerRefresh = () => {
+export const triggerScheduleRefresh = () => {
   refreshCallback(); // triggers the actual refetch inside the hook
 };
 
-// Custom hook
-export default function strandGetter() {
-  const [data, setData] = useState([]);
+export default function useSchedule() {
   const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState([]);
   const [refreshToken, setRefreshToken] = useState(0);
 
-  // Expose how to trigger refresh globally
   useEffect(() => {
     refreshCallback = () => setRefreshToken((prev) => prev + 1);
     return () => {
-      // Cleanup to avoid memory leaks
       refreshCallback = () => {};
     };
   }, []);
 
-  // Fetch data whenever refreshToken changes
   useEffect(() => {
     setIsLoading(true);
-    getStrands()
+    getSchedules()
       .then((apiData) => {
         if (Array.isArray(apiData)) {
           setData(apiData);
         } else {
-          console.warn('Invalid data format:', apiData);
           setData([]);
+          console.warn('getSchedules did not return an array. Received:', apiData);
         }
       })
       .catch((err) => {
-        console.error('Failed to fetch strands:', err);
+        console.error('Failed to fetch schedules:', err);
         setData([]);
       })
       .finally(() => setIsLoading(false));
   }, [refreshToken]);
 
-  return {
-    data,
-    isLoading,
-  };
+  return { data, isLoading };
 }

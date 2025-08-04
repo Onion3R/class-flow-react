@@ -8,7 +8,7 @@ import Page1 from "./Pages/Page1/page1";
 import Subject from "./Pages/Subject/subject";
 import InstructorDetail from "./Pages/InstructorDetail/instructorDetail";
 import RegularView from "./Pages/RegularView/regularView";
-import GenerateSchedule from "./Pages/GenerateSchedule/generateSchedule";
+
 import Rooms from "./Pages/Rooms/roomPage";
 import Programs from "./Pages/Programs/programs";
 
@@ -23,6 +23,9 @@ import AuthenticationLayout from "./AuthenticationLayout"; // For login register
 
 // Schedule Pages
 import Schedules from "./Pages/Schedules/schedules";
+import CreateSchedule from "./Pages/CreateSchedule/createSchedule";
+import GenerateSchedule from "./Pages/GenerateSchedule/generateSchedule";
+
 // import FreshmenSchedPage from "./Pages/Schedules/freshmenSchedPage";
 // import SophomoreSchedPage from "./Pages/Schedules/sophomoreSchedPage";
 import JuniorSchedPage from "./Pages/Schedules/juniorSchedPage";
@@ -55,7 +58,8 @@ const AppRoutes = () => {
           <Route path="programs" element={<Programs />} />
           <Route path="room" element={<Rooms />} />
           <Route path="team/instructor-detail/:id" element={<InstructorDetail />} />
-          <Route path="generate-schedule" element={<GenerateSchedule />} />
+          <Route path="create-schedule" element={<CreateSchedule />} />
+          <Route path="generate-schedule" element={<GenerateSchedule/>} />
 
             {/* Schedule per Level */}
          <Route path="schedules" >
