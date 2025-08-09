@@ -1,6 +1,6 @@
-// subjectStore.js
-import { useState, useEffect } from 'react';
+// strandStore.js
 import { getSubjectStrand } from '@/services/apiService';
+import { useState, useEffect } from 'react';
 
 let refreshCallback = () => {};
 
@@ -8,19 +8,22 @@ export const triggerSubjectStrandRefresh = () => {
   refreshCallback(); // triggers the actual refetch inside the hook
 };
 
-export default function subjectStrandGetter() {
-  const [isLoading, setIsLoading] = useState(false);
+// Custom hook
+export default function useSubjectStrandGetter() {
   const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [refreshToken, setRefreshToken] = useState(0);
 
-  // Register the callback globally
+  // Expose how to trigger refresh globally
   useEffect(() => {
     refreshCallback = () => setRefreshToken((prev) => prev + 1);
     return () => {
+      // Cleanup to avoid memory leaks
       refreshCallback = () => {};
     };
   }, []);
 
+  // Fetch data whenever refreshToken changes
   useEffect(() => {
     setIsLoading(true);
     getSubjectStrand()
@@ -28,16 +31,19 @@ export default function subjectStrandGetter() {
         if (Array.isArray(apiData)) {
           setData(apiData);
         } else {
+          console.warn('Invalid data format:', apiData);
           setData([]);
-          console.warn('getSubjectStrand did not return an array. Received:', apiData);
         }
       })
       .catch((err) => {
-        console.error('Failed to fetch subject strands:', err);
+        console.error('Failed to fetch strands:', err);
         setData([]);
       })
       .finally(() => setIsLoading(false));
   }, [refreshToken]);
 
-  return { data, isLoading };
+  return {
+    data,
+    isLoading,
+  };
 }

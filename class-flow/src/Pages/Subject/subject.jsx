@@ -9,8 +9,9 @@ import {
     TabsList,
     TabsTrigger,
 } from "@Components/ui/tabs";
+import { ExternalLink } from 'lucide-react';
 import SubjectWithAssignmentFormPopover from '@/Components/CourseForm/courseFormPopover';
-import { Card, CardContent } from '@/Components/ui/card';
+import { Card, CardContent, CardDescription, CardTitle, CardHeader} from '@/Components/ui/card';
 
 import trackGetter from '@/lib/hooks/useTracks';
 import strandGetter from '@/lib/hooks/useStrands';
@@ -116,22 +117,22 @@ function SubjectPage() {
         setSelectedStrandCode(newStrandCode);
     };
 
+
     return (
-        <div className='h-screen flex justify-center'>
-            <div className="p-4 container ">
-               
+        <div className="min-h-screen flex justify-center bg-background">
+            <div className="container p-6">
                 <Tabs
-                    value={String(selectedTrackId || '')}
-                    onValueChange={(value) => setSelectedTrackId(Number(value))}
+                    value={selectedTrackId ? String(selectedTrackId) : ''}
+                    onValueChange={value => setSelectedTrackId(Number(value))}
                 >
-                    <div className='flex items-center justify-between'>
-                        <div className='flex gap-5 items-center justify-center h-8'>
-                            <h1 className="text-2xl font-bold my-2 container mx-auto">Subjects</h1>
-                            <Separator orientation='vertical' className='!h-6 !w-[2px]' />
-                            <TabsList className="rounded-[2px] shadow-2xl border border-dashed bg-gray-200 dark:bg-transparent">
-                                {Array.isArray(allTrackData) && allTrackData.map((track) => (
+                    <div className="flex items-center sm:items-start justify-between mb-4 sm:mb-none ">
+                        <div className="flex sm:flex-row sm:gap-5 gap-2 sm:items-center items-start flex-col ">
+                            <h1 className="text-2xl font-bold">Subjects</h1>
+                            <Separator orientation="vertical" className="!h-6 !w-[2px] sm:block hidden " />
+                            <TabsList className="rounded shadow border border-dashed bg-muted dark:bg-transparent">
+                                {Array.isArray(allTrackData) && allTrackData.map(track => (
                                     <TabsTrigger
-                                        className='rounded-[2px] shadow-2xl'
+                                        className="rounded px-3 py-1"
                                         value={String(track.id)}
                                         key={track.id}
                                     >
@@ -142,48 +143,66 @@ function SubjectPage() {
                         </div>
                         <PulseLoader size={6} loading={overallLoading} />
                     </div>
-                    <Card className='bg-transparent mt-1'>
-                        <CardContent>
-                        {Array.isArray(allTrackData) && allTrackData.map((track) => (
-                            <TabsContent value={String(track.id)} key={track.id}>
-                                <TabsComponent
-                                    data={flattenedSubjects}
-                                    getColumns={getColumns}
-                                    dialogData={{ // <-- Corrected spelling
-                                        id: 'subject',
-                                        desc: "This action cannot be undone. This will permanently delete your account and remove your data from our servers."
-                                    }}
-                                    filteredData={{ columnId: "subjectTitle", label: "Title" }}
-                                    filterComboBoxes={[
-                                        {
-                                            columnId: "yearLevelName",
-                                            label: "Year Level",
-                                            labelFormatter: (value) => value,
-                                        },
-                                        {
-                                            columnId: "semesterName",
-                                            label: "Semester",
-                                            labelFormatter: (value) => value,
-                                        },
-                                    ]}
-                                    tabList={strandsForCurrentTrack.map(s => ({ value: s.code, label: s.code }))}
-                                    addComponent={
-                                        <SubjectWithAssignmentFormPopover
-                                            track={trackNameForForm}
-                                            strand={strandCodeForForm}
-                                            strandId={selectedStrandId}
+                    <Card className="bg-transparent !gap-2">
+                       <CardHeader className= {strandsForCurrentTrack && strandsForCurrentTrack.length > 0 ? 'block' : 'hidden' }>
+                            <CardTitle>Add Subjects</CardTitle>
+                            <CardDescription >
+                            You can manage sections here.
+                            </CardDescription>
+                       </CardHeader>
+                        <CardContent >
+                            {strandsForCurrentTrack && strandsForCurrentTrack.length > 0 ? (
+                                Array.isArray(allTrackData) && allTrackData.map(track => (
+                                    <TabsContent value={String(track.id)} key={track.id} className='w-full '>
+                                        <TabsComponent
+                                            data={flattenedSubjects}
+                                            getColumns={getColumns}
+                                            dialogData={{
+                                                id: 'subject',
+                                                desc: "This action cannot be undone. This will permanently delete your account and remove your data from our servers."
+                                            }}
+                                            filteredData={{ columnId: "subjectTitle", label: "Title" }}
+                                            filterComboBoxes={[
+                                                {
+                                                    columnId: "yearLevelName",
+                                                    label: "Year Level",
+                                                    labelFormatter: value => value,
+                                                },
+                                                {
+                                                    columnId: "semesterName",
+                                                    label: "Semester",
+                                                    labelFormatter: value => value,
+                                                },
+                                            ]}
+                                            tabList={strandsForCurrentTrack.map(s => ({ value: s.code, label: s.code }))}
+                                            addComponent={
+                                                <SubjectWithAssignmentFormPopover
+                                                    track={trackNameForForm}
+                                                    strand={strandCodeForForm}
+                                                    strandId={selectedStrandId}
+                                                />
+                                            }
+                                            isLoading={overallLoading}
+                                            onStrandChange={handleStrandChange}
+                                            selectedStrandTab={selectedStrandCode}
                                         />
-                                    }
-                                    isLoading={overallLoading}
-                                    onStrandChange={handleStrandChange}
-                                    selectedStrandTab={selectedStrandCode}
-                                />
-                            </TabsContent>
-                        ))}
+                                    </TabsContent>
+                                ))
+                            ) : (
+                               <div className="flex flex-col sm:flex-row items-center justify-center w-full text-sm text-muted-foreground text-center sm:text-left">
+                                    <span>
+                                        This track doesn't have any strand and subjects. Go to
+                                    </span>
+                                    <span className="font-medium mx-1">Programs</span>
+                                    <span className='flex items-center justify-center'>to create them.<ExternalLink className="w-4 h-4 ml-1 mt-1 sm:mt-0" /></span>
+                                    
+                                    
+                                    </div>
+
+                            )}
                         </CardContent>
                     </Card>
                 </Tabs>
-                
             </div>
         </div>
     );

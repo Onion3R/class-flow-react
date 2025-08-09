@@ -9,7 +9,7 @@ import Subject from "./Pages/Subject/subject";
 import InstructorDetail from "./Pages/InstructorDetail/instructorDetail";
 import RegularView from "./Pages/RegularView/regularView";
 
-import Rooms from "./Pages/Rooms/roomPage";
+
 import Programs from "./Pages/Programs/programs";
 
 // import LoginPage from "./Pages/loginPage";
@@ -29,7 +29,7 @@ import GenerateSchedule from "./Pages/GenerateSchedule/generateSchedule";
 // import FreshmenSchedPage from "./Pages/Schedules/freshmenSchedPage";
 // import SophomoreSchedPage from "./Pages/Schedules/sophomoreSchedPage";
 import JuniorSchedPage from "./Pages/Schedules/juniorSchedPage";
-import SeniorSchedPage from "./Pages/Schedules/seniorSchedPage";
+// import SeniorSchedPage from "./Pages/Schedules/seniorSchedPage";
 
 
 const AppRoutes = () => {
@@ -56,7 +56,6 @@ const AppRoutes = () => {
           <Route path="subject" element={<Subject />} />
           <Route path="team" element={<Page1 />} />
           <Route path="programs" element={<Programs />} />
-          <Route path="room" element={<Rooms />} />
           <Route path="team/instructor-detail/:id" element={<InstructorDetail />} />
           <Route path="create-schedule" element={<CreateSchedule />} />
           <Route path="generate-schedule" element={<GenerateSchedule/>} />
@@ -67,7 +66,7 @@ const AppRoutes = () => {
             {/* <Route path="freshmen" element={<FreshmenSchedPage />} />
             <Route path="sophomore" element={<SophomoreSchedPage />} /> */}
             <Route path="junior" element={<JuniorSchedPage />} />
-            <Route path="senior" element={<SeniorSchedPage />} />
+            {/* <Route path="senior" element={<SeniorSchedPage />} /> */}
           </Route>
 
         </Route>

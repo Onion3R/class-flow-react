@@ -191,7 +191,7 @@ function SectionFormPopover() {
                             placeholder="section name"
                             required
                           />
-                        <div className="flex gap-6 items-center justify-between mt-2  w-full">
+                        <div className="flex sm:flex-row flex-col gap-6 items-center justify-between mt-2  w-full">
                          {yearLevelIsLoading ? (
                            <div>Loading year level...</div>
                         ) : (
@@ -200,7 +200,7 @@ function SectionFormPopover() {
                               label="Select year level"
                               value={entry.selectedYearLevel}
                               onChange={(value) => handleYearLevelChange(idx, value)}
-                              className="!max-w-none !w-full my-2 !min-w-none"
+                              className="!max-w-none !w-full sm:my-2 my-0 !min-w-none"
                            />
                         )}
                           {strandIsLoading ? (
@@ -211,7 +211,7 @@ function SectionFormPopover() {
                               label="Select Strand"
                               value={entry.selectedStrand}
                               onChange={(value) => handleStrandChange(idx, value)}
-                              className="!max-w-none !w-full my-2 !min-w-none"
+                              className="!max-w-none !w-full sm:my-2  my-0 !min-w-none"
                            />
                         )}
                         </div>

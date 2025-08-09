@@ -124,8 +124,8 @@ export function DataTable({
             }
           />
         </div>
-        <div className="w-full max-w-[calc(100% - 24rem)] flex justify-between items-center mt-2 sm:mt-0">
-          <div className="flex gap-2">
+        <div className="w-full max-w-[calc(100% - 24rem)] flex sm:flex-row flex-col  sm:justify-between  sm:items-center items-start mt-2 sm:mt-0">
+          <div className="flex gap-2 sm:mb-0 mb-2">
             {/* Dynamically render ComboBoxes based on filterComboBoxes prop */}
             {filterComboBoxes.map((filterDef, index) => {
               const options = getComboBoxOptions(filterDef.columnId, filterDef.labelFormatter);
@@ -142,6 +142,7 @@ export function DataTable({
                         !value || value.length === 0 ? undefined : value
                       );
                     }}
+                    className='w-full'
                   />
                 )
               );

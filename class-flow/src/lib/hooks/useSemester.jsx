@@ -8,7 +8,7 @@ export const triggerRefreshSemester = () => {
   refreshSemesterCallback(); // triggers the actual refetch inside the hook
 };
 
-export default function semesterGetter() {
+export default function useSemesterGetter() {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshToken, setRefreshToken] = useState(0);

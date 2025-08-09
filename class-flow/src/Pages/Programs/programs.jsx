@@ -61,9 +61,9 @@ function Programs() {
       <div className="p-4 container ">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <div className='flex items-center justify-between'>
-            <div className='flex gap-5 items-center justify-center h-8'>
+            <div className='flex sm:flex-row flex-col sm:gap-5 gap-2 sm:items-center items-start justify-center h-auto '>
               <h1 className="text-2xl font-bold my-2 container mx-auto">Academic Programs</h1>
-              <Separator orientation='vertical' className='!h-6 !w-[2px]' />
+              <Separator orientation='vertical' className='!h-6 !w-[2px] sm:block hidden ' />
               <TabsList className="rounded-[2px] shadow-2xl border border-dashed bg-gray-200 dark:bg-transparent">
                 {tablist.map((tabName) => (
                   <TabsTrigger className='rounded-[2px]' key={tabName} value={tabName}>{tabName}</TabsTrigger>

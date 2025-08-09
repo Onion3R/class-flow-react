@@ -2,7 +2,7 @@ import React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from '@Components/ui/button'
 import AvatarPopUpComponent from '@/Components/AvatarPopUp/avatarPopUpComponent'
-import  ScheduleTableComponent  from '@/Components/Tabs/sheduleTableComponent'
+// import  ScheduleTableComponent  from '@/Components/Tabs/sheduleTableComponent'
 import columns from "./column"
 import { TableComponent } from '@/Components/Table/tableComponent'
 import {data} from "./class-data"

@@ -22,8 +22,17 @@ function Page1() {
   return (
     <div className="h-screen max-h-[calc(100vh-29px)]  ">
       <div className="p-4 sm:w-auto   ">
-        <h1 className="text-2xl font-bold mb-4 container mx-auto">Instructors</h1>
-        <DataTableComponent data={teachers} getColumns={getColumns} filteredData='email' comboFilteredData="subject" addComponent={<ShareDialog />} />
+        <h1 className="text-2xl font-bold mb-4 container mx-auto">Teachers</h1>
+        <DataTableComponent 
+        data={teachers} 
+        getColumns={getColumns} 
+        dialogData={{ // <-- Corrected spelling
+                          id: 'section',
+                          desc: "This action cannot be undone. This will permanently delete your account and remove your data from our servers."
+                      }}
+        filteredData={{ columnId: "name", label: "section name" }}
+         filterComboBoxes={[]}
+        addComponent={<ShareDialog  />} />
       </div>
     </div>
   )

@@ -23,7 +23,7 @@ import {
 
 
 
-export function ComboBox({data,label, setComboBoxHasSelectedItem, setFilterValue ,comboFilteredData}) {
+export function ComboBox({data,label, setComboBoxHasSelectedItem, setFilterValue ,comboFilteredData, className}) {
   const [comboFilters, setComboFilters] = useState([])
   const [open, setOpen] = useState(false)
   const [selectedItems, setSelectedItems] = useState([])
@@ -66,13 +66,13 @@ export function ComboBox({data,label, setComboBoxHasSelectedItem, setFilterValue
 
   return (
     <div className="flex items-center justify-between"> 
-      <Popover open={open} onOpenChange={setOpen} className="">
+      <Popover open={open} onOpenChange={setOpen} >
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-auto flex justify-between items-center border-dashed mr-1 rounded-md"
+            className={`w-auto flex justify-between items-center border-dashed mr-1 rounded-md ${className}` }
           >
             <CirclePlus className="shrink-0 " />
             <div className="hidden sm:flex">
@@ -91,7 +91,7 @@ export function ComboBox({data,label, setComboBoxHasSelectedItem, setFilterValue
             {selectedItems.length > 0 ? (
               (<span className="mx-0.5 text-[13px] p-1 bg-secondary rounded">{selectedItems.length} selected</span>)
             ) : (
-              comboFilteredData
+              label
             )}
           </div>
           </Button>

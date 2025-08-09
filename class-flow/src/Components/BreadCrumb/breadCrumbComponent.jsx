@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,65 +6,61 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-
+} from "@/components/ui/breadcrumb";
 import { useLocation } from "react-router-dom";
 
-function   BreadCrumbComponent() {
-     let location = useLocation();
-  const [breadcrumbItem, setBreadcrumbItem] = useState([])
+function BreadCrumbComponent() {
+  const location = useLocation();
+  const [breadcrumbItems, setBreadcrumbItems] = useState([]);
+
   useEffect(() => {
-    setBreadcrumbItem(formatPath(location.pathname))
-  }, [location])
+    setBreadcrumbItems(formatPath(location.pathname));
+  }, [location]);
 
   function formatPath(pathname) {
+    const segments = pathname
+      .split("/")
+      .filter((part) => part && part !== "admin");
 
-  let path = []
-  const segments = pathname
-  .split("/")
-  .filter((part) => part && part !== "admin"); 
+    return segments.map((segment, index) => {
+      // Capitalize each word in kebab-case
+      const formatted = segment
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
 
- 
- segments.forEach((s) => {
-  const capitalized = s.charAt(0).toUpperCase() + s.slice(1);
-   const segmentPath = pathname.split("/").filter(Boolean);
-  const detailIndex = segmentPath.indexOf(s);
-  const url = "/" + segmentPath.slice(0, detailIndex + 1 ).join("/");
+      const url = "/" + segments.slice(0, index + 1).join("/");
 
-  path.push({ path: capitalized, url });
-});
+      return { path: formatted, url };
+    });
+  }
 
- if (path.length === 0) return "";
-return path;
-}
   return (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink href="/admin">Home</BreadcrumbLink>
         </BreadcrumbItem>
-        {breadcrumbItem.length > 0 &&  <BreadcrumbSeparator />}
-       
-         {
-         
-           breadcrumbItem.length > 0 &&
-         breadcrumbItem.map((item, index) => {
-          if(index === breadcrumbItem.length -1  ) {
-            return  <BreadcrumbPage key={index}>{item.path}</BreadcrumbPage>
-          } else {
-            return (<>
-            <BreadcrumbItem key={index}>
-              <BreadcrumbLink href={item.url}>{item.path}</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-          </>)
-          }
-         })
-        
-        }
+
+        {breadcrumbItems.length > 0 && <BreadcrumbSeparator />}
+
+        {breadcrumbItems.map((item, index) => {
+          const isLast = index === breadcrumbItems.length - 1;
+
+          return isLast ? (
+            <BreadcrumbPage key={index}>{item.path}</BreadcrumbPage>
+          ) : (
+            <React.Fragment key={index}>
+              <BreadcrumbItem>
+                <BreadcrumbLink href={item.url}>{item.path}</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+            </React.Fragment>
+          );
+        })}
       </BreadcrumbList>
     </Breadcrumb>
-  )
+  );
 }
 
-export default BreadCrumbComponent
+export default BreadCrumbComponent;

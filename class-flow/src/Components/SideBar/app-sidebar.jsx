@@ -9,8 +9,7 @@ import {
   AudioWaveform,
   MessageSquare,
   GalleryVerticalEnd,
-  ChartNoAxesGantt,
-  LayoutGrid} from "lucide-react"
+  ChartNoAxesGantt} from "lucide-react"
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import {
@@ -76,11 +75,7 @@ const data2 = {
                 url: "programs",
                 icon: ChartNoAxesGantt,
             } ,
-            {
-                title: "Rooms",
-                url: "room",
-                icon: LayoutGrid,
-            }    
+           
           ]
       },
       {

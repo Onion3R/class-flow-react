@@ -1,7 +1,7 @@
 import { getYearLevels } from '@/services/apiService';
 import { useState, useEffect } from 'react';
 
-export default function yearLevelsGetter() {
+export default function useYearLevelsGetter() {
   const [isLoading, setIsLoading] = useState(false);
   // Initialize 'data' as an empty array to ensure .map() always works
   const [data, setData] = useState([]);

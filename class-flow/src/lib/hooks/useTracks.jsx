@@ -8,7 +8,7 @@ export const triggerTrackRefresh = () => {
   refreshCallback(); // triggers the actual refetch inside the hook
 };
 
-export default function trackGetter() {
+export default function useTrackGetter() {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
   const [refreshToken, setRefreshToken] = useState(0);

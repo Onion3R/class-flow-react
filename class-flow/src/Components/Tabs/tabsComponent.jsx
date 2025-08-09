@@ -32,6 +32,7 @@ export default function TabsComponent({
         onStrandChange(tabList[0].value); // Set initial selected strand to the value of the first one
       }
     }
+    console.log(tabList)
   }, [tabList, selectedStrandTab, onStrandChange]);
 
 

@@ -12,7 +12,7 @@ import {
 } from "@/Components/ui/dropdown-menu"
 import { useNavigate } from "react-router-dom"
 import { Fragment } from "react"
-export const getColumns = ( {setOpenDialog, setOpenAlertDialog} ) => [
+export const getColumns = ( {setOpenDialog, setOpenAlertDialog, setSelectedRow} ) => [
   
    {
     id: "select",
@@ -96,7 +96,7 @@ export const getColumns = ( {setOpenDialog, setOpenAlertDialog} ) => [
     cell: ({ row }) => {
       const navigate = useNavigate()
       const rowData = row.original;
-      const menuActions = actions(navigate ,setOpenDialog, setOpenAlertDialog); 
+      const menuActions = actions(navigate ,setOpenDialog, setOpenAlertDialog, setSelectedRow); 
       
 
       return (

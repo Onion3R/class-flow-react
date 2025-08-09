@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 
 let refreshCallback = () => {};
 
-export const triggerRefresh = () => {
+export const triggerStrandRefresh = () => {
   refreshCallback(); // triggers the actual refetch inside the hook
 };
 
 // Custom hook
-export default function strandGetter() {
+export default function useStrandGetter() {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshToken, setRefreshToken] = useState(0);

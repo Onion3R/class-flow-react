@@ -5,6 +5,18 @@ export const getSubjects = async () => {
   const response = await api.get('subjects/');
   return response.data;
 };
+export const getSubjectById = async (subjectId) => {
+
+  try {
+    
+  const response = await api.get(`subjects/${subjectId}/`);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating main schedule:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
 export const getStrands = async () => {
   const response = await api.get('strands/');
   return response.data;
@@ -26,6 +38,18 @@ export const getSubjectStrand = async () => {
   return response.data;
 };
 
+
+
+export const createSubjectStrand = async (scheduleData) => {
+  try {
+    const response = await api.post('strand-subjects/', scheduleData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating schedule strand:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
 export const getYearLevels = async () => {
   const response = await api.get('yearlevels/');
   return response.data;
@@ -37,31 +61,19 @@ export const getSemester = async () => {
 };
 
 
-// CORRECTED: getRooms should fetch from 'rooms/'
-export const getRooms = async () => {
-  const response = await api.get('rooms/');
-  return response.data;
-};
-
-// CORRECTED: getRoomSchedule should fetch from 'roomschedules/'
-export const getRoomSchedule = async () => {
-  const response = await api.get('roomschedules/');
-  return response.data;
-};
-
-
 export const getTeachers = async () => {
   const response = await api.get('teachers/');
   return response.data;
 };
 
-export const getScheduleClasses = async () => {
-  const response = await api.get('scheduledclasses/');
+export const getSchedules = async () => {
+  const response = await api.get('schedules/');
   return response.data;
 };
 
-export const getSchedules = async () => {
-  const response = await api.get('schedules/');
+
+export const getGeneratedSchedules = async () => {
+  const response = await api.get('generated-schedules/');
   return response.data;
 };
 
@@ -75,69 +87,36 @@ export const createSchedule = async (scheduleData) => {
   }
 };
 
-// --- MODIFIED/NEW FUNCTIONS FOR SINGLE ITEM POSTS ---
-
-// Renamed from createSectionCourses to createSectionCourse (singular)
-export const createSectionCourse = async (courseData) => {
+export const getFilteredScheduleById = async (scheduleId) => {
   try {
-    const response = await api.post('courses/', courseData);
+    const response = await api.get(`timetable/?generated_schedule_id=${scheduleId}` );
     return response.data;
   } catch (error) {
-    console.error("Error creating section course:", error.response?.data || error.message);
+    console.error("Error creating main schedule:", error.response?.data || error.message);
     throw error;
   }
 };
 
-// Renamed from createInstructorSchedules to createInstructorSchedule (singular)
-export const createInstructorSchedule = async (instructorScheduleData) => {
-  try {
-    const response = await api.post('instructor-schedules/', instructorScheduleData);
-    return response.data;
-  } catch (error) {
-    console.error("Error creating instructor schedule:", error.response?.data || error.message);
-    throw error;
-  }
-};
 
-// Renamed from createRoomSchedules to createRoomSchedule (singular)
-export const createRoomSchedule = async (roomScheduleData) => {
-  try {
-    const response = await api.post('roomschedules/', roomScheduleData);
-    return response.data;
-  } catch (error) {
-    console.error("Error creating room schedule:", error.response?.data || error.message);
-    throw error;
-  }
-};
 
-// This one was already singular in concept, but keeping the naming consistent
-export const createGeneratedSchedule = async (generatedScheduleData) => {
+export const deleteSchedule = async (scheduleId) => {
   try {
-    const response = await api.post('generatedschedules/', generatedScheduleData);
-    return response.data;
-  } catch (error) {
-    console.error("Error creating generated schedule entry:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-// ** NEW FUNCTION TO ADD **
-export const sendGenerateRequest = async (override, scheduleId, yearLevel, scheduleName) => {
-  try {
-    const data = {
-      schedule_id: scheduleId,      // Correct: Matches backend 'schedule_id'
-      year_level_id: yearLevel,     // <--- CORRECTED: Now matches backend 'year_level_id'
-      name: scheduleName,           // <--- CORRECTED: Now matches backend 'name'
-      override: override            // Correct: Matches backend 'override'
-    };
-    console.log("Sending generate request data (corrected keys):", data); // Added (corrected keys) for clarity
-    const response = await api.post('generate-schedule/', data);
+    // Log the ID of the strand we are about to delete for debugging.
+    console.log("Deleting strand with ID:", scheduleId);
+    const response = await api.delete(`schedules/${scheduleId}/`);
+    
+    // Return the response from the server.
     return response;
   } catch (error) {
-    console.error("Error triggering schedule generation:", error.response?.data || error.message);
+    // Log the full error response from the server if available.
+    console.error("Error deleting strand:", error.response?.strandId || error.message);
+    
+    // Re-throw the error so it can be handled by the calling function.
     throw error;
   }
 };
+
+
 
 
 export const createSubjectWithAssignments = async (payload) => {
@@ -159,7 +138,7 @@ export const createSubjectWithAssignments = async (payload) => {
 export const createTrack = async (data) => {
   try {
    
-    console.log("Sending subject and assignment data:", data);
+    console.log("Sending tack and assignment data:", data);
     
     // Using api.post to send the combined payload to the specified endpoint.
     const response = await api.post('tracks/', data);
@@ -167,7 +146,7 @@ export const createTrack = async (data) => {
     return response;
   } catch (error) {
     // Log the full error response from the server if available.
-    console.error("Error creating subject and assignments:", error.response?.payload || error.message);
+    console.error("Error creating track and assignments:", error.response?.payload || error.message);
     throw error;
   }
 };
@@ -176,9 +155,6 @@ export const deleteTrack = async (trackIds) => {
   try {
     // Log the ID of the strand we are about to delete for debugging.
     console.log("Deleting strand with ID:", trackIds);
-    
-    // Use api.delete to send a DELETE request to the 'strands' endpoint
-    // with the specific strand's ID appended to the URL.
     const response = await api.delete(`tracks/${trackIds}/`);
     
     // Return the response from the server.
@@ -196,7 +172,7 @@ export const deleteTrack = async (trackIds) => {
 export const createStrand = async (data) => {
   try {
    
-    console.log("Sending subject and assignment data:", data);
+    console.log("Sending strand and assignment data:", data);
     
     // Using api.post to send the combined payload to the specified endpoint.
     const response = await api.post('strands/', data);
@@ -204,7 +180,7 @@ export const createStrand = async (data) => {
     return response;
   } catch (error) {
     // Log the full error response from the server if available.
-    console.error("Error creating subject and assignments:", error.response?.payload || error.message);
+    console.error("Error creating strand and assignments:", error.response?.payload || error.message);
     throw error;
   }
 };
@@ -233,7 +209,7 @@ export const deleteStrand = async (strandId) => {
 export const createSection = async (data) => {
   try {
    
-    console.log("Sending subject and assignment data:", data);
+    console.log("Sending section and assignment data:", data);
     
     // Using api.post to send the combined payload to the specified endpoint.
     const response = await api.post('sections/', data);
@@ -241,7 +217,7 @@ export const createSection = async (data) => {
     return response;
   } catch (error) {
     // Log the full error response from the server if available.
-    console.error("Error creating subject and assignments:", error.response?.payload || error.message);
+    console.error("Error creating section and assignments:", error.response?.payload || error.message);
     throw error;
   }
 };
@@ -250,7 +226,7 @@ export const createSection = async (data) => {
 export const deleteSection = async (sectionId) => {
   try {
     // Log the ID of the strand we are about to delete for debugging.
-    console.log("Deleting strand with ID:", sectionId);
+    console.log("Deleting section with ID:", sectionId);
     
     // Use api.delete to send a DELETE request to the 'strands' endpoint
     // with the specific strand's ID appended to the URL.
@@ -286,21 +262,56 @@ export const deleteSubject = async (subjectId) => {
     throw error;
   }
 };
+export const deleteSubjectStrand = async (subjectId) => {
+  try {
+    // Log the ID of the strand we are about to delete for debugging.
+    console.log("Deleting subject strand with ID:", subjectId);
+    
+    // Use api.delete to send a DELETE request to the 'strands' endpoint
+    // with the specific strand's ID appended to the URL.
+    const response = await api.delete(`strand-subjects/${subjectId}/`);
+    
+    // Return the response from the server.
+    return response;
+  } catch (error) {
+    // Log the full error response from the server if available.
+    console.error("Error deleting strand:", error.response?.strandId || error.message);
+    
+    // Re-throw the error so it can be handled by the calling function.
+    throw error;
+  }
+};
+
+
+
+
+export const  generateSchedule = async (data) => {
+  try {
+   
+    console.log("Sending subject and assignment data:", data); 
+    // Using api.post to send the combined payload to the specified endpoint.
+    const response = await api.post('generate-schedule/', data);
+    return response;
+  } catch (error) {
+    // Log the full error response from the server if available.
+    console.error("Error generating schedules:", error.response?.payload || error.message);
+    throw error;
+  }
+};
 
 
 
 
 
-// src/services/apiService.js
 
-/**
- * Mocks an API call to generate an invitation link.
- * Replace this with your actual backend API call when ready.
- *
- * @param {string} role - The role for the invited user (e.g., 'admin', 'instructor').
- * @param {number|null} expirationDays - Number of days until the link expires, or null for no expiration.
- * @returns {Promise<{invite_url: string}>} - A promise that resolves with the generated invitation URL.
- */
+
+
+
+
+
+
+
+
 export async function generateInviteLink(role, expirationDays) {
     console.log("MOCK API CALL (NO BACKEND): Generating link for role:", role, "expiration:", expirationDays, "days");
 

@@ -23,7 +23,7 @@ import { PulseLoader } from "react-spinners";
 
 // Import the API function provided by you
 import trackGetter from '@/lib/hooks/useTracks';
-import { triggerRefresh } from '@/lib/hooks/useStrands';
+import { triggerStrandRefresh } from '@/lib/hooks/useStrands';
 import { createStrand } from '@/services/apiService';
 
 
@@ -106,7 +106,7 @@ function StrandFormPopover() {
 
       try {
         await createStrand(strandData);
-        triggerRefresh()
+        triggerStrandRefresh()
       } catch (err) {
         console.error("Failed to submit one or more tracks:", err);
         console.error("API Response Data:", err.response?.data);
@@ -136,8 +136,8 @@ function StrandFormPopover() {
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Track</DialogTitle>
-            <DialogDescription>You are about to add a new track.</DialogDescription>
+            <DialogTitle>Add Strand</DialogTitle>
+            <DialogDescription>You are about to add a new strand.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="flex flex-col w-full">
             {/* Display error message if present */}
@@ -160,7 +160,7 @@ function StrandFormPopover() {
                   key={idx}
                 >
                   <AccordionItem value={itemId}>
-                    <AccordionTrigger>Track Information</AccordionTrigger>
+                    <AccordionTrigger>Strand Information</AccordionTrigger>
                     <AccordionContent className="flex flex-col text-balance items-center justify-center">
                       <div className="gap-2 flex flex-col items-center justify-center w-[95%]">
                         <div className="flex gap-6 items-center justify-between mt-2">

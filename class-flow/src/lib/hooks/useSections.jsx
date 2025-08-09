@@ -8,7 +8,7 @@ export const triggerSectionRefresh = () => {
   refreshCallback(); // triggers the actual refetch inside the hook
 };
 
-export default function sectionGetters() {
+export default function useSectionGetter() {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState({});
   const [refreshToken, setRefreshToken] = useState(0);
