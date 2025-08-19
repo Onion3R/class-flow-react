@@ -39,6 +39,12 @@ export const getSubjectStrand = async () => {
 };
 
 
+export const getSpecificSubjectStrand = async (id) => {
+  const response = await api.get(`strand-subjects/${id}/`);
+  return response.data;
+};
+
+
 
 export const createSubjectStrand = async (scheduleData) => {
   try {
@@ -63,6 +69,11 @@ export const getSemester = async () => {
 
 export const getTeachers = async () => {
   const response = await api.get('teachers/');
+  return response.data;
+};
+
+export const getSpecificTeacher = async (teacherId) => {
+  const response = await api.get(`teachers/${teacherId}/`);
   return response.data;
 };
 
@@ -167,6 +178,23 @@ export const deleteTrack = async (trackIds) => {
     throw error;
   }
 };
+export const updateTrack = async (trackIds, updatedData) => {
+  try {
+    // Log the ID of the strand we are about to delete for debugging.
+    console.log("Updating strand with ID:", trackIds);
+    const response = await api.put(`tracks/${trackIds}/`, updatedData);
+
+    // Return the response from the server.
+    return response;
+  } catch (error) {
+    // Log the full error response from the server if available.
+    console.error("Error updating strand:", error.response?.strandId || error.message);
+    
+    // Re-throw the error so it can be handled by the calling function.
+    throw error;
+  }
+};
+
 
 
 export const createStrand = async (data) => {
@@ -193,6 +221,25 @@ export const deleteStrand = async (strandId) => {
     // Use api.delete to send a DELETE request to the 'strands' endpoint
     // with the specific strand's ID appended to the URL.
     const response = await api.delete(`strands/${strandId}/`);
+    
+    // Return the response from the server.
+    return response;
+  } catch (error) {
+    // Log the full error response from the server if available.
+    console.error("Error deleting strand:", error.response?.strandId || error.message);
+    
+    // Re-throw the error so it can be handled by the calling function.
+    throw error;
+  }
+};
+export const updateStrand = async (strandId, updatedData) => {
+  try {
+    // Log the ID of the strand we are about to delete for debugging.
+    console.log("Deleting strand with ID:", strandId);
+    
+    // Use api.delete to send a DELETE request to the 'strands' endpoint
+    // with the specific strand's ID appended to the URL.
+    const response = await api.put(`strands/${strandId}/`, updatedData);
     
     // Return the response from the server.
     return response;
@@ -236,7 +283,26 @@ export const deleteSection = async (sectionId) => {
     return response;
   } catch (error) {
     // Log the full error response from the server if available.
-    console.error("Error deleting strand:", error.response?.strandId || error.message);
+    console.error("Error deleting strand:", error.response?.sectionId || error.message);
+    
+    // Re-throw the error so it can be handled by the calling function.
+    throw error;
+  }
+};
+export const updateSection = async (sectionId, updatedData) => {
+  try {
+    // Log the ID of the strand we are about to delete for debugging.
+    console.log("Updating section with ID:", sectionId);
+    
+    // Use api.delete to send a DELETE request to the 'strands' endpoint
+    // with the specific strand's ID appended to the URL.
+    const response = await api.put(`sections/${sectionId}/`, updatedData);
+    
+    // Return the response from the server.
+    return response;
+  } catch (error) {
+    // Log the full error response from the server if available.
+    console.error("Error updating strand:", error.response?.sectionId || error.message);
     
     // Re-throw the error so it can be handled by the calling function.
     throw error;
@@ -285,17 +351,38 @@ export const deleteSubjectStrand = async (subjectId) => {
 
 
 
-export const  generateSchedule = async (data) => {
-  try {
+
+// export const  generateSchedule = async (data) => {
+//   try {
    
-    console.log("Sending subject and assignment data:", data); 
+//     console.log("Sending subject and assignment data:", data); 
+//     // Using api.post to send the combined payload to the specified endpoint.
+//     const response = await api.post('generate-schedule/', data);
+//     return response;
+//   } catch (error) {
+//     // Log the full error response from the server if available.
+//     console.error("Error generating schedules:", error.response?.data || error.message);
+//     throw error;
+//   }
+// };
+
+
+export const generateSchedule = async (data) => {
+  try {
+    console.log("Sending subject and assignment data:", data);
     // Using api.post to send the combined payload to the specified endpoint.
     const response = await api.post('generate-schedule/', data);
-    return response;
+    return response.data; // Return the data directly on success
   } catch (error) {
-    // Log the full error response from the server if available.
-    console.error("Error generating schedules:", error.response?.payload || error.message);
-    throw error;
+    // Log the full error response for debugging purposes
+    console.error("Error generating schedules:", error.response?.data || error.message);
+    
+    // Extract the specific error message from the nested response object.
+    const errorMessage = error.response?.data?.message || "An unexpected error occurred.";
+    
+    // Throw a new Error object with just the message string.
+    // This allows the calling function to catch a simple, clean message.
+    throw new Error(errorMessage);
   }
 };
 

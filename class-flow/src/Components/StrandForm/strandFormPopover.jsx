@@ -1,7 +1,7 @@
+"use client";
 import { useState } from 'react';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -16,24 +16,29 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import SelectComponent from '../Select/selectComponent';
+import { triggerToast } from '@/lib/utils/toast';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash } from "lucide-react";
 import { PulseLoader } from "react-spinners";
 
 // Import the API function provided by you
-import trackGetter from '@/lib/hooks/useTracks';
-import { triggerStrandRefresh } from '@/lib/hooks/useStrands';
+import useTrackGetter from '@/lib/hooks/useTracks';
 import { createStrand } from '@/services/apiService';
 
 
-function StrandFormPopover() {
-  const { data: allTrackData, isLoading: trackIsLoading} = trackGetter()
+// This component now accepts an 'onRefresh' function as a prop.
+// The global triggerStrandRefresh function is no longer needed.
+function StrandFormPopover({ onRefresh }) {
+  const { data: allTrackData, isLoading: trackIsLoading} = useTrackGetter()
   const [activeAccordion, setActiveAccordion] = useState("");
   const [entries, setEntries] = useState([
     { name: '', code: '' , selectedTrack: ''},
   ]);
   
+  // State to manage the Dialog's open/closed state
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   // State for API call feedback
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -73,32 +78,26 @@ function StrandFormPopover() {
     setIsLoading(true);
     setError(null);
 
-    // Check if track entries are valid before sending
+    // Check if entries are valid before sending
     for (const entry of entries) {
-      if (!entry.name || !entry.code) {
-        setError({ message: "All track fields must be filled out correctly." });
+      if (!entry.name || !entry.code || !entry.selectedTrack) {
+        setError({ message: "All strand fields must be filled out correctly." });
         setIsLoading(false);
         return;
       }
     }
-
-
     
-    
-
-
-    // Loop through all entries and create a request for each track
+    // Loop through all entries and create a request for each strand
     for (const entry of entries) {
       const track = allTrackData.find(
         (track) => track.name === entry.selectedTrack
       );
 
-      // 1. Format the track data from the form entry
+      // 1. Format the strand data from the form entry
       const strandData = {
         track_id: track.id,
         name: entry.name,
         code: entry.code,
-      
       };
 
       // Log the single payload object to be sent for debugging
@@ -106,9 +105,17 @@ function StrandFormPopover() {
 
       try {
         await createStrand(strandData);
-        triggerStrandRefresh()
+        triggerToast({
+            success: true,
+            title: "Strand added",
+            desc: `The strand "${entry.name}" has been successfully added.`,
+        });
+        
+        // Call the passed-down onRefresh function on successful submission
+        onRefresh();
+        
       } catch (err) {
-        console.error("Failed to submit one or more tracks:", err);
+        console.error("Failed to submit one or more strands:", err);
         console.error("API Response Data:", err.response?.data);
         setError(err.response?.data || { message: "An unexpected error occurred." });
         setIsLoading(false);
@@ -116,8 +123,12 @@ function StrandFormPopover() {
       }
     }
     
-    console.log('All tracks submitted successfully!');
+    console.log('All strands submitted successfully!');
     setIsLoading(false);
+
+    // Reset the form and close the dialog
+    setEntries([{name: '', code: '', selectedTrack: '' }]);
+    setIsDialogOpen(false);
   };
 
   const handleDeleteEntry = (index, e) => {
@@ -127,10 +138,11 @@ function StrandFormPopover() {
   };
 
   return (
-    <Dialog className='gap-0'>
+    // The Dialog's open state is now controlled by a state variable
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen} className='gap-0'>
       <form>
         <DialogTrigger asChild>
-          <Button variant="default" className="ml-2">
+          <Button variant="default" className="ml-2" onClick={() => setIsDialogOpen(true)}>
             <Plus /> Add
           </Button>
         </DialogTrigger>
@@ -168,28 +180,28 @@ function StrandFormPopover() {
                             name="name"
                             value={entry.name}
                             onChange={(e) => handleChange(idx, e)}
-                            placeholder="Track name"
+                            placeholder="Strand name"
                             required
                           />
                           <Input
                             name="code"
                             value={entry.code}
                             onChange={(e) => handleChange(idx, e)}
-                            placeholder="Track code"
+                            placeholder="Strand code"
                             required
                           />
                         </div>
                           {trackIsLoading ? (
-                           <div>Loading tracks...</div>
-                        ) : (
-                           <SelectComponent
+                            <div>Loading tracks...</div>
+                          ) : (
+                            <SelectComponent
                               items={allTrackData.map((s) => s.name)}
                               label="Select Parent Track"
                               value={entry.selectedTrack}
                               onChange={(value) => handleParentTrackChange(idx, value)}
                               className="!max-w-none !w-full my-2 !min-w-none"
-                           />
-                        )}
+                            />
+                          )}
                         <div className="flex w-full items-center justify-center mt-4 gap-7">
                           <Button
                             variant="outline"
@@ -198,12 +210,15 @@ function StrandFormPopover() {
                           >
                             Done
                           </Button>
-                          <Button
-                            onClick={(e) => handleDeleteEntry(idx, e)}
-                            className="bg-red-600 hover:bg-red-500"
-                          >
-                            <Trash className="text-red-200" />
-                          </Button>
+                          {/* Only show the delete button if there's more than one entry */}
+                          {entries.length > 1 && (
+                            <Button
+                              onClick={(e) => handleDeleteEntry(idx, e)}
+                              className="bg-red-600 hover:bg-red-500"
+                            >
+                              <Trash className="text-red-200" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </AccordionContent>
@@ -225,20 +240,16 @@ function StrandFormPopover() {
             </div>
 
             <DialogFooter className="flex gap-2 justify-end mt-2">
-              <DialogClose asChild>
-                <Button type="button" variant="secondary">
-                  Cancel
-                </Button>
-              </DialogClose>
-              <DialogClose asChild>
-                <Button type="submit" variant="default" disabled={isLoading}>
-                  {isLoading ? (
-                    <PulseLoader size={8} color="#ffffff" />
-                  ) : (
-                    'Submit All'
-                  )}
-                </Button>
-              </DialogClose>
+              <Button type="button" variant="secondary" onClick={() => setIsDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="default" disabled={isLoading}>
+                {isLoading ? (
+                  <PulseLoader size={8} color="#ffffff" />
+                ) : (
+                  'Submit All'
+                )}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

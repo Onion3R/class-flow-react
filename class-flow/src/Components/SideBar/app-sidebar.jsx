@@ -61,8 +61,8 @@ const data2 = {
                 icon: Home,
               },
               {
-                title: "Team",
-                url: "team",
+                title: "Teachers",
+                url: "teachers",
                 icon: Users,
               },
               {

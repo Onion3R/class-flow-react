@@ -17,7 +17,7 @@ import { Fragment } from "react"; // For conditionally rendering separators
 // IMPORTANT: This now imports from the generic 'actions.js'
 import { actions } from "./actions";
 
-export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow}) => [
+export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow, setLabel}) => [
   // Checkbox Column for Row Selection
   {
     id: "select",
@@ -105,24 +105,35 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow})
     
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {menuActions.map(({ id, label, action }) => (
-              <Fragment key={id}>
-                <DropdownMenuItem onClick={() => action(rowData)}>
-                  {label}
-                </DropdownMenuItem>
-                {id === 'view' && <DropdownMenuSeparator />}
-              </Fragment>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+         <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <span className="sr-only">Open menu</span>
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {menuActions.map(({ id, label, icon, action }) => (
+                      id != 'delete' ? (
+                        <Fragment key={id}>
+                        <DropdownMenuItem onClick={() => {
+                          action(rowData)
+                          setLabel('strands')
+                          }}  className='w-full justify-between'>
+                          {label} {icon}
+                        </DropdownMenuItem>
+                        {id === 'view' && <DropdownMenuSeparator />}
+                      </Fragment>
+                      ) : (
+                        <Fragment key={id}>
+                        <DropdownMenuItem onClick={() => action(rowData)} className='w-full !text-red-500  justify-between hover:bg-red-100 dark:hover:bg-red-950/50 !hover:text-red-500'>
+                          {label} {icon}
+                        </DropdownMenuItem>
+                      </Fragment>
+                      )
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
       );
     },
     enableHiding: false,

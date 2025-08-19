@@ -62,18 +62,18 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow }
       );
     },
   },
-  {
-    id: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const isActive = row.original.is_active;
-      return (
-        <span className={`font-medium ${isActive ? "text-green-600" : "text-red-500"}`}>
-          {isActive ? "Active" : "Inactive"}
-        </span>
-      );
-    },
-  },
+  // {
+  //   id: "status",
+  //   header: "Status",
+  //   cell: ({ row }) => {
+  //     const isActive = row.original.is_active;
+  //     return (
+  //       <span className={`font-medium ${isActive ? "text-green-600" : "text-red-500"}`}>
+  //         {isActive ? "Active" : "Inactive"}
+  //       </span>
+  //     );
+  //   },
+  // },
   {
     accessorKey: "actions",
     id: "actions",

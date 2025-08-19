@@ -29,7 +29,7 @@ const {data: allScheduleData, isLoading: scheduleIsLoading } = scheduleGetter()
             <DataTableComponent
             data={allScheduleData}
             getColumns={getColumns}
-            dialogData={{ // <-- Corrected spelling
+            alertDialogData={{ // <-- Corrected spelling
                 id: 'schedule',
                 desc: "This action cannot be undone. This will permanently delete your account and remove your data from our servers."
             }}

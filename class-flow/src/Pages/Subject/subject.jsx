@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import TabsComponent from '@/Components/Tabs/tabsComponent';
 import { PulseLoader } from 'react-spinners';
-import { getColumns } from './column';
+import { getColumns } from './Config/column';
 import { Separator } from '@/Components/ui/separator';
 import {
     Tabs,
@@ -9,59 +9,70 @@ import {
     TabsList,
     TabsTrigger,
 } from "@Components/ui/tabs";
-import { ExternalLink } from 'lucide-react';
-import SubjectWithAssignmentFormPopover from '@/Components/CourseForm/courseFormPopover';
-import { Card, CardContent, CardDescription, CardTitle, CardHeader} from '@/Components/ui/card';
+import LoadingCard from '../../Components/LoadingCard/loadingCard';
+import { ExternalLink, CircleAlert } from 'lucide-react';
+import SubjectWithAssignmentFormPopover from '@/Components/SubjectForm/subjectFromPopover';
+import { Card, CardContent, CardDescription, CardTitle, CardHeader } from '@/Components/ui/card';
 
-import trackGetter from '@/lib/hooks/useTracks';
-import strandGetter from '@/lib/hooks/useStrands';
-import subjectStrandGetter from '../../lib/hooks/useSubjectStrand';
+import useTracks from '@/lib/hooks/useTracks';
+import useStrands from '@/lib/hooks/useStrands';
+import useSubjectStrand from '../../lib/hooks/useSubjectStrand';
 
+const EmptyMessage = (
+    <span className='flex'>
+        This track doesn't have any strand and subjects. Go to
+        <span className="font-medium mx-1">Programs</span>
+        <span className='flex items-center justify-center'>
+            to create them.<ExternalLink className="w-4 h-4 ml-1 mt-1 sm:mt-0" />
+        </span>
+    </span>
+);
 
-function SubjectPage() {
-    const { data: allSubjectData, isLoading: subjectsIsLoading } = subjectStrandGetter();
-    const { data: allStrandData, isLoading: strandIsLoading } = strandGetter();
-    const { data: allTrackData, isLoading: trackIsLoading } = trackGetter();
+const NoDataMessage = (
+    <span className='flex items-end justify-center'>
+        No data found on the database <CircleAlert className="w-4 h-4 ml-1 mb-0.5 sm:mt-0" />
+    </span>
+);
+
+function useSubjectPageState() {
+    const { data: allSubjectData, isLoading: subjectsIsLoading, refresh: refreshSubjectStrand } = useSubjectStrand();
+    const { data: allStrandData, isLoading: strandIsLoading } = useStrands();
+    const { data: allTrackData, isLoading: trackIsLoading } = useTracks();
 
     const [selectedTrackId, setSelectedTrackId] = useState(null);
     const [selectedStrandCode, setSelectedStrandCode] = useState(null);
-    const [selectedStrandId, setSelectedStrandId] = useState()
+    const [selectedStrandId, setSelectedStrandId] = useState('');
     const [subjectsFilteredByTrack, setSubjectsFilteredByTrack] = useState([]);
     const [finalFilteredSubjects, setFinalFilteredSubjects] = useState([]);
     const [flattenedSubjects, setFlattenedSubjects] = useState([]);
 
     const overallLoading = subjectsIsLoading || strandIsLoading || trackIsLoading;
 
+    // Set default track
     useEffect(() => {
-        if (allTrackData && Array.isArray(allTrackData) && allTrackData.length > 0 && selectedTrackId === null) {
+        if (Array.isArray(allTrackData) && allTrackData.length > 0 && selectedTrackId === null) {
             setSelectedTrackId(allTrackData[0].id);
         }
     }, [allTrackData, selectedTrackId]);
 
+    // Filter subjects by track and handle strand selection
     useEffect(() => {
-        if (allSubjectData && Array.isArray(allSubjectData) && selectedTrackId !== null) {
+        if (Array.isArray(allSubjectData) && selectedTrackId !== null) {
             const filteredByTrack = allSubjectData.filter(item =>
-                item.strand && item.strand.track && item.strand.track.id === selectedTrackId
+                item.strand?.track?.id === selectedTrackId
             );
             setSubjectsFilteredByTrack(filteredByTrack);
 
-            if (allStrandData && Array.isArray(allStrandData)) {
+            if (Array.isArray(allStrandData)) {
                 const strandsForCurrentTrack = allStrandData.filter(
-                    strand => strand.track && strand.track.id === selectedTrackId
+                    strand => strand.track?.id === selectedTrackId
                 );
                 const isCurrentStrandValid = selectedStrandCode && strandsForCurrentTrack.some(s => s.code === selectedStrandCode);
                 if (!isCurrentStrandValid && strandsForCurrentTrack.length > 0) {
                     setSelectedStrandCode(strandsForCurrentTrack[0].code);
                 } else if (strandsForCurrentTrack.length === 0) {
                     setSelectedStrandCode(null);
-                    
                 }
-            }
-
-            if(selectedStrandCode) {
-              const strandId = allStrandData.find(strand => strand.code === strandCodeForForm)?.id;
-              setSelectedStrandId(strandId)
-              
             }
         } else {
             setSubjectsFilteredByTrack([]);
@@ -69,19 +80,29 @@ function SubjectPage() {
         }
     }, [allSubjectData, selectedTrackId, allStrandData, selectedStrandCode]);
 
+    // Set selectedStrandId when selectedStrandCode changes
     useEffect(() => {
-        if (subjectsFilteredByTrack && Array.isArray(subjectsFilteredByTrack) && selectedStrandCode !== null) {
-            const filteredByTrackAndStrand = subjectsFilteredByTrack.filter(item =>
-                item.strand && item.strand.code === selectedStrandCode
+        if (selectedStrandCode && Array.isArray(allStrandData)) {
+            const strand = allStrandData.find(s => s.code === selectedStrandCode);
+            setSelectedStrandId(strand?.id || '');
+        }
+    }, [selectedStrandCode, allStrandData]);
+
+    // Filter subjects by strand
+    useEffect(() => {
+        if (Array.isArray(subjectsFilteredByTrack) && selectedStrandCode !== null) {
+            const filtered = subjectsFilteredByTrack.filter(item =>
+                item.strand?.code === selectedStrandCode
             );
-            setFinalFilteredSubjects(filteredByTrackAndStrand);
+            setFinalFilteredSubjects(filtered);
         } else {
             setFinalFilteredSubjects([]);
         }
     }, [subjectsFilteredByTrack, selectedStrandCode]);
 
+    // Flatten subjects for table
     useEffect(() => {
-        if (finalFilteredSubjects && Array.isArray(finalFilteredSubjects)) {
+        if (Array.isArray(finalFilteredSubjects)) {
             const flattened = finalFilteredSubjects.map(item => ({
                 ...item,
                 subjectCode: item.subject?.code,
@@ -98,7 +119,7 @@ function SubjectPage() {
 
     const strandsForCurrentTrack = useMemo(() => {
         if (Array.isArray(allStrandData) && selectedTrackId !== null) {
-            return allStrandData.filter(strand => strand.track && strand.track.id === selectedTrackId);
+            return allStrandData.filter(strand => strand.track?.id === selectedTrackId);
         }
         return [];
     }, [allStrandData, selectedTrackId]);
@@ -110,17 +131,44 @@ function SubjectPage() {
         return null;
     }, [allTrackData, selectedTrackId]);
 
-    const trackNameForForm = currentTrack?.name || null;
-    const strandCodeForForm = selectedStrandCode;
-
-    const handleStrandChange = (newStrandCode) => {
-        setSelectedStrandCode(newStrandCode);
+    return {
+        allTrackData,
+        allSubjectData,
+        strandsForCurrentTrack,
+        flattenedSubjects,
+        selectedTrackId,
+        setSelectedTrackId,
+        selectedStrandCode,
+        setSelectedStrandCode,
+        selectedStrandId,
+        currentTrack,
+        overallLoading,
+        refreshSubjectStrand,
     };
+}
 
+function SubjectPage() {
+    const {
+        allTrackData,
+        allSubjectData,
+        strandsForCurrentTrack,
+        flattenedSubjects,
+        selectedTrackId,
+        setSelectedTrackId,
+        selectedStrandCode,
+        setSelectedStrandCode,
+        selectedStrandId,
+        currentTrack,
+        overallLoading,
+        refreshSubjectStrand,
+    } = useSubjectPageState();
+
+    const handleStrandChange = (newStrandCode) => setSelectedStrandCode(newStrandCode);
+    const handleRefresh = () => refreshSubjectStrand();
 
     return (
-        <div className="min-h-screen flex justify-center bg-background">
-            <div className="container p-6">
+        <div className="min-h-d flex justify-center ">
+            <div className="container p-4">
                 <Tabs
                     value={selectedTrackId ? String(selectedTrackId) : ''}
                     onValueChange={value => setSelectedTrackId(Number(value))}
@@ -129,79 +177,82 @@ function SubjectPage() {
                         <div className="flex sm:flex-row sm:gap-5 gap-2 sm:items-center items-start flex-col ">
                             <h1 className="text-2xl font-bold">Subjects</h1>
                             <Separator orientation="vertical" className="!h-6 !w-[2px] sm:block hidden " />
-                            <TabsList className="rounded shadow border border-dashed bg-muted dark:bg-transparent">
-                                {Array.isArray(allTrackData) && allTrackData.map(track => (
-                                    <TabsTrigger
-                                        className="rounded px-3 py-1"
-                                        value={String(track.id)}
-                                        key={track.id}
-                                    >
-                                        {track.name}
-                                    </TabsTrigger>
-                                ))}
-                            </TabsList>
-                        </div>
-                        <PulseLoader size={6} loading={overallLoading} />
-                    </div>
-                    <Card className="bg-transparent !gap-2">
-                       <CardHeader className= {strandsForCurrentTrack && strandsForCurrentTrack.length > 0 ? 'block' : 'hidden' }>
-                            <CardTitle>Add Subjects</CardTitle>
-                            <CardDescription >
-                            You can manage sections here.
-                            </CardDescription>
-                       </CardHeader>
-                        <CardContent >
-                            {strandsForCurrentTrack && strandsForCurrentTrack.length > 0 ? (
-                                Array.isArray(allTrackData) && allTrackData.map(track => (
-                                    <TabsContent value={String(track.id)} key={track.id} className='w-full '>
-                                        <TabsComponent
-                                            data={flattenedSubjects}
-                                            getColumns={getColumns}
-                                            dialogData={{
-                                                id: 'subject',
-                                                desc: "This action cannot be undone. This will permanently delete your account and remove your data from our servers."
-                                            }}
-                                            filteredData={{ columnId: "subjectTitle", label: "Title" }}
-                                            filterComboBoxes={[
-                                                {
-                                                    columnId: "yearLevelName",
-                                                    label: "Year Level",
-                                                    labelFormatter: value => value,
-                                                },
-                                                {
-                                                    columnId: "semesterName",
-                                                    label: "Semester",
-                                                    labelFormatter: value => value,
-                                                },
-                                            ]}
-                                            tabList={strandsForCurrentTrack.map(s => ({ value: s.code, label: s.code }))}
-                                            addComponent={
-                                                <SubjectWithAssignmentFormPopover
-                                                    track={trackNameForForm}
-                                                    strand={strandCodeForForm}
-                                                    strandId={selectedStrandId}
-                                                />
-                                            }
-                                            isLoading={overallLoading}
-                                            onStrandChange={handleStrandChange}
-                                            selectedStrandTab={selectedStrandCode}
-                                        />
-                                    </TabsContent>
-                                ))
-                            ) : (
-                               <div className="flex flex-col sm:flex-row items-center justify-center w-full text-sm text-muted-foreground text-center sm:text-left">
-                                    <span>
-                                        This track doesn't have any strand and subjects. Go to
-                                    </span>
-                                    <span className="font-medium mx-1">Programs</span>
-                                    <span className='flex items-center justify-center'>to create them.<ExternalLink className="w-4 h-4 ml-1 mt-1 sm:mt-0" /></span>
-                                    
-                                    
-                                    </div>
-
+                            {!overallLoading && allTrackData?.length > 0 && (
+                                <TabsList className="rounded shadow border border-dashed bg-muted dark:bg-transparent">
+                                    {allTrackData.map(track => (
+                                        <TabsTrigger
+                                            className="rounded px-3 py-1"
+                                            value={String(track.id)}
+                                            key={track.id}
+                                        >
+                                            {track.name}
+                                        </TabsTrigger>
+                                    ))}
+                                </TabsList>
                             )}
-                        </CardContent>
-                    </Card>
+                        </div>
+                       
+                    </div>
+                    {overallLoading ? (
+                        <LoadingCard variant="database" />
+                    ) : (
+                        allSubjectData && allSubjectData.length !== 0 ? (
+                            strandsForCurrentTrack.length > 0 ? (
+                                <Card className="bg-transparent !gap-2">
+                                    <CardHeader>
+                                        <CardTitle>Add Subjects</CardTitle>
+                                        <CardDescription>
+                                            You can manage sections here.
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        {allTrackData.map(track => (
+                                            <TabsContent value={String(track.id)} key={track.id} className='w-full'>
+                                                <TabsComponent
+                                                    data={flattenedSubjects}
+                                                    getColumns={getColumns}
+                                                    alertDialogData={{
+                                                        id: 'subject',
+                                                        desc: "This action cannot be undone. This will permanently delete your account and remove your data from our servers."
+                                                    }}
+                                                    filteredData={{ columnId: "subjectTitle", label: "Title" }}
+                                                    filterComboBoxes={[
+                                                        {
+                                                            columnId: "yearLevelName",
+                                                            label: "Year Level",
+                                                            labelFormatter: value => value,
+                                                        },
+                                                        {
+                                                            columnId: "semesterName",
+                                                            label: "Semester",
+                                                            labelFormatter: value => value,
+                                                        },
+                                                    ]}
+                                                    onRefresh={handleRefresh}
+                                                    tabList={strandsForCurrentTrack.map(s => ({ value: s.code, label: s.code }))}
+                                                    addComponent={
+                                                        <SubjectWithAssignmentFormPopover
+                                                            track={currentTrack?.name || null}
+                                                            strand={selectedStrandCode}
+                                                            strandId={selectedStrandId}
+                                                            onRefresh={refreshSubjectStrand}
+                                                        />
+                                                    }
+                                                    isLoading={overallLoading}
+                                                    onStrandChange={handleStrandChange}
+                                                    selectedStrandTab={selectedStrandCode}
+                                                />
+                                            </TabsContent>
+                                        ))}
+                                    </CardContent>
+                                </Card>
+                            ) : (
+                                <LoadingCard message={EmptyMessage} variant='default' />
+                            )
+                        ) : (
+                            <LoadingCard message={NoDataMessage} variant='default' />
+                        )
+                    )}
                 </Tabs>
             </div>
         </div>

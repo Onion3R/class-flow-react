@@ -1,55 +1,35 @@
-import { Button } from "@/Components/ui/button"
-import { triggerToast } from "@/lib/utils/toast"
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/Components/ui/input"
-import { fields } from "./fields"
-import { Label } from "@/Components/ui/label"
+import React, { useState, useEffect } from "react"
+import { Dialog } from "@/components/ui/dialog"
 
-const toastInfo = {
-  success: false, 
-  title: 'Update profile',
-  desc: 'Sucessfully updated'
-}
+import SubjectDialogContent from "./subjectDialogContent"
+import TrackDialogContent from "./trackDialogContent"
+import StrandDialogContent from "./strandDialogContent"
+import SectionDialogContent from "./sectionDialogContent"
+export default function DialogComponent({ label, open, onOpenChange, selectedRow, onConfirm, onRefresh}) {
+  const [dialogContent, setDialogContent] = useState(null)
 
-export default function DialogComponent ({ open, onOpenChange, onConfirm }) {
-  
+  useEffect(() => {
+    switch (label) {
+      case 'subjects':
+        setDialogContent(<SubjectDialogContent selectedRow={selectedRow} onConfirm={onConfirm} onOpenChange={onOpenChange} onRefresh={onRefresh} />)
+        break
+      case 'strands':
+        setDialogContent(<StrandDialogContent selectedRow={selectedRow} onConfirm={onConfirm} onOpenChange={onOpenChange} onRefresh={onRefresh} />)
+        break
+      case 'sections':
+        setDialogContent(<SectionDialogContent selectedRow={selectedRow} onConfirm={onConfirm} onOpenChange={onOpenChange} onRefresh={onRefresh} />)
+        break
+      case 'tracks':
+        setDialogContent(<TrackDialogContent selectedRow={selectedRow} onConfirm={onConfirm} onOpenChange={onOpenChange} onRefresh={onRefresh} />)
+        break
+      default:
+        setDialogContent(null)
+    }
+  }, [label, selectedRow, onConfirm])
+
   return (
-    <Dialog  open={open} onOpenChange={onOpenChange}>
-      <form>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-            <DialogDescription>
-              Make changes to your profile here. Click save when you&apos;re
-              done.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4">
-            {
-              fields.map(({ label, id, name, defaultValue }, index) => (
-              <div id={id} className="grid gap-3">
-                <Label htmlFor={id}>{label}</Label>
-                <Input id={id} name={name} defaultValue={defaultValue} />
-              </div>
-              ))
-            }
-          </div>
-          <DialogFooter>
-            <DialogClose asChild onClick={() => onOpenChange(false)}>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-           <Button variant="default" onClick={() => {triggerToast(toastInfo); onConfirm();}}>Save</Button>
-          </DialogFooter>
-        </DialogContent>
-      </form>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {open && dialogContent}
     </Dialog>
   )
 }

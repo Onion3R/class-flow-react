@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -20,30 +19,27 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash } from "lucide-react";
 import { PulseLoader } from "react-spinners";
+import { triggerToast } from '@/lib/utils/toast';
 
-// Import the API function provided by you
-import trackGetter from '@/lib/hooks/useTracks';
-import strandGetter from '@/lib/hooks/useStrands';
-import yearLevelsGetter from '@/lib/hooks/useYearLevels';
+// Import the API function
 import { createSection } from '@/services/apiService';
 
+// Import the refactored hooks with their local refresh functions
+import useStrandGetter from '@/lib/hooks/useStrands';
+import useYearLevelsGetter from '@/lib/hooks/useYearLevels';
 
-// For refreshing data once the data is inserted
-import { triggerSectionRefresh } from '@/lib/hooks/useSections'; 
+function SectionFormPopover({ onRefresh }) {
+  const { data: allYearlevelData, isLoading: yearLevelIsLoading } = useYearLevelsGetter();
+  const { data: allStrandData, isLoading: strandIsLoading } = useStrandGetter();
 
-function SectionFormPopover() {
-  const { data: allYearlevelData, isLoading: yearLevelIsLoading} = yearLevelsGetter()
-  const { data: allStrandData, isLoading: strandIsLoading} = strandGetter()
-
-  const [allLoading, setAllLoading] = useState(false)
+  // State to manage dialog's open/close state
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   const [activeAccordion, setActiveAccordion] = useState("");
   const [entries, setEntries] = useState([
-    { name: '' , selectedStrand: '', selectedYearLevel: ''},
+    { name: '', selectedStrand: '', selectedYearLevel: ''},
   ]);
   
-
-  // State for API call feedback
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleChange = (index, e) => {
@@ -62,6 +58,7 @@ function SectionFormPopover() {
       return updated;
     });
   };
+
   const handleStrandChange = (index, value) => {
     setEntries((prev) => {
       const updated = [...prev];
@@ -73,7 +70,7 @@ function SectionFormPopover() {
   const handleAddEntry = () => {
    setEntries((prev) => [
       ...prev,
-       { name: '', code: '' , selectedStrand: '', selectedYearLevel: ''},
+       { name: '', selectedStrand: '', selectedYearLevel: ''},
     ]);
   };
 
@@ -82,61 +79,65 @@ function SectionFormPopover() {
     setActiveAccordion("");
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsFormSubmitting(true);
     setError(null);
 
-    // Check if track entries are valid before sending
-   
+    // Check for empty fields
     for (const entry of entries) {
-      if (!entry.name ) {
-        setError({ message: "All track fields must be filled out correctly." });
-        setIsLoading(false);
+      if (!entry.name || !entry.selectedStrand || !entry.selectedYearLevel) {
+        setError({ message: "All section fields must be filled out correctly." });
+        setIsFormSubmitting(false);
         return;
       }
     }
 
-
-    // Loop through all entries and create a request for each track
+    // Loop through all entries and create a request for each section
     for (const entry of entries) {
-      const strand = allStrandData.find(
-        (s) => s.code === entry.selectedStrand
-      );
-      const yearLevel = allYearlevelData.find(
-        (y) => y.name === entry.selectedYearLevel
-      );
+      const strand = allStrandData.find(s => s.code === entry.selectedStrand);
+      const yearLevel = allYearlevelData.find(y => y.name === entry.selectedYearLevel);
+      
+      if (!strand || !yearLevel) {
+          setError({ message: "Could not find corresponding strand or year level IDs." });
+          setIsFormSubmitting(false);
+          return;
+      }
 
-
-      // 1. Format the track data from the form entry
       const sectionData = {
         name: entry.name,
         strand_id: strand.id,
-        year_level_id:  yearLevel.id,
+        year_level_id: yearLevel.id,
         max_students:'20',
         is_active: false,
-      
       };
 
-      // Log the single payload object to be sent for debugging
       console.log("Payload being sent to API:", sectionData);
 
       try {
         await createSection(sectionData);
-        triggerSectionRefresh()
-      setEntries( [{ name: '', code: '' , selectedStrand: '', selectedYearLevel: ''}])
+        triggerToast({
+            success: true,
+            title: "Section added",
+            desc: "The section has been successfully added.",
+          });
       } catch (err) {
-        console.error("Failed to submit one or more tracks:", err);
+        console.error("Failed to submit one or more sections:", err);
         console.error("API Response Data:", err.response?.data);
         setError(err.response?.data || { message: "An unexpected error occurred." });
-        setIsLoading(false);
+        setIsFormSubmitting(false);
         return;
       }
     }
     
-    console.log('All tracks submitted successfully!');
-    setIsLoading(false);
+    console.log('All sections submitted successfully!');
+    setIsFormSubmitting(false);
+
+    // Call the refresh function provided by the parent
+    onRefresh();
+    // Reset form entries and close the dialog manually
+    setEntries([{ name: '', selectedStrand: '', selectedYearLevel: ''}]);
+    setIsDialogOpen(false);
   };
 
   const handleDeleteEntry = (index, e) => {
@@ -144,131 +145,124 @@ function SectionFormPopover() {
     setEntries((prev) => prev.filter((_, i) => i !== index));
     setActiveAccordion("");
   };
-  
-  yearLevelIsLoading && strandIsLoading  && isLoading && setAllLoading(true)
+
+  const allLoading = yearLevelIsLoading || strandIsLoading || isFormSubmitting;
 
   return (
-    <Dialog className='gap-0'>
-      <form>
-        <DialogTrigger asChild>
-          <Button variant="default" className="ml-2">
-            <Plus /> Add
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Section</DialogTitle>
-            <DialogDescription>You are about to add a new section.</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="flex flex-col w-full">
-            {/* Display error message if present */}
-            {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                <strong className="font-bold">Error: </strong>
-                <span className="block sm:inline">{error.message}</span>
-              </div>
-            )}
-            
-            {entries.map((entry, idx) => {
-              const itemId = `entry-${idx}`;
-              return (
-                <Accordion
-                  type="single"
-                  collapsible
-                  value={activeAccordion}
-                  onValueChange={setActiveAccordion}
-                  className="w-full border-t"
-                  key={idx}
-                >
-                  <AccordionItem value={itemId}>
-                    <AccordionTrigger>Section Information</AccordionTrigger>
-                    <AccordionContent className="flex flex-col text-balance items-center justify-center">
-                      <div className="gap-2 flex flex-col items-center justify-center w-[95%]">
-                         <Input
-                            name="name"
-                            value={entry.name}
-                            onChange={(e) => handleChange(idx, e)}
-                            placeholder="section name"
-                            required
-                          />
-                        <div className="flex sm:flex-row flex-col gap-6 items-center justify-between mt-2  w-full">
-                         {yearLevelIsLoading ? (
-                           <div>Loading year level...</div>
-                        ) : (
-                           <SelectComponent
-                              items={allYearlevelData.map((a) => a.name)}
-                              label="Select year level"
-                              value={entry.selectedYearLevel}
-                              onChange={(value) => handleYearLevelChange(idx, value)}
-                              className="!max-w-none !w-full sm:my-2 my-0 !min-w-none"
-                           />
-                        )}
-                          {strandIsLoading ? (
-                           <div>Loading strands...</div>
-                        ) : (
-                           <SelectComponent
-                              items={allStrandData.map((s) => s.code)}
-                              label="Select Strand"
-                              value={entry.selectedStrand}
-                              onChange={(value) => handleStrandChange(idx, value)}
-                              className="!max-w-none !w-full sm:my-2  my-0 !min-w-none"
-                           />
-                        )}
-                        </div>
-                          
-                        <div className="flex w-full items-center justify-center mt-4 gap-7">
-                          <Button
-                            variant="outline"
-                            onClick={(e) => handleFillingTrackInfo(idx, e)}
-                            className="flex-1 w-full"
-                          >
-                            Done
-                          </Button>
-                          <Button
-                            onClick={(e) => handleDeleteEntry(idx, e)}
-                            className="bg-red-600 hover:bg-red-500"
-                          >
-                            <Trash className="text-red-200" />
-                          </Button>
-                        </div>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              );
-            })}
-
-            <div className="flex justify-start mt-4">
-              <Button
-                type="button"
-                variant="outline"
-                className="border-dashed border-gray-white"
-                onClick={handleAddEntry}
-              >
-                <Plus className="h-4 w-4" />
-                Add
-              </Button>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <DialogTrigger asChild>
+        <Button variant="default" className="ml-2">
+          <Plus /> Add
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add Section</DialogTitle>
+          <DialogDescription>You are about to add a new section.</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="flex flex-col w-full">
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+              <strong className="font-bold">Error: </strong>
+              <span className="block sm:inline">{error.message}</span>
             </div>
+          )}
+          
+          {entries.map((entry, idx) => {
+            const itemId = `entry-${idx}`;
+            return (
+              <Accordion
+                type="single"
+                collapsible
+                value={activeAccordion}
+                onValueChange={setActiveAccordion}
+                className="w-full border-t"
+                key={idx}
+              >
+                <AccordionItem value={itemId}>
+                  <AccordionTrigger>Section Information {idx + 1}</AccordionTrigger>
+                  <AccordionContent className="flex flex-col text-balance items-center justify-center">
+                    <div className="gap-2 flex flex-col items-center justify-center w-[95%]">
+                      <Input
+                        name="name"
+                        value={entry.name}
+                        onChange={(e) => handleChange(idx, e)}
+                        placeholder="Section name"
+                        required
+                      />
+                      <div className="flex sm:flex-row flex-col gap-6 items-center justify-between mt-2 w-full">
+                        {yearLevelIsLoading || !allYearlevelData ? (
+                          <div>Loading year levels...</div>
+                        ) : (
+                          <SelectComponent
+                            items={allYearlevelData.map((a) => a.name)}
+                            label="Select year level"
+                            value={entry.selectedYearLevel}
+                            onChange={(value) => handleYearLevelChange(idx, value)}
+                            className="!max-w-none !w-full sm:my-2 my-0 !min-w-none"
+                          />
+                        )}
+                        {strandIsLoading || !allStrandData ? (
+                          <div>Loading strands...</div>
+                        ) : (
+                          <SelectComponent
+                            items={allStrandData.map((s) => s.code)}
+                            label="Select Strand"
+                            value={entry.selectedStrand}
+                            onChange={(value) => handleStrandChange(idx, value)}
+                            className="!max-w-none !w-full sm:my-2 my-0 !min-w-none"
+                          />
+                        )}
+                      </div>
+                      
+                      <div className="flex w-full items-center justify-center mt-4 gap-7">
+                        <Button
+                          variant="outline"
+                          onClick={(e) => handleFillingTrackInfo(idx, e)}
+                          className="flex-1 w-full"
+                        >
+                          Done
+                        </Button>
+                        <Button
+                          onClick={(e) => handleDeleteEntry(idx, e)}
+                          className="bg-red-600 hover:bg-red-500"
+                        >
+                          <Trash className="text-red-200" />
+                        </Button>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            );
+          })}
 
-            <DialogFooter className="flex gap-2 justify-end mt-2">
-              <DialogClose asChild>
-                <Button type="button" variant="secondary">
-                  Cancel
-                </Button>
-              </DialogClose>
-              <DialogClose asChild>
-                <Button type="submit" variant="default" disabled={allLoading}>
-                  {allLoading ? (
-                    <PulseLoader size={8} color="#ffffff" />
-                  ) : (
-                    'Submit All'
-                  )}
-                </Button>
-              </DialogClose>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </form>
+          <div className="flex justify-start mt-4">
+            <Button
+              type="button"
+              variant="outline"
+              className="border-dashed border-gray-white"
+              onClick={handleAddEntry}
+            >
+              <Plus className="h-4 w-4" />
+              Add
+            </Button>
+          </div>
+
+          <DialogFooter className="flex gap-2 justify-end mt-2">
+            <Button type="button" variant="secondary" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="default" disabled={allLoading}>
+              {allLoading ? (
+                <PulseLoader size={8} color="#ffffff" />
+              ) : (
+                'Submit All'
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 }

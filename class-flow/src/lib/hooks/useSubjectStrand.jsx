@@ -1,49 +1,72 @@
-// strandStore.js
+// useSubjectStrandGetter.js
+
+import { useState, useEffect, useCallback } from 'react';
 import { getSubjectStrand } from '@/services/apiService';
-import { useState, useEffect } from 'react';
 
-let refreshCallback = () => {};
-
-export const triggerSubjectStrandRefresh = () => {
-  refreshCallback(); // triggers the actual refetch inside the hook
-};
-
-// Custom hook
+/**
+ * Custom hook to fetch and manage subject strand data.
+ * The refresh functionality is now encapsulated within the hook.
+ *
+ * @returns {{
+ * data: Array,
+ * isLoading: boolean,
+ * refresh: Function
+ * }} An object containing the data, loading state, and a refresh function.
+ */
 export default function useSubjectStrandGetter() {
+  // State for the fetched data, loading status, and a token to trigger refresh
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshToken, setRefreshToken] = useState(0);
 
-  // Expose how to trigger refresh globally
-  useEffect(() => {
-    refreshCallback = () => setRefreshToken((prev) => prev + 1);
-    return () => {
-      // Cleanup to avoid memory leaks
-      refreshCallback = () => {};
-    };
+  // Memoized function to trigger a data refresh.
+  // We use useCallback to ensure this function reference is stable
+  // and doesn't cause unnecessary re-renders in components that use it.
+  const refresh = useCallback(() => {
+    setRefreshToken(prev => prev + 1);
   }, []);
 
-  // Fetch data whenever refreshToken changes
+  // Effect to fetch data whenever the refreshToken changes
   useEffect(() => {
-    setIsLoading(true);
-    getSubjectStrand()
-      .then((apiData) => {
-        if (Array.isArray(apiData)) {
-          setData(apiData);
-        } else {
-          console.warn('Invalid data format:', apiData);
+    // We only want to fetch if the component is still mounted.
+    let isMounted = true;
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const apiData = await getSubjectStrand();
+        if (isMounted) {
+          if (Array.isArray(apiData)) {
+            setData(apiData);
+          } else {
+            console.warn('Invalid data format:', apiData);
+            setData([]);
+          }
+        }
+      } catch (err) {
+        if (isMounted) {
+          console.error('Failed to fetch strands:', err);
           setData([]);
         }
-      })
-      .catch((err) => {
-        console.error('Failed to fetch strands:', err);
-        setData([]);
-      })
-      .finally(() => setIsLoading(false));
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    // Cleanup function to prevent state updates on unmounted components
+    return () => {
+      isMounted = false;
+    };
   }, [refreshToken]);
 
+  // Return the data, loading state, and the refresh function
   return {
     data,
     isLoading,
+    refresh,
   };
 }

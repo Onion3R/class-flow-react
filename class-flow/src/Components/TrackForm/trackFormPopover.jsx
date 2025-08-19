@@ -1,7 +1,7 @@
+"use client";
 import { useState } from 'react';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -22,15 +22,19 @@ import { PulseLoader } from "react-spinners";
 
 // Import the API function provided by you
 import { createTrack } from '@/services/apiService';
+import { triggerToast } from '@/lib/utils/toast'; 
 
-import { triggerTrackRefresh } from '@/lib/hooks/useTracks'; 
-
-function TrackFormPopover() {
+// This component now accepts an 'onRefresh' function as a prop.
+// We no longer need to import the global triggerTrackRefresh function.
+function TrackFormPopover({ onRefresh }) {
   const [activeAccordion, setActiveAccordion] = useState("");
   const [entries, setEntries] = useState([
     { name: '', code: '' },
   ]);
   
+  // State to manage the Dialog's open/closed state
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   // State for API call feedback
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -83,8 +87,15 @@ function TrackFormPopover() {
 
       try {
         await createTrack(trackData);
-        triggerTrackRefresh();
-        setEntries([{name: '', code: '' }]);
+        triggerToast({
+            success: true,
+            title: "Track added",
+            desc: `The track "${entry.name}" has been successfully added.`,
+        });
+        
+        // Call the passed-down onRefresh function on successful submission
+        onRefresh();
+
       } catch (err) {
         console.error("Failed to submit one or more tracks:", err);
         console.error("API Response Data:", err.response?.data);
@@ -96,6 +107,10 @@ function TrackFormPopover() {
     
     console.log('All tracks submitted successfully!');
     setIsLoading(false);
+    
+    // Reset the form and close the dialog
+    setEntries([{name: '', code: '' }]);
+    setIsDialogOpen(false);
   };
 
   const handleDeleteEntry = (index, e) => {
@@ -105,10 +120,11 @@ function TrackFormPopover() {
   };
 
   return (
-    <Dialog className='gap-0'>
+    // The Dialog's open state is now controlled by a state variable
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen} className='gap-0'>
       <form>
         <DialogTrigger asChild>
-          <Button variant="default" className="ml-2">
+          <Button variant="default" className="ml-2" onClick={() => setIsDialogOpen(true)}>
             <Plus /> Add
           </Button>
         </DialogTrigger>
@@ -166,12 +182,15 @@ function TrackFormPopover() {
                           >
                             Done
                           </Button>
-                          <Button
-                            onClick={(e) => handleDeleteEntry(idx, e)}
-                            className="bg-red-600 hover:bg-red-500"
-                          >
-                            <Trash className="text-red-200" />
-                          </Button>
+                          {/* Only show the delete button if there's more than one entry */}
+                          {entries.length > 1 && (
+                            <Button
+                              onClick={(e) => handleDeleteEntry(idx, e)}
+                              className="bg-red-600 hover:bg-red-500"
+                            >
+                              <Trash className="text-red-200" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </AccordionContent>
@@ -193,12 +212,9 @@ function TrackFormPopover() {
             </div>
 
             <DialogFooter className="flex gap-2 justify-end mt-2">
-              <DialogClose asChild>
-                <Button type="button" variant="secondary">
+                <Button type="button" variant="secondary" onClick={() => setIsDialogOpen(false)}>
                   Cancel
                 </Button>
-              </DialogClose>
-              <DialogClose asChild>
                 <Button type="submit" variant="default" disabled={isLoading}>
                   {isLoading ? (
                     <PulseLoader size={8} color="#ffffff" />
@@ -206,7 +222,6 @@ function TrackFormPopover() {
                     'Submit All'
                   )}
                 </Button>
-              </DialogClose>
             </DialogFooter>
           </form>
         </DialogContent>

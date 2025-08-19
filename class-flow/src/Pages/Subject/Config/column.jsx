@@ -1,19 +1,24 @@
 // src/columns.js
-import {actions} from "./actions"
-import { MoreHorizontal, ArrowUpDown } from "lucide-react"
-import { Button } from "@/Components/ui/button"
-import { Checkbox } from "@Components/ui/checkbox"
+import { actions } from "./actions";
+import { MoreHorizontal, ArrowUpDown } from "lucide-react";
+import { Button } from "@/Components/ui/button";
+import { Checkbox } from "@Components/ui/checkbox";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/Components/ui/dropdown-menu"
-import { Fragment } from "react"
-import { useNavigate } from "react-router-dom"; 
+} from "@/Components/ui/dropdown-menu";
+import { Fragment } from "react";
+import { useNavigate } from "react-router-dom";
 
-export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow}) => [
+export const getColumns = ({
+    setOpenDialog,
+    setOpenAlertDialog,
+    setSelectedRow,
+    setLabel,
+}) => [
     {
         id: "select",
         header: ({ table }) => (
@@ -37,7 +42,6 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow})
         enableHiding: false,
     },
     {
-        // Now using the flattened key: subjectCode
         accessorKey: "subjectCode",
         header: ({ column }) => (
             <Button
@@ -54,7 +58,6 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow})
         },
     },
     {
-        // Now using the flattened key: subjectTitle
         accessorKey: "subjectTitle",
         header: ({ column }) => (
             <Button
@@ -71,7 +74,6 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow})
         },
     },
     {
-        // Now using the flattened key: yearLevelName
         accessorKey: "yearLevelName",
         header: ({ column }) => (
             <Button
@@ -88,7 +90,6 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow})
         },
     },
     {
-        // Now using the flattened key: semesterName
         accessorKey: "semesterName",
         header: ({ column }) => (
             <Button
@@ -105,21 +106,25 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow})
         },
     },
     {
-        // Now using the flattened key: minutesPerWeek
         accessorKey: "minutesPerWeek",
         header: "Minutes Per Week",
         cell: ({ row }) => {
             const minutes = row.original.minutesPerWeek;
-            return <div>{minutes || 'N/A'}</div>;
-        }
+            return <div>{minutes || "N/A"}</div>;
+        },
     },
     {
         id: "actions",
         cell: ({ row }) => {
             const navigate = useNavigate();
             const rowData = row.original;
-            // Get the actions from the generic 'actions.js'
-            const menuActions = actions(navigate, setOpenDialog, setOpenAlertDialog, setSelectedRow);
+            const menuActions = actions(
+                navigate,
+                setOpenDialog,
+                setOpenAlertDialog,
+                setSelectedRow
+            );
+
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -129,22 +134,31 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow})
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        {
-                            menuActions.map(({ id, label, action }) => id === 1 ?
-                                (
-                                    <Fragment key={id}>
-                                        <DropdownMenuItem onClick={() => action(rowData)}>
-                                            {label}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                    </Fragment>
-                                ) : (
-                                    <DropdownMenuItem key={id} onClick={() => action(rowData)}>
-                                        {label}
+                        {menuActions.map(({ id, label, icon, action }) =>
+                            id !== "delete" ? (
+                                <Fragment key={id}>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            action(rowData);
+                                            setLabel("subjects");
+                                        }}
+                                        className="w-full justify-between"
+                                    >
+                                        {label} {icon}
                                     </DropdownMenuItem>
-                                )
+                                    {id === "view" && <DropdownMenuSeparator />}
+                                </Fragment>
+                            ) : (
+                                <Fragment key={id}>
+                                    <DropdownMenuItem
+                                        onClick={() => action(rowData)}
+                                        className="w-full !text-red-500  justify-between hover:bg-red-100 dark:hover:bg-red-950/50 !hover:text-red-500"
+                                    >
+                                        {label} {icon}
+                                    </DropdownMenuItem>
+                                </Fragment>
                             )
-                        }
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             );

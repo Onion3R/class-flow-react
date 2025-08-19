@@ -26,6 +26,7 @@ import SelectComponent from '@/Components/Select/selectComponent';
 import { generateSchedule } from '@/services/apiService';
 import { Alert, AlertDescription, AlertTitle } from "@Components/ui/alert";
 import useGeneratedScheduleGetter from '@/lib/hooks/useGeneratedSchedules';
+import { ScrollArea } from '@/Components/ui/scroll-area';
 
 function GenerateSchedule() {
   const { data: allScheduleData = [], isLoading: scheduleIsLoading } = useScheduleGetter();
@@ -37,10 +38,13 @@ function GenerateSchedule() {
   const [loading, setLoading] = useState(false);
   const [isOverride, setIsOverride] = useState(false);
   const [scheduleName, setScheduleName] = useState('');
+  const [errorMessage, setErrorMessage] = useState('')
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const found = allScheduleData.find(a => a.title === selectedSchedule);
     setSelectedScheduleId(found?.id || '');
+  
   }, [selectedSchedule, allScheduleData]);
 
   const handleGenerate = async () => {
@@ -56,34 +60,59 @@ function GenerateSchedule() {
     await submitGenerate(false);
   };
 
-  const submitGenerate = async (override) => {
-    try {
-      setLoading(true);
-      const data = {
-        schedule_id: selectedScheduleId,
-        name: scheduleName,
-        override,
-      };
-      console.log(data)
-      await generateSchedule(data);
-      triggerToast({
-                success: true,
-                title: "Generate Success",
-                desc: "Schedule have generated sucessfully",
-              });
-    } catch (error) {
-      // Optionally handle error
-    } finally {
-      setLoading(false);
-      setDialogOpen(false);
-      setIsOverride(false);
-    }
-  };
+const submitGenerate = async (override) => {
+  try {
+    setLoading(true);
+    const data = {
+      schedule_id: selectedScheduleId,
+      name: scheduleName,
+      override,
+    };
+    
+    console.log("Sending data to API:", data);
+    const responseData = await generateSchedule(data);
+    setErrorMessage('');
+    setSuccessMessage(responseData.message);
+
+    triggerToast({
+      success: true,
+      title: "Generate Success",
+      desc: responseData.message, // Use the specific message from the API
+    });
+
+  } catch (error) {
+    // This catch block handles errors thrown by generateSchedule.
+    console.error("Error in submitGenerate:", error.message);
+    
+    // Set the state with the error message.
+    setErrorMessage(error.message);
+    setSuccessMessage(''); // Clear any previous success messages
+    
+    // Provide a toast message for user feedback on failure.
+    triggerToast({
+      success: false,
+      title: "Generate Failed",
+      desc: error.message,
+    });
+    
+  } finally {
+    setLoading(false);
+    setDialogOpen(false);
+    setIsOverride(false);
+  }
+};
+
 
   const handleDialogContinue = () => {
     setIsOverride(true);
     submitGenerate(true);
   };
+
+  useEffect(() => {
+  setErrorMessage('')
+  setSuccessMessage('')
+  }, [selectedSchedule])
+  
 
   return (
     <div className='container mx-auto p-4 '>
@@ -136,7 +165,24 @@ function GenerateSchedule() {
               onChange={setSelectedSchedule}
               className="!max-w-none !w-full !min-w-none mt-4"
             />
-            <div className='border rounded-2xl my-4'></div>
+            <div className='my-4'>
+              <h1 className='font-bold mb-2'>Terminal log</h1>
+              <ScrollArea className='h-55 w-full border rounded-md gap-2 flex flex-col  p-4'  >
+               
+                  <div className="text-sm text-gray-400">
+                   <span className='text-sm'> Ready to generate. Any messages or errors will appear here. </span> <br />
+                  {!selectedSchedule ? <span>Select a schedule to generate</span> :  <span>Selected: {selectedSchedule}.</span> } <br />
+                  {errorMessage && <span className='text-sm !text-red-400'>{errorMessage}</span>} 
+                  {successMessage && <span className='text-sm '>Success: {successMessage}  Check your generated schedule in "Schedule"</span>}
+                   
+                 <span className={`text-sm text-gray-400  ${!loading ? 'hidden' : 'block'}`}>
+                    Generating schedule, please wait...
+                  </span>
+                
+                  </div>
+                {errorMessage && <span className='text-sm !text-red-400'>{errorMessage}</span>}
+              </ScrollArea>
+            </div>
             <Button onClick={handleGenerate} disabled={!selectedScheduleId || loading}>
               {loading ? 'Generating...' : 'Generate'}
             </Button>

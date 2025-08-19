@@ -1,43 +1,39 @@
-// trackStore.js
-import { useState, useEffect } from 'react';
 import { getTracks } from '@/services/apiService';
+import { useState, useEffect, useCallback } from 'react';
 
-let refreshCallback = () => {};
 
-export const triggerTrackRefresh = () => {
-  refreshCallback(); // triggers the actual refetch inside the hook
-};
+const useTrackGetter = () => {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null); // <-- NEW
 
-export default function useTrackGetter() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState([]);
-  const [refreshToken, setRefreshToken] = useState(0);
+  const refresh = useCallback(async () => {
+    setIsLoading(true);
+    setError(null); // Reset error before fetching
 
-  // Register the callback globally
-  useEffect(() => {
-    refreshCallback = () => setRefreshToken((prev) => prev + 1);
-    return () => {
-      refreshCallback = () => {};
-    };
+    try {
+      const fetchedData = await getTracks();
+
+      // Check if data is empty
+      if (!fetchedData || (Array.isArray(fetchedData) && fetchedData.length === 0)) {
+        setData([]); // Still a successful fetch, just no data
+      } else {
+        setData(fetchedData);
+      }
+    } catch (err) {
+      console.error('Failed to fetch tracks data:', err);
+      setError(err); // <-- Capture the error
+      setData([]);   // Optional: fallback to empty array
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    setIsLoading(true);
-    getTracks()
-      .then((apiData) => {
-        if (Array.isArray(apiData)) {
-          setData(apiData);
-        } else {
-          setData([]);
-          console.warn('getTracks did not return an array. Received:', apiData);
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to fetch tracks:', err);
-        setData([]);
-      })
-      .finally(() => setIsLoading(false));
-  }, [refreshToken]);
+    refresh();
+  }, [refresh]);
 
-  return { data, isLoading };
-}
+  return { data, isLoading, error, refresh };
+};
+
+export default useTrackGetter;

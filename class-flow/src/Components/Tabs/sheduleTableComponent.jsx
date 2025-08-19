@@ -150,10 +150,10 @@ function ScheduleTableComponent({ scheduleId }) {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen p-4">
-        <PulseLoader color="#4A90E2" size={15} />
-        <p className="text-gray-500 text-lg ml-4">Loading schedule...</p>
-      </div>
+      <div className='p-4 items-center justify-center flex border rounded'>
+        <span className='text-foreground/40 text-sm mr-2'>Loading schedule</span>
+        <PulseLoader size={4} loading={true} color='#ffffff' /> 
+      </div>  
     );
   }
 
@@ -200,12 +200,12 @@ function ScheduleTableComponent({ scheduleId }) {
               <TableRow>
                 <TableHead rowSpan={3} className="text-left font-semibold border-r border-muted-foreground">Time</TableHead>
                 {grade11SectionsCount > 0 && (
-                  <TableHead colSpan={grade11SectionsCount} className="text-center font-bold text-lg border-b-2 border-muted-foreground">
+                  <TableHead colSpan={grade11SectionsCount} className="text-center font-bold text-lg border-b-1 border-muted-foreground">
                     Grade 11
                   </TableHead>
                 )}
                 {grade12SectionsCount > 0 && (
-                  <TableHead colSpan={grade12SectionsCount} className="text-center font-bold text-lg border-b-2 border-gray-200">
+                  <TableHead colSpan={grade12SectionsCount} className="text-center font-bold text-lg border-b-1 border-muted">
                     Grade 12
                   </TableHead>
                 )}
@@ -214,11 +214,11 @@ function ScheduleTableComponent({ scheduleId }) {
               <TableRow>
                 {/* Grade 11 Strands */}
                 {grade11Data && Object.keys(grade11Data.strandSections).map(strandName => (
-                  <TableHead key={`g11-strand-${strandName}`} colSpan={grade11Data.strandSections[strandName].length} className="text-center font-semibold text-base border-b border-gray-200">{strandName}</TableHead>
+                  <TableHead key={`g11-strand-${strandName}`} colSpan={grade11Data.strandSections[strandName].length} className="text-center font-semibold text-base border-b border-muted">{strandName}</TableHead>
                 ))}
                 {/* Grade 12 Strands */}
                 {grade12Data && Object.keys(grade12Data.strandSections).map(strandName => (
-                  <TableHead key={`g12-strand-${strandName}`} colSpan={grade12Data.strandSections[strandName].length} className="text-center font-semibold text-base border-b border-gray-200">{strandName}</TableHead>
+                  <TableHead key={`g12-strand-${strandName}`} colSpan={grade12Data.strandSections[strandName].length} className="text-center font-semibold text-base border-b border-muted">{strandName}</TableHead>
                 ))}
               </TableRow>
               {/* Section headers row */}
@@ -245,7 +245,7 @@ function ScheduleTableComponent({ scheduleId }) {
                         <p className="text-sm font-semibold">{formatTime(specialEvent.start_time)}</p>
                         <p className="text-xs text-gray-600">to {formatTime(specialEvent.end_time)}</p>
                       </TableCell>
-                      <TableCell colSpan={allSectionsCount} className="text-center font-bold text-lg text-gray-200 bg-muted">
+                      <TableCell colSpan={allSectionsCount} className="text-center font-bold text-lg text-gray-900 dark:text-muted-foreground bg-muted">
                         {specialEvent.title}
                       </TableCell>
                     </TableRow>

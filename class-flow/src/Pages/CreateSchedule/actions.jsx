@@ -16,6 +16,7 @@ export const actions = (navigate, setOpenDialog, setOpenAlertDialog, setSelected
       console.log("Editing program:", rowData.name);
       // Example: Open a dialog for editing. You'd likely pass rowData to a state
       // in your parent component to populate the dialog.
+      setSelectedRow(rowData)
       setOpenDialog(true);
       // In a real app, you'd also pass rowData or its ID to the dialog/form
       // to pre-fill it. E.g., context.setProgramToEdit(rowData);
@@ -27,8 +28,9 @@ export const actions = (navigate, setOpenDialog, setOpenAlertDialog, setSelected
     action: (rowData) => {
       console.log("Deleting program:", rowData.name);
       // Example: Open a confirmation dialog before deleting
-      setOpenAlertDialog(true);
       setSelectedRow(rowData)
+      setOpenAlertDialog(true);
+      
     },
   },
   // Add more program-specific actions here

@@ -13,18 +13,19 @@ import DataTableComponent from '@/Components/DataTable/dataTableComponent'; // Y
 export default function TabsComponent({
   data,
   getColumns,
-  dialogData,
+  alertDialogData,
   tabList,
   filteredData,
   // IMPORTANT: Add filterComboBoxes to props destructuring here!
   filterComboBoxes = [], // <-- New prop, default to empty array
+  onRefresh,
   addComponent,
   isLoading,
   onStrandChange,
   selectedStrandTab
 }) {
-
-  // Effect to set the initial selected tab if selectedStrandTab is null or not in tabList
+ 
+    
   useEffect(() => {
     if (tabList && tabList.length > 0) {
       const isCurrentStrandValid = selectedStrandTab && tabList.some(tab => tab.value === selectedStrandTab);
@@ -69,11 +70,12 @@ export default function TabsComponent({
                 <DataTableComponent
                   data={data}
                   getColumns={getColumns}
-                  dialogData={dialogData}
+                  alertDialogData={alertDialogData}
                   filteredData={filteredData}
                   // Pass the new prop down to the DataTableComponent
                   filterComboBoxes={filterComboBoxes}
                   addComponent={addComponent}
+                  onRefresh={onRefresh}
                 />
               )}
             </div>
