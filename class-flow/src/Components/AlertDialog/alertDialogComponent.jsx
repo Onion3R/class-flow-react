@@ -75,7 +75,7 @@ export default function AlertDialogComponent({ open, selectedRow, onOpenChange, 
         try {
           await deleteSchedule(selectedRow.id);
           triggerToast(toastInfo);
-          // triggerScheduleRefresh();
+          onRefresh()
         } catch (error) {
           console.error("Error deleting schedule:", error.response?.data || error.message);
           triggerToast({

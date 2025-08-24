@@ -9,6 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
@@ -88,6 +89,8 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow ,
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
                     {menuActions.map(({ id, label, icon, action }) => (
                       id != 'delete' ? (
                         <Fragment key={id}>
@@ -100,7 +103,6 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow ,
                         className='w-full justify-between'>
                           {label} {icon}
                         </DropdownMenuItem>
-                        {id === 'view' && <DropdownMenuSeparator />}
                       </Fragment>
                       ) : (
                         <Fragment key={id}>

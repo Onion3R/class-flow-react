@@ -9,9 +9,10 @@ import {
 import SelectComponent from '../Select/selectComponent';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash } from "lucide-react";
+import { Plus, Trash, AlertCircleIcon } from "lucide-react";
 import { PulseLoader } from "react-spinners";
-
+import { Separator } from "@/components/ui/separator";
+import { Label } from '@/components/ui/label';
 // Hooks and Services
 import useYearLevels from '@/lib/hooks/useYearLevels';
 import useSemester from '@/lib/hooks/useSemester';
@@ -21,17 +22,8 @@ import {
   createSubjectStrand,
   createSubjectWithAssignments
 } from '@/services/apiService';
+import { Alert, AlertTitle } from "@/components/ui/alert"
 
-/**
- * A popover form to add new subjects and assign them to a specific strand.
- * The onRefresh prop is used to trigger a data refresh after a successful submission.
- *
- * @param {object} props - Component props.
- * @param {string} props.track - The name of the track.
- * @param {string} props.strand - The name of the strand.
- * @param {string} props.strandId - The ID of the strand.
- * @param {function} props.onRefresh - A function to call to refresh data.
- */
 function SubjectWithAssignmentFormPopover({ track, strand, strandId, onRefresh }) {
   const { data: allYearLevelData, isLoading: yearLevelIsLoading } = useYearLevels();
   const { data: allSemesterData, isLoading: semesterIsLoading } = useSemester();
@@ -42,9 +34,9 @@ function SubjectWithAssignmentFormPopover({ track, strand, strandId, onRefresh }
     // Initialize with properties for the selects to prevent uncontrolled to controlled error
     { subjectCode: '', subjectTitle: '', minutesPerWeek: '', selectedSemester: '', selectedYearLevel: '' },
   ]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [entryErrors, setEntryErrors] = useState(() => ({ [entries.length]: true }));
   const [error, setError] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(false);
   // State to manage the active accordion item
   const [openAccordionItem, setOpenAccordionItem] = useState("");
 
@@ -58,22 +50,57 @@ function SubjectWithAssignmentFormPopover({ track, strand, strandId, onRefresh }
   };
 
   const handleAddEntry = () => {
+    if (error) {
+      setError({ message: "Please complete all fields, then click Done." });
+    } else {
+      if (!(entries[entries.length - 1].subjectCode )) {
+        setError({ message: "Ensure all fields are filled in." });
+      } else {
+        setEntries((prev) => [...prev, { subjectCode: '', subjectTitle: '', minutesPerWeek: '', selectedSemester: '', selectedYearLevel: '' }]);
+        setEntryErrors((prev) => ({ ...prev, [entries.length]: '' }));
+        console.log('nadara',entries.length)
+      }
+    }
     // Add a new entry with initial values for all fields, but don't automatically open it.
-    setEntries((prev) => [...prev, { subjectCode: '', subjectTitle: '', minutesPerWeek: '', selectedSemester: '', selectedYearLevel: '' }]);
   };
 
   const handleDeleteEntry = (index) => {
-    setEntries((prev) => prev.filter((_, i) => i !== index));
+    if (entries.length > 1) {
+      setEntries((prev) => prev.filter((_, i) => i !== index));
+    }
+    if (entryErrors[index]) {
+        setEntryErrors((prev) => {
+          const { [index]: _, ...rest } = prev;
+          return rest;
+        });
+      }
+      setError(null)
     // Also, close the accordion if the deleted item was the active one
     if (`entry-${index}` === openAccordionItem) {
       setOpenAccordionItem("");
     }
   };
 
-  const handleDoneClick = (e) => {
+  const handleDoneClick = (e, idx) => {
     e.preventDefault();
     // Close the current accordion item
-    setOpenAccordionItem("");
+    if (
+      entries[idx].subjectCode &&
+      entries[idx].subjectTitle &&
+      entries[idx].minutesPerWeek &&
+      entries[idx].selectedSemester &&
+      entries[idx].selectedYearLevel
+    ) {
+      setEntryErrors(prev => {
+        const { [idx]: _, ...others } = prev
+        return (others)
+      });
+      setError(null);
+      setOpenAccordionItem("");
+    } else {
+      setError({ message: "Please fill all fields." });
+      setEntryErrors(prev => ({ ...prev, [idx]: true }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -140,7 +167,11 @@ function SubjectWithAssignmentFormPopover({ track, strand, strandId, onRefresh }
             }],
           };
 
-          await createSubjectWithAssignments(payload);
+          await createSubjectWithAssignments(payload).then(() => {
+            console.log("Subject and assignments created successfully");
+          }).catch((error) => {
+            console.error("Error creating subject and assignments:", error);
+          });
         }
       }
 
@@ -167,44 +198,153 @@ function SubjectWithAssignmentFormPopover({ track, strand, strandId, onRefresh }
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Subjects</DialogTitle>
-          <DialogDescription>You are about to add subjects for the track <u>{track}</u>, in the strand <u>{strand}</u>.</DialogDescription>
+          <DialogDescription>
+            You are about to add subjects for the track <u>{track}</u>, in the strand <u>{strand}</u>.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col w-full">
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-              <strong className="font-bold">Error: </strong>
-              <span className="block sm:inline">{error.message}</span>
-            </div>
+           <Alert variant="destructive" className="border-red-500  mb-4  bg-red-100 dark:bg-red-900/30">
+              <AlertCircleIcon className="h-4 w-4" />
+              <AlertTitle className="!truncate-none !whitespace-normal !break-words ">
+                Error:
+                <span className="!text-sm font-normal ml-1">
+                  {error.message}
+                </span>
+              </AlertTitle>
+            </Alert>
           )}
-          
-          <Accordion 
-            type="single" 
-            collapsible 
-            value={openAccordionItem} 
-            onValueChange={setOpenAccordionItem} 
+          <Separator />
+
+          <Accordion
+            type="single"
+            collapsible
+            value={openAccordionItem}
+            onValueChange={setOpenAccordionItem}
             className="w-full"
           >
             {entries.map((entry, idx) => {
               const itemId = `entry-${idx}`;
               return (
                 <AccordionItem value={itemId} key={idx}>
-                  <AccordionTrigger>{entry.subjectCode || `Subject information`}</AccordionTrigger>
+                  <AccordionTrigger
+                    className={
+                      entryErrors[idx] || (error && !entry.subjectCode)
+                        ? "text-red-600 font-semibold"
+                        : "text-black dark:text-muted-foreground"
+                    }
+                  >
+                    {entry.subjectCode || `Subject information`}
+                  </AccordionTrigger>
                   <AccordionContent className="flex flex-col items-center">
-                    <div className="gap-2 flex flex-col sm:w-[90%] w-[90%]">
-                      <div className="flex sm:flex-row flex-col gap-6 items-center mt-2">
-                        <Input name="subjectCode" value={entry.subjectCode} onChange={(e) => handleChange(idx, e)} placeholder="Subject code" required />
-                        <Input name="minutesPerWeek" type="number" value={entry.minutesPerWeek} onChange={(e) => handleChange(idx, e)} placeholder="Minutes per week" min="0" />
+                    <div className="gap-4 flex flex-col sm:w-[90%] w-[90%]">
+                      <div className="flex sm:flex-row flex-col gap-6 items-center justify-center mt-2">
+                        <div className='w-full'>
+                          <Label
+                            htmlFor={`subjectCode-${idx}`}
+                            className={`mb-2 text-xs text-foreground/80 ${((entryErrors[idx] && !entry.subjectCode) || (error && !entry.subjectCode)) && "text-red-600 font-semibold"}`}
+                          >
+                            Subject Code *
+                          </Label>
+                          <Input
+                            id={`subjectCode-${idx}`}
+                            name="subjectCode"
+                            value={entry.subjectCode}
+                            onChange={(e) => handleChange(idx, e)}
+                            placeholder="Subject code"
+                            className={`!w-full !max-w-none ${((entryErrors[idx] && !entry.subjectCode) || (error && !entry.subjectCode)) && "border border-red-500 placeholder:text-red-400"}`}
+                            required
+                          />
+                        </div>
+                        <div className='w-full'>
+                          <Label
+                            htmlFor={`minutesPerWeek-${idx}`}
+                            className={`mb-2 text-xs text-foreground/80 ${((entryErrors[idx] && !entry.minutesPerWeek) || (error && !entry.minutesPerWeek)) && "text-red-600 font-semibold"}`}
+                          >
+                            Minutes per week *
+                          </Label>
+                          <Input
+                            id={`minutesPerWeek-${idx}`}
+                            name="minutesPerWeek"
+                            type="number"
+                            value={entry.minutesPerWeek}
+                            onChange={(e) => handleChange(idx, e)}
+                            placeholder="Minutes per week"
+                            min="0"
+                            className={`!w-full !max-w-none ${((entryErrors[idx] && !entry.minutesPerWeek) || (error && !entry.minutesPerWeek)) && "border border-red-500 placeholder:text-red-400"}`}
+                            required
+                          />
+                        </div>
                       </div>
-                      <Input name="subjectTitle" value={entry.subjectTitle} onChange={(e) => handleChange(idx, e)} placeholder="Subject title" className="my-4" required />
-                      <div className='flex w-full gap-6 sm:flex-row flex-col'>
-                        {semesterIsLoading ? <div>Loading semesters...</div> : <SelectComponent items={allSemesterData.map(s => s.name)} label="Semester" value={entry.selectedSemester} onChange={(value) => handleChange(idx, { target: { name: 'selectedSemester', value } })} className="!w-full !max-w-none" />}
-                        {yearLevelIsLoading ? <div>Loading year levels...</div> : <SelectComponent items={allYearLevelData.map(s => s.name)} label="Year Level" value={entry.selectedYearLevel} onChange={(value) => handleChange(idx, { target: { name: 'selectedYearLevel', value } })} className="!w-full !max-w-none" />}
+                      <div>
+                        <Label
+                          htmlFor={`subjectTitle-${idx}`}
+                          className={`mb-2 text-xs text-foreground/80 ${((entryErrors[idx] && !entry.subjectTitle) || (error && !entry.subjectTitle)) && "text-red-600 font-semibold"}`}
+                        >
+                          Subject Title *
+                        </Label>
+                        <Input
+                          id={`subjectTitle-${idx}`}
+                          name="subjectTitle"
+                          value={entry.subjectTitle}
+                          onChange={(e) => handleChange(idx, e)}
+                          placeholder="Subject title"
+                          className={`!w-full !max-w-none ${((entryErrors[idx] && !entry.subjectTitle) || (error && !entry.subjectTitle)) && "border border-red-500 placeholder:text-red-400"}`}
+                          required
+                        />
+                      </div>
+                      <div className='flex w-full gap-6 sm:flex-row flex-col  '>
+                        {semesterIsLoading ? (
+                          <div>Loading semesters...</div>
+                        ) : (
+                          <div className='md:w-[50%] w-full'>
+                            <Label
+                              className={`mb-2 text-xs text-foreground/80 ${((entryErrors[idx] && !entry.selectedSemester) || (error && !entry.selectedSemester)) && "text-red-600 font-semibold"}`}
+                            >
+                              Semester *
+                            </Label>
+                            <SelectComponent
+                              items={allSemesterData.map(s => s.name)}
+                              label="Semester"
+                              value={entry.selectedSemester}
+                              onChange={(value) => handleChange(idx, { target: { name: 'selectedSemester', value } })}
+                              className={`!w-full !max-w-none ${((entryErrors[idx] && !entry.selectedSemester) || (error && !entry.selectedSemester)) && "text-red-600 data-[placeholder]:text-red-400 border-red-500"}`}
+                              required
+                            />
+                          </div>
+                        )}
+                        {yearLevelIsLoading ? (
+                          <div>Loading year levels...</div>
+                        ) : (
+                          <div className='md:w-[50%] w-full'>
+                            <Label
+                              className={`mb-2 text-xs text-foreground/80 ${((entryErrors[idx] && !entry.selectedYearLevel) || (error && !entry.selectedYearLevel)) && "text-red-600 font-semibold"}`}
+                            >
+                              Year Level *
+                            </Label>
+                            <SelectComponent
+                              items={allYearLevelData.map(s => s.name)}
+                              label="Year Level"
+                              value={entry.selectedYearLevel}
+                              onChange={(value) => handleChange(idx, { target: { name: 'selectedYearLevel', value } })}
+                              className={`!w-full !max-w-none ${((entryErrors[idx] && !entry.selectedYearLevel) || (error && !entry.selectedYearLevel)) && "text-red-600 data-[placeholder]:text-red-400 border-red-500"}`}
+                              required
+                            />
+                          </div>
+                        )}
                       </div>
                       <div className="flex w-full justify-center mt-4 gap-7">
-                        <Button variant="outline" onClick={handleDoneClick} className="flex-1">Done</Button>
-                        <Button type="button" onClick={() => handleDeleteEntry(idx)} className="bg-red-600 hover:bg-red-500">
-                          <Trash className="text-red-200" />
+                        <Button variant="outline" onClick={(e) => handleDoneClick(e, idx)} className="flex-1">
+                          Done
                         </Button>
+                        {entries.length > 1 && (
+                            <Button
+                              onClick={() => handleDeleteEntry(idx)}
+                              className="bg-red-600 hover:bg-red-500"
+                            >
+                              <Trash className="text-red-200" />
+                            </Button>
+                          )}
                       </div>
                     </div>
                   </AccordionContent>
@@ -220,7 +360,9 @@ function SubjectWithAssignmentFormPopover({ track, strand, strandId, onRefresh }
           </div>
 
           <DialogFooter className="flex gap-2 justify-end mt-2">
-            <Button type="button" variant="secondary" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+            <Button type="button" variant="secondary" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
             <Button type="submit" variant="default" disabled={isLoading}>
               {isLoading ? <PulseLoader size={8} color="#ffffff" /> : 'Submit All'}
             </Button>

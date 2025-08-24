@@ -56,11 +56,11 @@ const AppRoutes = () => {
       {isAdmin && (
         <Route path="/admin" element={<Layout />}>
           <Route index element={<Home />} />                   
-          <Route path="subject" element={<Subject />} />
-          <Route path="subject/detail/:id" element={<SubjectDetail />} />
+          <Route path="subjects" element={<Subject />} />
+          <Route path="subjects/detail/:id" element={<SubjectDetail />} />
           <Route path="teachers" element={<Teachers />} />
           <Route path="programs" element={<Programs />} />
-          <Route path="team/instructor-detail/:id" element={<InstructorDetail />} />
+          <Route path="teachers/teacher-detail/:id" element={<InstructorDetail />} />
           <Route path="create-schedule" element={<CreateSchedule />} />
           <Route path="generate-schedule" element={<GenerateSchedule/>} />
 

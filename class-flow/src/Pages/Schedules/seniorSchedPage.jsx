@@ -5,6 +5,7 @@ import { Lock, Search, Trash, Printer } from 'lucide-react';
 import { PulseLoader } from 'react-spinners';
 import { Button } from '@Components/ui/button';
 import { Separator } from '@Components/ui/separator';
+import DayTableComponent from '@/Components/Tabs/dayTableComponent';
 import ScheduleTableComponent from '@/Components/Tabs/sheduleTableComponent';
 import {
   Tabs,
@@ -35,6 +36,8 @@ function SeniorSchedPage() {
   const [selectedSection, setSelectedSection] = useState('');
   const [activeTrack, setActiveTrack] = useState(null);
   const [api, setApi] = useState('');
+
+  const [scheduleTable, setscheduleTable] = useState();
 
   // Load schedule ID from local storage on initial render
   const [selectedGeneratedSchedule] = useState(() => {
@@ -93,6 +96,15 @@ function SeniorSchedPage() {
       }
 
       setApi(newApi);
+       if(newApi) {
+        if(sectionId) {
+          console.log(newApi)
+          setscheduleTable(<DayTableComponent scheduleId={newApi} />);
+        } else {
+          console.log(newApi)
+          setscheduleTable(<ScheduleTableComponent scheduleId={newApi} />);
+        }
+      }
     }
   }, [
     selectedGeneratedSchedule.id,
@@ -117,15 +129,8 @@ function SeniorSchedPage() {
   };
 
   // Show loading state while data is being fetched
-  if (trackIsLoading || sectionsIsLoading || strandIsLoading) {
+  if (!trackIsLoading || !sectionsIsLoading || !strandIsLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <PulseLoader size={12} color="#4A90E2" />
-      </div>
-    );
-  }
-
-  return (
     <div className='container mx-auto p-4 relative'>
       <Tabs value={activeTrack} onValueChange={handleTrackChange}>
         <div className='flex items-center justify-between'>
@@ -143,7 +148,7 @@ function SeniorSchedPage() {
         </div>
         {allTrackData.map((e) => (
           <TabsContent key={e.id} value={e.id}>
-            <div className='bg-white dark:bg-accent p-4 rounded-lg shadow-md mb-4 justify-between sm:items-center items-start lg:flex'>
+            <div className='py-4 border-b-1 mb-4 justify-between sm:items-center items-start lg:flex'>
               <div className='flex gap-[5%] mb-2 lg:mb-0 w-full min-w-[300px] max-w-[700px]'>
                 <SelectComponent
                   items={strandsForActiveTrack.map((a) => a.code)}
@@ -165,7 +170,7 @@ function SeniorSchedPage() {
               </Button>
             </div>
             <div>
-              {api && <ScheduleTableComponent scheduleId={api} />}
+             {api && scheduleTable}
             </div>
           </TabsContent>
         ))}
@@ -173,5 +178,8 @@ function SeniorSchedPage() {
     </div>
   );
 }
+  }
+
+  
 
 export default SeniorSchedPage;

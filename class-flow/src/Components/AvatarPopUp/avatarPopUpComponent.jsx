@@ -30,6 +30,12 @@ function AvatarPopUpComponent() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
 
+  function handleThemeChange(value) { 
+    if (value != theme && value) {
+            setTheme(value)
+    }
+  }
+
   const handleSignOut = async (e) => {
     e.preventDefault();
     if (!isLoggingOut) {
@@ -86,7 +92,7 @@ function AvatarPopUpComponent() {
               className="border"
               size="sm"
               value={theme}
-              onValueChange={setTheme}
+              onValueChange={(value)=> handleThemeChange(value)}
             >
               <ToggleGroupItem value="light"><Sun className="size-4" /></ToggleGroupItem>
               <ToggleGroupItem value="dark"><Moon className="size-4" /></ToggleGroupItem>

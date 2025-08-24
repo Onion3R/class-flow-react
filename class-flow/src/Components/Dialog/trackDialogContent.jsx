@@ -10,30 +10,40 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Separator } from '../ui/separator'
+import { AlertCircleIcon } from 'lucide-react'
 import {Input} from "@/Components/ui/input"
+import { Label } from '../ui/label'
 import { updateTrack } from '@/services/apiService'
 const toastInfo = {
   success: false, 
   title: 'Update Track',
   desc: 'Sucessfully updated'
 }
+import { Alert, AlertTitle } from "@/components/ui/alert"
+
 
 function TrackDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh}) {
  
  const [name, setName] = useState(selectedRow?.name || '');
  const [code, setCode] = useState(selectedRow?.code || '');
+  const [error, setError] = useState(null);
 
-
-  useEffect(() => {
-    if (selectedRow) {
-      setName(selectedRow.name || '');
-      setCode(selectedRow.code || '');
-    }
-  }, [selectedRow])
+  // useEffect(() => {
+  //   if (selectedRow) {
+  //     setName(selectedRow.name || '');
+  //     setCode(selectedRow.code || '');
+  //   }
+  // }, [selectedRow])
   
 
   async function handleUpdate(e) {
     e.preventDefault();
+    
+    if (!name || !code) { 
+      setError({message: 'All fields are required'});
+      return;
+    }
     try {
       const data = {
         name, 
@@ -56,19 +66,53 @@ function TrackDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh}) 
               Make changes to your track here. Click update when you&apos;re
               done.
             </DialogDescription>
-          </DialogHeader>
-            <div className="space-y-4 px-2">  
             
-              <Input 
-              id='name' 
-              placeholder='Track name' 
+          </DialogHeader>
+            {error && (
+           <Alert variant="destructive" className="border-red-500 bg-red-100 dark:bg-red-900/30">
+              <AlertCircleIcon className="h-4 w-4" />
+              <AlertTitle className="!truncate-none !whitespace-normal !break-words ">
+                Error:
+                <span className="!text-sm font-normal ml-1">
+                  {error.message}
+                </span>
+              </AlertTitle>
+            </Alert>
+          )}
+          <Separator/>
+            <div className="space-y-4 px-2">  
+              <div>
+              <Label
+                htmlFor='name'
+                className={`mb-2 text-xs text-foreground/80 ${!name && "text-red-600 font-semibold"}`}
+              >
+                Track Name *
+              </Label>
+              <Input
+              id='name'
+              placeholder='Enter name'
               onChange={(e) => setName(e.target.value)}
-              value={name}/>
+              value={name}
+              className={`!w-full !max-w-none ${!name && "border border-red-500 placeholder:text-red-400"}`}
+              required
+              />
+              </div>
+              <div>
+              <Label
+                htmlFor='code'
+                className={`mb-2 text-xs text-foreground/80 ${!code && "text-red-600 font-semibold"}`}
+              >
+                Track Code *
+              </Label>
               <Input 
               id='code' 
-              placeholder='Track code' 
+              placeholder='Enter code' 
               onChange={(e) => setCode(e.target.value)}
-              value={code}/>
+              value={code}
+              className={`!w-full !max-w-none ${!code && "border border-red-500 placeholder:text-red-400"}`}
+              required
+              />
+              </div>
             </div>
           <DialogFooter>
             <DialogClose asChild onClick={() => onOpenChange(false)}>

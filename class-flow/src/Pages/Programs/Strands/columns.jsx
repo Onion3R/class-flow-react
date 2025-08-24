@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuLabel
 } from "@/Components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom"; // Assuming you are using react-router-dom
 import { Fragment } from "react"; // For conditionally rendering separators
@@ -113,16 +114,20 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog, setSelectedRow, 
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
                     {menuActions.map(({ id, label, icon, action }) => (
                       id != 'delete' ? (
                         <Fragment key={id}>
-                        <DropdownMenuItem onClick={() => {
-                          action(rowData)
-                          setLabel('strands')
-                          }}  className='w-full justify-between'>
+                        <DropdownMenuItem 
+                        onClick={() => 
+                          {
+                            action(rowData)
+                            setLabel('strands')
+                          }}  
+                        className='w-full justify-between'>
                           {label} {icon}
                         </DropdownMenuItem>
-                        {id === 'view' && <DropdownMenuSeparator />}
                       </Fragment>
                       ) : (
                         <Fragment key={id}>

@@ -72,6 +72,18 @@ export const getTeachers = async () => {
   return response.data;
 };
 
+
+export const addSpecializationToTeacher = async (data) => {
+  const response = await api.post('teacher-specializations/', data);
+  return response.data;
+};
+
+export const deleteSpecializationFromTeacher = async (data) => {
+  const response = await api.delete(`teacher-specializations/${data}/`);
+  return response.data;
+};
+
+
 export const getSpecificTeacher = async (teacherId) => {
   const response = await api.get(`teachers/${teacherId}/`);
   return response.data;
@@ -145,6 +157,9 @@ export const createSubjectWithAssignments = async (payload) => {
     throw error;
   }
 };
+
+
+
 
 export const createTrack = async (data) => {
   try {

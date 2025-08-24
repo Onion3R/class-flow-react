@@ -1,42 +1,40 @@
 // useSchedule.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getSchedules } from '@/services/apiService';
 
-let refreshCallback = () => {};
-
-export const triggerScheduleRefresh = () => {
-  refreshCallback(); // triggers the actual refetch inside the hook
-};
-
-export default function useScheduleGetter() {
-  const [isLoading, setIsLoading] = useState(false);
+/**
+ * Custom hook to fetch and manage schedules data.
+ * It returns the data, a loading state, and a refresh function.
+ */
+const useScheduleGetter = () => {
   const [data, setData] = useState([]);
-  const [refreshToken, setRefreshToken] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    refreshCallback = () => setRefreshToken((prev) => prev + 1);
-    return () => {
-      refreshCallback = () => {};
-    };
+  // Memoized refresh function (same pattern as useStrandGetter)
+  const refresh = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const fetchedData = await getSchedules();
+      if (Array.isArray(fetchedData)) {
+        setData(fetchedData);
+      } else {
+        console.warn('Invalid data format:', fetchedData);
+        setData([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch schedules:', error);
+      setData([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
+  // Fetch once on mount
   useEffect(() => {
-    setIsLoading(true);
-    getSchedules()
-      .then((apiData) => {
-        if (Array.isArray(apiData)) {
-          setData(apiData);
-        } else {
-          setData([]);
-          console.warn('getSchedules did not return an array. Received:', apiData);
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to fetch schedules:', err);
-        setData([]);
-      })
-      .finally(() => setIsLoading(false));
-  }, [refreshToken]);
+    refresh();
+  }, [refresh]);
 
-  return { data, isLoading };
-}
+  return { data, isLoading, refresh };
+};
+
+export default useScheduleGetter;

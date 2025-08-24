@@ -1,68 +1,106 @@
+import React, {useState}from 'react';
+import { Plus } from 'lucide-react';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import useSubjectsGetter from '@/lib/hooks/useSubjects';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardAction,
+  CardTitle,
+} from "@/components/ui/card";
 
-import React from 'react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
-function getInitials(name) {
-  const parts = name.trim().split(' ');
-  if (parts.length === 1) return parts[0][0].toUpperCase(); // Single name
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
-export default function UserList({ users, title }) {
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { addSpecializationToTeacher } from '@/services/apiService';
+export default function SubjectList({teachersId, onRefresh}) {
+  const [open, setOpen] = useState(false)
+  const { data: subjects, isLoading } = useSubjectsGetter();
+
+  const handleAssign = async (subjectId) => {
+    console.log(`Assigning subject with ID: ${subjectId}`);
+    try {
+      if(teachersId && subjectId) {
+          const data ={
+        teacher_id: Number(teachersId),
+        subject_id: subjectId,
+        proficiency_level: 'Proficient'
+      }
+      console.log('Data to be sent:', data);
+       await addSpecializationToTeacher( data ).then(() => {
+         console.log(`Successfully assigned subject with ID: ${subjectId}`);
+       });
+      onRefresh();
+      }
+    } catch (error) {
+        console.log('Error assigning subject:', error);
+    }
+
+  };
+
   return (
-    <div className="h-[100%] min-h-[20px] max-h-[320px]  ">
-      {title && <p className="font-semibold mb-4">{title}</p>}
-      <ScrollArea className=" h-full rounded-md ">
-        <ul className="space-y-3 pr-2">
-          {users.map((user, index) => (
-            <li key={index} className="flex items-center gap-4">
-              <Avatar className="h-6 w-6 bg-gray-400 rounded-full flex items-center justify-center text-lg">
-                <AvatarFallback className="text-[12px] text-gray-500">
-                  {getInitials(user.name)}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-sm text-gray-800">{user.name}</span>
-            </li>
-          ))}
-        </ul>
-      </ScrollArea>
-    </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="default">Assign</Button>
+      </PopoverTrigger>
+
+      <PopoverContent className="p-0 w-[400px]" side="left" align="center" sideOffset={8}>
+        <Card className="bg-transparent border-none shadow-none m-0 w-full gap-4">
+          <CardHeader className="px-4">
+            <CardTitle>Subject</CardTitle>
+            <CardDescription>Add subjects to a teacher</CardDescription>
+            <CardAction><Button variant='default' onClick={() => setOpen(false)}>Cancel</Button></CardAction>
+          </CardHeader>
+
+          <CardContent className="px-2">
+           
+              <Command  className='px-2 '>
+                <CommandInput  placeholder="Search subject" />
+                <CommandList>
+                   <ScrollArea className="rounded-md h-[300px]">
+                  {isLoading ? (
+                    <div className="p-4 text-sm text-muted-foreground">Loading subjects...</div>
+                  ) : subjects?.length === 0 ? (
+                    <CommandEmpty>No subjects found.</CommandEmpty>
+                  ) : (
+                    <CommandGroup className='px-2'>
+                      {subjects.map((s) => (
+                        <CommandItem key={s.id} className="text-sm text-muted-foreground p-1 h-auto flex flex-col  !bg-transparent">
+                          <div className="flex justify-between items-center w-full">
+                            <span>
+                              <span className="font-bold">{s.code}: </span> {s.title}
+                            </span>
+                            <Button variant="outline" onClick={() => handleAssign(s.id)}>
+                              <Plus />
+                            </Button>
+                          </div>
+                          <Separator  />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
+                   </ScrollArea>
+                </CommandList>
+              </Command>
+           
+          </CardContent>
+        </Card>
+      </PopoverContent>
+    </Popover>
   );
 }
-
-
-
-//  <ScrollArea className="max-h-[300px] overflow-y-auto">
-//         <ul className="space-y-3 pr-2">
-//           {users.map((user, index) => (
-//             <li key={index} className="flex items-center gap-4">
-//               <Avatar className="h-6.5 w-6.5 bg-gray-400 rounded-full flex items-center justify-center text-lg">
-//                 <AvatarFallback className="text-sm text-gray-500">
-//                   {getInitials(user.name)}
-//                 </AvatarFallback>
-//               </Avatar>
-//               <span className="text-sm text-gray-800">{user.name}</span>
-//             </li>
-//           ))}
-//         </ul>
-//       </ScrollArea>
-
-
-
-//  <li key={index} className="flex items-center gap-4">
-//             {user.avatar ? (
-//               // <img
-//               //   src={user.avatar}
-//               //   alt={user.name}
-//               //   className="w-10 h-10 rounded-full object-cover"
-//               // />
-//               <Avatar className={"ml-9"}>
-//                 <AvatarImage src={avatar} />
-//                 <AvatarFallback>CN</AvatarFallback>
-//               </Avatar>
-//             ) : (
-//               <div className="w-10 h-10 rounded-full bg-gray-300 text-gray-700 flex items-center justify-center font-bold">
-//                 {getInitials(user.name)}
-//               </div>
-//             )}

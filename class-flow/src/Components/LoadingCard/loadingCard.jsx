@@ -41,7 +41,7 @@ function LoadingCard({ message, variant }) {
   }, [variant, message]);
 
   return (
-    <Card>
+    <Card className='bg-transparent'>
       <CardContent>{cardContent}</CardContent>
     </Card>
   );

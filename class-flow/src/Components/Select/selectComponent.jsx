@@ -14,9 +14,9 @@ export default function SelectComponent({disabled, items, label, value, onChange
   
   return (
     <Select disabled={disabled} value={value} onValueChange={onChange} >
-   <SelectTrigger className={`w-[180px] min-w-[70px] max-w-[200px] sm:min-w-0 ${className}`} >
+   <SelectTrigger className={`w-[180px] min-w-[70px] max-w-[200px] sm:min-w-0  ${className} `} >
 
-        <SelectValue placeholder={label + " " +"Options"} />
+        <SelectValue  placeholder={label + " " +"Options"} />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>

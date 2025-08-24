@@ -8,6 +8,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useLocation } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 function BreadCrumbComponent() {
   const location = useLocation();
@@ -17,23 +18,25 @@ function BreadCrumbComponent() {
     setBreadcrumbItems(formatPath(location.pathname));
   }, [location]);
 
-  function formatPath(pathname) {
+    function formatPath(pathname) {
+    const basePath = "/admin"; // adjust this if your base route is different
+
     const segments = pathname
       .split("/")
-      .filter((part) => part && part !== "admin");
+      .filter((part) => part && part !== "admin" && !part.startsWith("U2F"));
 
     return segments.map((segment, index) => {
-      // Capitalize each word in kebab-case
       const formatted = segment
         .split("-")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ");
 
-      const url = "/" + segments.slice(0, index + 1).join("/");
+      const url = `${basePath}/${segments.slice(0, index + 1).join("/")}`;
 
-      return { path: formatted, url };
-    });
-  }
+    return { path: formatted, url };
+  });
+}
+
 
   return (
     <Breadcrumb>
@@ -52,7 +55,9 @@ function BreadCrumbComponent() {
           ) : (
             <React.Fragment key={index}>
               <BreadcrumbItem>
-                <BreadcrumbLink href={item.url}>{item.path}</BreadcrumbLink>
+                <Link to={item.url}>
+              {item.path}
+                </Link>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
             </React.Fragment>

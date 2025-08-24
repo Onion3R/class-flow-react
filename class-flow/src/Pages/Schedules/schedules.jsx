@@ -59,7 +59,7 @@ function Schedules() {
   };
 
   return (
-    <div className='p-4 max-w-full'>
+    <div className='p-4  mx-auto'>
       <h1 className="text-2xl font-bold mb-2">Generated Schedules</h1>
       <div className='bg-muted p-4 rounded-lg border justify-between sm:items-center items-start flex'>
         <div>

@@ -14,16 +14,12 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert"
+
 import { Separator } from '@/Components/ui/separator';
 import LoadingCard from '../../Components/LoadingCard/loadingCard';
 import DataTableComponent from '@/Components/DataTable/dataTableComponent';
 import { PulseLoader } from 'react-spinners';
-import { AlertCircleIcon } from 'lucide-react';
+import AlertComponent from '@/Components/Alert/alertComponent';
 
 // Import your refactored data-fetching hooks
 import useTrackGetter from '@/lib/hooks/useTracks';
@@ -86,12 +82,12 @@ function Programs() {
   };
 
   return (
-    <div className=" flex justify-center">
-      <div className="p-4 container">
-        <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value)}>
-          <div className='flex items-center justify-between'>
+    <div className="container p-4 mx-auto">
+      <div className="sm:w-auto ">
+        <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value)} className='m-0'>
+          <div className='flex items-center justify-between mb-4' >
             <div className='flex sm:flex-row flex-col sm:gap-5 gap-2 sm:items-center items-start justify-center h-auto'>
-              <h1 className="text-2xl font-bold my-2 container mx-auto">Academic Programs</h1>
+              <h1 className="text-2xl font-bold ">Academic Programs</h1>
               <Separator orientation='vertical' className='!h-6 !w-[2px] sm:block hidden' />
               <TabsList className="rounded shadow border border-dashed bg-muted dark:bg-transparent">
                 {tablist.map((tabName) => (
@@ -99,7 +95,7 @@ function Programs() {
                 ))}
               </TabsList>
             </div>
-            <PulseLoader size={6} loading={overallLoading} />
+            <PulseLoader size={6} loading={overallLoading} color={'#808080'} />
           </div>
           {tablist.map((tabName) => (
             <TabsContent key={tabName} value={tabName} className='w-full'>
@@ -110,18 +106,7 @@ function Programs() {
                 <div>
                   {error && 
                   (
-                 <Alert variant="destructive" className="mb-4 bg-red-100">
-                    <AlertCircleIcon />
-                    <AlertTitle>Connection Error</AlertTitle>
-                    <AlertDescription>
-                      <p>We couldn’t connect to the server. Please check your internet connection and try again.</p>
-                      <ul className="list-inside list-disc text-sm">
-                        <li>Ensure your device is connected to the internet</li>
-                        <li>Disable any VPN or firewall that might block access</li>
-                        <li>Try refreshing the page once you're back online</li>
-                      </ul>
-                    </AlertDescription>
-                  </Alert>
+                    <AlertComponent/>
                   )}
                 <Card className='bg-transparent mt-1'>
                 <div>

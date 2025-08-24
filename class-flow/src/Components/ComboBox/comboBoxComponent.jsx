@@ -100,7 +100,7 @@ export function ComboBox({data,label, setComboBoxHasSelectedItem, setFilterValue
           <Command>
             <CommandInput placeholder={`Search ${label}...`} />
             <CommandList>
-              <CommandEmpty>No subjects found.</CommandEmpty>
+              <CommandEmpty>No {label} found.</CommandEmpty>
               <CommandGroup>
                 {comboFilters.map((comboFilter) => (
                   <CommandItem

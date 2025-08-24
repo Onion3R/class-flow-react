@@ -167,13 +167,13 @@ function SubjectPage() {
     const handleRefresh = () => refreshSubjectStrand();
 
     return (
-        <div className="min-h-d flex justify-center ">
-            <div className="container p-4">
+        <div className="container p-4 mx-auto  ">
+            <div className="sm-auto">
                 <Tabs
                     value={selectedTrackId ? String(selectedTrackId) : ''}
                     onValueChange={value => setSelectedTrackId(Number(value))}
                 >
-                    <div className="flex items-center sm:items-start justify-between mb-4 sm:mb-none ">
+                    <div className="flex items-center sm:items-center justify-between mb-4 sm:mb-none  ">
                         <div className="flex sm:flex-row sm:gap-5 gap-2 sm:items-center items-start flex-col ">
                             <h1 className="text-2xl font-bold">Subjects</h1>
                             <Separator orientation="vertical" className="!h-6 !w-[2px] sm:block hidden " />
@@ -190,8 +190,9 @@ function SubjectPage() {
                                     ))}
                                 </TabsList>
                             )}
+                           
                         </div>
-                       
+                        <PulseLoader size={6} loading={overallLoading} color={'#808080'} />
                     </div>
                     {overallLoading ? (
                         <LoadingCard variant="database" />

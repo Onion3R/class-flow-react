@@ -1,16 +1,6 @@
 import { PencilLine, Trash2 } from "lucide-react";
 export const actions = (navigate, setOpenDialog, setOpenAlertDialog, setSelectedRow) => [
   {
-    id: 'view', // Unique ID for the action
-    label: "View Details",
-    icon: null,
-    action: (rowData) => {
-      console.log("Viewing program:", rowData.name);
-      // Example: Navigate to a detailed view page for the program
-      navigate(`/programs/${rowData.id}`);
-    },
-  },
-  {
     id: 'edit',
     label: "Edit",
     icon: <PencilLine className="h-[10px] w-[10px] " />,

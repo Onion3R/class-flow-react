@@ -67,7 +67,7 @@ const data2 = {
               },
               {
                 title: "Subjects",
-                url: "subject",
+                url: "subjects",
                 icon: Library,
             },   
             {

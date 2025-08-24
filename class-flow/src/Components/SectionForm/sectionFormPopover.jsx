@@ -17,9 +17,11 @@ import {
 import SelectComponent from '../Select/selectComponent';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash } from "lucide-react";
+import { Label } from '../ui/label';
+import { Plus, Trash ,  AlertCircleIcon} from "lucide-react";
 import { PulseLoader } from "react-spinners";
 import { triggerToast } from '@/lib/utils/toast';
+import { Alert, AlertTitle } from "@/components/ui/alert"
 
 // Import the API function
 import { createSection } from '@/services/apiService';
@@ -35,14 +37,40 @@ function SectionFormPopover({ onRefresh }) {
   // State to manage dialog's open/close state
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
-  const [activeAccordion, setActiveAccordion] = useState("");
   const [entries, setEntries] = useState([
     { name: '', selectedStrand: '', selectedYearLevel: ''},
   ]);
-  
+
+  const [openAccordionItem, setOpenAccordionItem] = useState("");
+  const [entryErrors, setEntryErrors] = useState(() => ({ [entries.length]: true }));
   const [error, setError] = useState(null);
 
-  const handleChange = (index, e) => {
+  // const handleChange = (index, e) => {
+  //   const { name, value } = e.target;
+  //   setEntries((prev) => {
+  //     const updated = [...prev];
+  //     updated[index][name] = value;
+  //     return updated;
+  //   });
+  // };
+
+  // const handleYearLevelChange = (index, value) => {
+  //   setEntries((prev) => {
+  //     const updated = [...prev];
+  //     updated[index].selectedYearLevel = value;
+  //     return updated;
+  //   });
+  // };
+
+  // const handleStrandChange = (index, value) => {
+  //   setEntries((prev) => {
+  //     const updated = [...prev];
+  //     updated[index].selectedStrand = value;
+  //     return updated;
+  //   });
+  // };
+
+   const handleChange = (index, e) => {
     const { name, value } = e.target;
     setEntries((prev) => {
       const updated = [...prev];
@@ -51,32 +79,39 @@ function SectionFormPopover({ onRefresh }) {
     });
   };
 
-  const handleYearLevelChange = (index, value) => {
-    setEntries((prev) => {
-      const updated = [...prev];
-      updated[index].selectedYearLevel = value;
-      return updated;
-    });
-  };
-
-  const handleStrandChange = (index, value) => {
-    setEntries((prev) => {
-      const updated = [...prev];
-      updated[index].selectedStrand = value;
-      return updated;
-    });
-  };
-
   const handleAddEntry = () => {
-   setEntries((prev) => [
-      ...prev,
-       { name: '', selectedStrand: '', selectedYearLevel: ''},
-    ]);
+    if (error) {
+      setError({ message: "Please complete all fields, then click Done." });
+    } else {
+      if (!(entries[entries.length - 1].name )) {
+        setError({ message: "Ensure all fields are filled in." });
+      } else {
+        setEntries((prev) => [...prev,  { name: '', selectedStrand: '', selectedYearLevel: ''}]);
+        setEntryErrors((prev) => ({ ...prev, [entries.length]: '' }));
+        console.log('nadara',entries.length)
+      }
+    }
+    // Add a new entry with initial values for all fields, but don't automatically open it.
   };
 
-  const handleFillingTrackInfo = (index, e) => {
+  const handleDoneClick = (e,idx) => {
     e.preventDefault();
-    setActiveAccordion("");
+     // Close the current accordion item
+    if (
+      entries[idx].name &&
+      entries[idx].selectedStrand &&
+      entries[idx].selectedYearLevel 
+    ) {
+      setEntryErrors(prev => {
+        const { [idx]: _, ...others } = prev
+        return (others)
+      });
+      setError(null);
+      setOpenAccordionItem("");
+    } else {
+      setError({ message: "Please fill all fields." });
+      setEntryErrors(prev => ({ ...prev, [idx]: true }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -140,10 +175,21 @@ function SectionFormPopover({ onRefresh }) {
     setIsDialogOpen(false);
   };
 
-  const handleDeleteEntry = (index, e) => {
-    e.preventDefault();
-    setEntries((prev) => prev.filter((_, i) => i !== index));
-    setActiveAccordion("");
+  const handleDeleteEntry = (index) => {
+    if (entries.length > 1) {
+      setEntries((prev) => prev.filter((_, i) => i !== index));
+    }
+    if (entryErrors[index]) {
+        setEntryErrors((prev) => {
+          const { [index]: _, ...rest } = prev;
+          return rest;
+        });
+      }
+      setError(null)
+    // Also, close the accordion if the deleted item was the active one
+    if (`entry-${index}` === openAccordionItem) {
+      setOpenAccordionItem("");
+    }
   };
 
   const allLoading = yearLevelIsLoading || strandIsLoading || isFormSubmitting;
@@ -161,11 +207,16 @@ function SectionFormPopover({ onRefresh }) {
           <DialogDescription>You are about to add a new section.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col w-full">
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-              <strong className="font-bold">Error: </strong>
-              <span className="block sm:inline">{error.message}</span>
-            </div>
+           {error && (
+           <Alert variant="destructive" className="border-red-500  mb-4  bg-red-100 dark:bg-red-900/30">
+              <AlertCircleIcon className="h-4 w-4" />
+              <AlertTitle className="!truncate-none !whitespace-normal !break-words ">
+                Error:
+                <span className="!text-sm font-normal ml-1">
+                  {error.message}
+                </span>
+              </AlertTitle>
+            </Alert>
           )}
           
           {entries.map((entry, idx) => {
@@ -174,61 +225,98 @@ function SectionFormPopover({ onRefresh }) {
               <Accordion
                 type="single"
                 collapsible
-                value={activeAccordion}
-                onValueChange={setActiveAccordion}
+                value={openAccordionItem}
+                onValueChange={setOpenAccordionItem}
                 className="w-full border-t"
                 key={idx}
               >
                 <AccordionItem value={itemId}>
-                  <AccordionTrigger>Section Information {idx + 1}</AccordionTrigger>
+                  <AccordionTrigger
+                    className={
+                      entryErrors[idx] || (error && !entry.name)
+                        ? "text-red-600 font-semibold"
+                        : "text-black dark:text-muted-foreground"
+                    }
+                  >
+                    {entry.name || `Subject information`}
+                  </AccordionTrigger>
                   <AccordionContent className="flex flex-col text-balance items-center justify-center">
                     <div className="gap-2 flex flex-col items-center justify-center w-[95%]">
+                      <div className='w-full'>
+                        <Label
+                          htmlFor={`name-${idx}`}
+                          className={`mb-2 text-xs text-foreground/80 ${((entryErrors[idx] && !entry.name) || (error && !entry.name)) && "text-red-600 font-semibold"}`}
+                        >
+                          Section Name *
+                        </Label>
                       <Input
+                        id={`name-${idx}`}
                         name="name"
                         value={entry.name}
                         onChange={(e) => handleChange(idx, e)}
                         placeholder="Section name"
                         required
+                        className={`!w-full !max-w-none ${((entryErrors[idx] && !entry.name) || (error && !entry.name)) && "border border-red-500 placeholder:text-red-400"}`}
                       />
-                      <div className="flex sm:flex-row flex-col gap-6 items-center justify-between mt-2 w-full">
+                      </div>
+                      <div className="flex sm:flex-row flex-col items-center justify-between w-full gap-6">
                         {yearLevelIsLoading || !allYearlevelData ? (
                           <div>Loading year levels...</div>
                         ) : (
+                          <div className='w-full md:w-[50%]'>
+                            <Label
+                          htmlFor={`selectedYearLevel-${idx}`}
+                          className={`mb-2 text-xs text-foreground/80 ${((entryErrors[idx] && !entry.selectedYearLevel) || (error && !entry.selectedYearLevel)) && "text-red-600 font-semibold"}`}
+                        >
+                          Year Level *
+                        </Label>
                           <SelectComponent
                             items={allYearlevelData.map((a) => a.name)}
-                            label="Select year level"
+                            label="Year level"
                             value={entry.selectedYearLevel}
-                            onChange={(value) => handleYearLevelChange(idx, value)}
-                            className="!max-w-none !w-full sm:my-2 my-0 !min-w-none"
+                            onChange={(value) => handleChange(idx, { target: { name: 'selectedYearLevel', value } })}
+                             className={`!w-full !max-w-none ${((entryErrors[idx] && !entry.selectedYearLevel) || (error && !entry.selectedYearLevel)) && "text-red-600 data-[placeholder]:text-red-400 border-red-500"}`}
+                             required
                           />
+                          </div>
                         )}
                         {strandIsLoading || !allStrandData ? (
                           <div>Loading strands...</div>
                         ) : (
+                           <div className='w-full md:w-[50%]'>
+                            <Label
+                          htmlFor={`selectedStrand-${idx}`}
+                          className={`mb-2 text-xs text-foreground/80 ${((entryErrors[idx] && !entry.selectedStrand) || (error && !entry.selectedStrand)) && "text-red-600 font-semibold"}`}
+                        >
+                          Strand *
+                        </Label>
                           <SelectComponent
                             items={allStrandData.map((s) => s.code)}
-                            label="Select Strand"
+                            label="Strand"
                             value={entry.selectedStrand}
-                            onChange={(value) => handleStrandChange(idx, value)}
-                            className="!max-w-none !w-full sm:my-2 my-0 !min-w-none"
+                            onChange={(value) => handleChange(idx, { target: { name: 'selectedStrand', value } })}
+                            className={`!w-full !max-w-none ${((entryErrors[idx] && !entry.selectedStrand) || (error && !entry.selectedStrand)) && "text-red-600 data-[placeholder]:text-red-400 border-red-500"}`}
                           />
+                          </div>
                         )}
                       </div>
                       
                       <div className="flex w-full items-center justify-center mt-4 gap-7">
                         <Button
                           variant="outline"
-                          onClick={(e) => handleFillingTrackInfo(idx, e)}
+                          onClick={(e) => handleDoneClick(e,idx)}
                           className="flex-1 w-full"
                         >
                           Done
                         </Button>
-                        <Button
-                          onClick={(e) => handleDeleteEntry(idx, e)}
-                          className="bg-red-600 hover:bg-red-500"
-                        >
-                          <Trash className="text-red-200" />
-                        </Button>
+                       {entries.length > 1 && (
+                            <Button
+                              onClick={() => handleDeleteEntry(idx)}
+                              className="bg-red-600 hover:bg-red-500"
+                            >
+                              <Trash className="text-red-200" />
+                            </Button>
+                          )}
                       </div>
                     </div>
                   </AccordionContent>

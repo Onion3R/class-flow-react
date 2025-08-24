@@ -19,9 +19,8 @@ import { PulseLoader } from "react-spinners";
 import semesterGetter from "@/lib/hooks/useSemester";
 import DatePickerComponent from "../DataPicker/datePickerComponent";
 import { createSchedule } from "@/services/apiService";
-import { triggerScheduleRefresh } from "@/lib/hooks/useSchedules";
-triggerScheduleRefresh
-function ScheduleFormPopover() {
+
+function ScheduleFormPopover({onRefresh}) {
   const { data: allSemesterData, isLoading: semesterIsLoading } = semesterGetter();
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
@@ -60,8 +59,8 @@ function ScheduleFormPopover() {
     try {
        console.log(scheduleData)
       await createSchedule(scheduleData)
-      triggerScheduleRefresh()
       // await submitSchedule(scheduleData); // ← your API call here
+      onRefresh()
     } catch (err) {
       setError(err);
     } finally {

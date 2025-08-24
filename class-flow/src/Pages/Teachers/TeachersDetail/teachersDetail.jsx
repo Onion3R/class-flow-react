@@ -1,106 +1,78 @@
-import React, {useState, useEffect} from 'react'
-import { UserPen } from 'lucide-react'
-import { Avatar, AvatarImage, AvatarFallback } from '@/Components/ui/avatar'
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import React, { useState, useEffect } from 'react'
+
+
+import { Card, CardContent } from '@/Components/ui/card'
+
 import { getSpecificTeacher } from '@/services/apiService'
-import { useParams } from 'react-router-dom';
-import CryptoJS from 'crypto-js';
+import { useParams } from 'react-router-dom'
+import CryptoJS from 'crypto-js'
 
+import ProfileInfo from './profileInfo'
+import Profile from './profile'
+import Specialization from './Specialization'
+const SECRET_KEY = import.meta.env.VITE_SECRET_KEY
 
-const SECRET_KEY = import.meta.env.VITE_SECRET_KEY;
-const AvatarComponent = () => (
-  
-  <div className='relative w-fit'>
-    <Avatar className="h-25 w-25">
-      <AvatarImage src="https://github.com/shadcn.png" />
-      <AvatarFallback>CN</AvatarFallback>
-    </Avatar>
-    <div className='absolute right-3 bottom-0 bg-white rounded-full h-7 w-7 flex items-center justify-center border border-l-white'>
-      <UserPen className='text-primary w-4 h-4' />
-    </div>
-  </div>
-);
 
 function TeachersDetail() {
+  const { id } = useParams() // This is either plain or encrypted
+  const [teachersId, setTeachersId] = useState(null)
+  const [teacherDetail, setTeacherDetail] = useState(null)
+  const [disable, setDisable] = useState(true)
   
-  const { id } = useParams(); // This is either plain or encrypted
-  const [teachersId, setTeachersId] = useState(null);
-  const [teacherDetail, setTeacherDetail] = useState(null);
-  useEffect(() => {
-    try {
-      const bytes = CryptoJS.AES.decrypt(decodeURIComponent(id), SECRET_KEY);
-      const originalId = bytes.toString(CryptoJS.enc.Utf8);
-      setTeachersId(originalId);
-    } catch (error) {
-      console.error("Failed to decrypt ID:", error);
-      setTeachersId(id); // fallback to plain ID
-    }
-  }, [id]);
 
   useEffect(() => {
-  async function getTeacher() {
-    try {
-      await getSpecificTeacher(teachersId).then((data) => {
-        setTeacherDetail(data);
-        console.log('Fetched teacher data:', data);
-      });
+    try {``
+      const bytes = CryptoJS.AES.decrypt(decodeURIComponent(id), SECRET_KEY)
+      const originalId = bytes.toString(CryptoJS.enc.Utf8)
+      setTeachersId(originalId)
     } catch (error) {
-      console.log('Error fetching teacher:', error);
+      console.error("Failed to decrypt ID:", error)
+      setTeachersId(id) // fallback to plain ID
     }
+  }, [id])
+
+  async function getTeacher() {
+  try {
+    const data = await getSpecificTeacher(teachersId)
+    setTeacherDetail(data)
+    console.log('Fetched teacher data:', data)
+  } catch (error) {
+    console.log('Error fetching teacher:', error)
   }
-  getTeacher()
-  }, [teachersId])
+}
+
+useEffect(() => {
+  if (teachersId) {
+    getTeacher()
+  }
+}, [teachersId])
+
+function onRefresh() {
+  if (teachersId) {
+    getTeacher()
+  }
+}
+
   
 
   return (
+    
     <div className='container mx-auto p-4'>
-      <Card >
+     { teacherDetail &&(
+      <Card className='min-h-[calc(100vh-79px)] bg-transparent '>
         <CardContent>
-          <div className='flex items-center gap-4 mb-4'>
-           <AvatarComponent />
-              <div>
-            <h1 className='text-2xl font-bold'>
-              {teacherDetail?.full_name} <br/>
-            </h1>
-            <p className='text-sm  text-muted-foreground'>{teacherDetail?.full_name}@gmail.com</p>
-            <CardDescription className='px-2'>
-            </CardDescription>
-            </div>
-        </div>
+         <Profile teacherDetail={teacherDetail}/>
 
-          <div className='flex bg-amber-30 h-full'>
-            
-          <div className='p-4 w-[50%] flex'>
-              hehhe
-          </div>
-          <div className='w-[50%]'>
-            
-            <Card className='shadow-none'>
-              <CardHeader>
-                <CardTitle>Specialization</CardTitle>
-                <CardDescription>Here are the speciliazation that the teachers </CardDescription>
-                <CardContent>
-                  <div>
-                    
-                  </div>
-                </CardContent>
-              </CardHeader>
-            </Card>
-          </div>
+          <div className='flex bg-amber-30 h-full gap-7 lg:flex-row flex-col justify-between items-start'>
+            <ProfileInfo teacherDetail={teacherDetail} disable={disable} setDisable={setDisable} />
+           
+              <Specialization teacherDetail={teacherDetail} teachersId={teachersId} onRefresh={() => onRefresh()}/>
           </div>
         </CardContent>
       </Card>
-    </div>
-  )
+        )}
+    </div>)
+
 }
 
 export default TeachersDetail
-

@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuLabel
 } from "@/Components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { Fragment } from "react";
@@ -140,19 +141,21 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog ,  setSelectedRow
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                   <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
                     {menuActions.map(({ id, label, icon, action }) => (
                       id != 'delete' ? (
                         <Fragment key={id}>
                         <DropdownMenuItem 
-                        onClick={() => {
-                          action(rowData)
-                          setLabel('sections')
-                        }}  
+                        onClick={() => 
+                          {
+                            action(rowData)
+                            setLabel('sections')
+                          }}  
                         className='w-full justify-between'>
                           {label} {icon}
                         </DropdownMenuItem>
-                        {id === 'view' && <DropdownMenuSeparator />}
                       </Fragment>
                       ) : (
                         <Fragment key={id}>

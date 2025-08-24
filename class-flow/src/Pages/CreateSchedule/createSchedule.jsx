@@ -15,10 +15,15 @@ import scheduleGetter from '@/lib/hooks/useSchedules';
 
 
 function CreateSchedule() {
-const {data: allScheduleData, isLoading: scheduleIsLoading } = scheduleGetter()
+const {data: allScheduleData, isLoading: scheduleIsLoading , refresh} = scheduleGetter()
     console.log(allScheduleData)
+     function handleRefresh() {
+      refresh();
+    }
+
   return (
 
+   
     <div className='container mx-auto p-4 justify-center flex'>
         <Card className='bg-transparent w-full'>
         <CardHeader>
@@ -35,12 +40,10 @@ const {data: allScheduleData, isLoading: scheduleIsLoading } = scheduleGetter()
             }}
            filteredData={{ columnId: "title", label: "title " }}
            filterComboBoxes={[]}
-            addComponent={<ScheduleFormPopover/>}
+            addComponent={<ScheduleFormPopover onRefresh={() => handleRefresh()} />}
+            onRefresh={() => refresh()}
             />
         </CardContent>
-        <CardFooter>
-            <p>Card Footer</p>
-        </CardFooter>
         </Card>
     </div>
   )

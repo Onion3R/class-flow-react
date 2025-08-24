@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { getFilteredScheduleById } from '@/services/apiService';
+import { PulseLoader } from 'react-spinners';
 // Assuming these are available from a component library like shadcn/ui
 const Table = ({ children }) => <table className="min-w-full text-left border-collapse">{children}</table>;
 const TableBody = ({ children }) => <tbody>{children}</tbody>;
@@ -8,12 +9,8 @@ const TableHead = ({ children, className, colSpan, rowSpan }) => <th colSpan={co
 const TableHeader = ({ children }) => <thead >{children}</thead>;
 const TableRow = ({ children, className }) => <tr className={`border-b border-gray-200 ${className}`}>{children}</tr>;
 
-// A mock API service function to simulate fetching data.
-// In a real application, you would replace this with your actual API call.
-
-
 // Main App component
-function App({ scheduleId = '168&track_id=1&year_level_ids=1&strand_ids=1&section_ids=1' }) {
+function DayTableComponent({ scheduleId }) {
   const [allScheduleData, setAllScheduleData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,14 +20,28 @@ function App({ scheduleId = '168&track_id=1&year_level_ids=1&strand_ids=1&sectio
   const [combinedTimeSlots, setCombinedTimeSlots] = useState([]);
   const [subjectColorMap, setSubjectColorMap] = useState({});
 
-  const subjectColorPalettes = useMemo(() => ([
-    // Soft pastels
-    { bg: 'bg-rose-100', text: 'text-rose-800' },
-    { bg: 'bg-sky-100', text: 'text-sky-800' },
-    { bg: 'bg-emerald-100', text: 'text-emerald-800' },
-    { bg: 'bg-purple-100', text: 'text-purple-800' },
-    { bg: 'bg-yellow-100', text: 'text-yellow-800' },
-  ]), []);
+ const subjectColorPalettes = useMemo(() => ([
+  {
+    bg: 'bg-rose-100 dark:bg-rose-100',
+    text: 'text-rose-800 dark:text-black/70',
+  },
+  {
+    bg: 'bg-sky-100 dark:bg-sky-200/90',
+    text: 'text-sky-800 dark:text-black/70',
+  },
+  {
+    bg: 'bg-emerald-100 dark:bg-emerald-100/90',
+    text: 'text-emerald-800 dark:text-black/70',
+  },
+  {
+    bg: 'bg-purple-100 dark:bg-purple-100/90',
+    text: 'text-purple-800 dark:text-black/70',
+  },
+  {
+    bg: 'bg-yellow-100 dark:bg-yellow-200',
+    text: 'text-yellow-800 dark:text-black/70',
+  },
+]), []);
 
   // Define special events to be included in the timetable
   const specialEvents = [
@@ -42,28 +53,32 @@ function App({ scheduleId = '168&track_id=1&year_level_ids=1&strand_ids=1&sectio
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
   // Effect to fetch data from the API
- useEffect(() => {
-         const fetchData = async () => {
-             if (scheduleId && scheduleId !== '') {
-                 setIsLoading(true);
-                 setError(null);
-                 try {
-                     const result = await getFilteredScheduleById(scheduleId);
-                     const classes = result.classes;
-                     setAllScheduleData(classes);
-                     console.log(classes)
-                 } catch (err) {
-                     console.error('Failed to fetch schedule:', err);
-                     setError('Failed to load schedule. Please check your network connection.');
-                     setAllScheduleData(null);
-                 } finally {
-                     setIsLoading(false);
-                 }
-             }
-         };
-         fetchData();
- 
-     }, [scheduleId]);
+  useEffect(() => {
+        const fetchData = async () => {
+            if (scheduleId && scheduleId !== '') {
+                setIsLoading(true);
+                setError(null);
+                setAllScheduleData(null);
+                setGrade11Data(null);
+                setGrade12Data(null);
+                setCombinedTimeSlots([]);
+                try {
+                    const result = await getFilteredScheduleById(scheduleId);
+                    const classes = result.classes;
+                    setAllScheduleData(classes);
+                    console.log(classes)
+                } catch (err) {
+                    console.error('Failed to fetch schedule:', err);
+                    setError('Failed to load schedule. Please check your network connection.');
+                    setAllScheduleData(null);
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+        };
+        fetchData();
+
+    }, [scheduleId]);
 
 
   // Effect to process the fetched data and create the subject color map
@@ -176,12 +191,12 @@ function App({ scheduleId = '168&track_id=1&year_level_ids=1&strand_ids=1&sectio
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen p-4">
-        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-gray-500 text-lg ml-4">Loading schedule...</p>
-      </div>
-    );
+     return (
+            <div className='p-4 items-center justify-center flex border rounded'>
+                <span className='text-foreground/40 text-sm mr-2'>Loading schedule</span>
+                <PulseLoader size={4} loading={true} color='#ffffff' />
+            </div>
+        );
   }
 
   if (error) {
@@ -248,12 +263,14 @@ function App({ scheduleId = '168&track_id=1&year_level_ids=1&strand_ids=1&sectio
               <TableRow>
                 {grade11Data && Object.values(grade11Data.strandSections).flatMap(sections => sections).map(sectionName => (
                   daysOfWeek.map(day => (
-                    <TableHead key={`g11-section-${sectionName}`} colSpan={1} className="text-center font-semibold border-l border-r border-gray-200 text-sm">{sectionName}</TableHead>
+                    // FIX: Combined sectionName and day into the key to ensure uniqueness
+                    <TableHead key={`g11-section-${sectionName}-${day}`} colSpan={1} className="text-center font-semibold border-l border-r border-gray-200 text-sm">{sectionName}</TableHead>
                   ))
                 ))}
                 {grade12Data && Object.values(grade12Data.strandSections).flatMap(sections => sections).map(sectionName => (
                   daysOfWeek.map(day => (
-                    <TableHead key={`g12-section-${sectionName}`} colSpan={1} className="text-center font-semibold border-l border-r border-gray-200 text-sm">{sectionName}</TableHead>
+                    // FIX: Combined sectionName and day into the key to ensure uniqueness
+                    <TableHead key={`g12-section-${sectionName}-${day}`} colSpan={1} className="text-center font-semibold border-l border-r border-gray-200 text-sm">{sectionName}</TableHead>
                   ))
                 ))}
               </TableRow>
@@ -282,7 +299,7 @@ function App({ scheduleId = '168&track_id=1&year_level_ids=1&strand_ids=1&sectio
                         <p className="text-xs text-gray-600">to {formatTime(specialEvent.end_time)}</p>
                       </TableCell>
                       <TableCell colSpan={totalCols} className="bg-muted">
-                          <div className="text-center font-bold text-lg text-gray-200 w-full h-full flex items-center justify-center">
+                          <div className="text-center font-bold text-lg text-muted-foreground w-full h-full flex items-center justify-center">
                             {specialEvent.title}
                           </div>
                       </TableCell>
@@ -370,4 +387,4 @@ function App({ scheduleId = '168&track_id=1&year_level_ids=1&strand_ids=1&sectio
 }
 
 
-export default App
+export default DayTableComponent
