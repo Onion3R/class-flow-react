@@ -1,4 +1,4 @@
-import { getYearLevels } from '@/services/apiService';
+import { getYearLevels } from '@/app/services/apiService';
 import { useState, useEffect } from 'react';
 
 export default function useYearLevelsGetter() {

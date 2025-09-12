@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getSections } from '@/services/apiService';
+import { getSections } from '@/app/services/apiService';
 
 /**
  * Custom hook to fetch and manage sections data.

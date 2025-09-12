@@ -11,9 +11,10 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import { Navigate } from "react-router-dom";
-import { doSignInWithEmailAndPassword, doSignInWithGoogle } from "@/firebase/auth";
-import { useAuth } from "@/context/authContext";
+import { doSignInWithEmailAndPassword, doSignInWithGoogle } from "@/app/firebase/auth";
+import { useAuth } from "@/app/context/authContext";
 
 export default function LoginFormComponent({ className, ...props }) {
   const { userLoggedIn, isLoading, userRoles } = useAuth();

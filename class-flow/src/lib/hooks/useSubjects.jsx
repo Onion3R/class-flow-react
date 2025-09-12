@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getSubjects } from '@/services/apiService';
+import { getSubjects } from '@/app/services/apiService';
 
 let refreshCallback = () => {};
 

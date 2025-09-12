@@ -1,12 +1,12 @@
 // "use client"
 import React, { useEffect, useState } from "react"
 // import { Separator } from "@/Components/ui/separator"
-import { Checkbox } from "@/Components/ui/checkbox"
+import { Checkbox } from "@/components/ui/checkbox"
 // import { cn } from "@/lib/utils"
 
 
 import { CirclePlus } from "lucide-react"
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/components/ui/button"
 import {
   Command,
   CommandEmpty,
@@ -14,12 +14,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/Components/ui/command"
+} from "@/components/ui/command"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/Components/ui/popover"
+} from "@/components/ui/popover"
 
 
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils/utils";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, AlertCircleIcon} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -12,8 +12,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Navigate } from "react-router-dom";
-import { doCreateUserWithEmailAndPassword } from "@/firebase/auth"; // You’ll need to implement this
-import { useAuth } from "@/context/authContext";
+import { Alert, AlertTitle } from "@/components/ui/alert"
+
+import { doCreateUserWithEmailAndPassword } from "@/app/firebase/auth"; // You’ll need to implement this
+import { useAuth } from "@/app/context/authContext";
 
 export default function RegisterFormComponent({ className, ...props }) {
   const { userLoggedIn, isLoading } = useAuth();
@@ -23,6 +25,9 @@ export default function RegisterFormComponent({ className, ...props }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  
+  //  For error dialog
+  const [error, setError] = useState(null)
 
  useEffect(() => {
   if(password != confirmPassword && confirmPassword.length > 0) {
@@ -35,6 +40,10 @@ export default function RegisterFormComponent({ className, ...props }) {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    if(!email || !password || !confirmPassword) {
+      setError({message})
+      return
+    }
     if (!isRegistering) {
       setIsRegistering(true);
       setErrorMessage("");
@@ -61,7 +70,18 @@ export default function RegisterFormComponent({ className, ...props }) {
           <CardDescription>Enter your details to register</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={onSubmit}>
+          <form >
+            {error && (
+            <Alert variant="destructive" className="border-red-500  mb-4  bg-red-100 dark:bg-red-900/30">
+                <AlertCircleIcon className="h-4 w-4" />
+                <AlertTitle className="!truncate-none !whitespace-normal !break-words ">
+                  Error:
+                  <span className="!text-sm font-normal ml-1">
+                    {error.message}
+                  </span>
+                </AlertTitle>
+              </Alert>
+            )}
             <div className="flex flex-col gap-6">
               
               {/* Email */}
@@ -107,7 +127,7 @@ export default function RegisterFormComponent({ className, ...props }) {
               </div>
 
               {/* Submit */}
-              <Button type="submit" className="w-full" disabled={isRegistering}>
+              <Button type="submit" className="w-full" disabled={isRegistering} onClick={() => onSubmit()}>
                 {isRegistering ? (
                   <>
                     <Loader2Icon className="animate-spin mr-2" />

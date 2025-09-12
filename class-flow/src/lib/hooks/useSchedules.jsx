@@ -1,6 +1,6 @@
 // useSchedule.js
 import { useState, useEffect, useCallback } from 'react';
-import { getSchedules } from '@/services/apiService';
+import { getSchedules } from '@/app/services/apiService';
 
 /**
  * Custom hook to fetch and manage schedules data.

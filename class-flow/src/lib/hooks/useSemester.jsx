@@ -1,5 +1,5 @@
 // semesterStore.js
-import { getSemester } from '@/services/apiService';
+import { getSemester } from '@/app/services/apiService';
 import { useState, useEffect } from 'react';
 
 let refreshSemesterCallback = () => {};

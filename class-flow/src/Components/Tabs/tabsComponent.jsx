@@ -7,7 +7,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import DataTableComponent from '@/Components/DataTable/dataTableComponent'; // Your wrapper DataTableComponent
+import DataTableComponent from '@/components/DataTable/dataTableComponent'; // Your wrapper DataTableComponent
 
 // This component manages the inner strand tabs and passes data to DataTableComponent
 export default function TabsComponent({

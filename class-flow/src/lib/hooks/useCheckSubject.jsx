@@ -1,6 +1,6 @@
 // useCheckSubject.js
 import subjectStrandGetter from '@/lib/hooks/useSubjectStrand';
-import { deleteSubject, deleteSubjectStrand } from '@/services/apiService';
+import { deleteSubject, deleteSubjectStrand } from '@/app/services/apiService';
 
 export default function useCheckSubject() {
   const { data: allSubjectStrandData, isLoading } = subjectStrandGetter();

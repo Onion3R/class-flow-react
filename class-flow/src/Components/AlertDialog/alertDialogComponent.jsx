@@ -1,4 +1,4 @@
-import React from "react"
+import React, {useState} from "react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,13 +8,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/Components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog"
 
 import { triggerToast } from "@lib/utils/toast"
 
-import { deleteStrand, deleteSection, deleteTrack, deleteSchedule, deleteSubject, deleteSubjectStrand } from "@/services/apiService"
+import { deleteStrand, deleteSection, deleteTrack, deleteSchedule, deleteSubject, deleteSubjectStrand } from "@/app/services/apiService"
 import useSubjectStrandGetter from "@/lib/hooks/useSubjectStrand"
-
+import { deleteTeacher } from "@/app/services/teacherService"
 const toastInfo = {
   success: true,
   title: 'Delete',
@@ -22,13 +22,19 @@ const toastInfo = {
 }
 
 
-export default function AlertDialogComponent({ open, selectedRow, onOpenChange, data, onRefresh}) {
+export default function AlertDialogComponent({ open, selectedRow, onOpenChange, data, onRefresh, content = null}) {
+
+  
   const {data: allSubjectStrandData } = useSubjectStrandGetter()
   async function handleDelete() {
+    const rows = Array.isArray(selectedRow) ? selectedRow : [selectedRow];
     switch (data.id) {
       case 'track':
         try {
-          await deleteTrack(selectedRow.id);
+          for (const row of rows) {
+          await deleteTrack(row.id);
+
+          }
           triggerToast(toastInfo);
           // triggerTrackRefresh();
         } catch (error) {
@@ -43,22 +49,25 @@ export default function AlertDialogComponent({ open, selectedRow, onOpenChange, 
         break;
       case 'strand':
         try {
-          await deleteStrand(selectedRow.id);
+         for (const row of rows) {
+            await deleteStrand(row.id);
+          }
           triggerToast(toastInfo);
-          // triggerStrandRefresh();
         } catch (error) {
           console.error("Error deleting strand:", error.response?.data || error.message);
           triggerToast({
             success: false,
             title: "Delete Failed",
-            desc: "An error occurred while deleting the strand.",
+            desc: "An error occurred while deleting one or more strands.",
           });
         }
-        onRefresh('strand')
+        onRefresh('strand');
         break;
       case 'section':
         try {
-          await deleteSection(selectedRow.id);
+          for (const row of rows) {
+            await deleteSection(row.id);
+          }
           triggerToast(toastInfo);
           onRefresh()
           
@@ -88,25 +97,26 @@ export default function AlertDialogComponent({ open, selectedRow, onOpenChange, 
       case 'subject':
         
       try {
-      
-         const count = allSubjectStrandData.filter(e => e.subject.id === selectedRow.subject.id);
-
-        
-         console.log('this',count.length)
-
-       if (count.length === 1) {
-        await deleteSubject(selectedRow.subject.id);  // <- add await here
+       
+      for (const row of rows) {
+          const count = allSubjectStrandData.filter(e => e.subject.id === row.subject.id);
+            if (count.length === 1) {
+        await deleteSubject(row.subject.id);  // <- add await here
         
        } else {
         const result = allSubjectStrandData.find(
-          a => a.subject.id === selectedRow.subject.id &&
-          a.strand.id === selectedRow.strand.id && 
-          a.year_level.id  === selectedRow.year_level.id
+          a => a.subject.id === row.subject.id &&
+          a.strand.id === row.strand.id && 
+          a.year_level.id  === row.year_level.id
         )
         console.log('hello',result)
         await deleteSubjectStrand(result.id)
         
       }
+      console.log(row)
+          }
+        
+        //  console.log('this',count.length)
       triggerToast(toastInfo);
       onRefresh()
       } catch (error) {
@@ -118,6 +128,21 @@ export default function AlertDialogComponent({ open, selectedRow, onOpenChange, 
         });
       }
       break;
+      case 'teacher':
+        try {
+          console.log(selectedRow.id)
+        await deleteTeacher(selectedRow.id)
+      triggerToast(toastInfo);
+      onRefresh()
+      } catch (error) {
+      console.error("Error deleting teacher:", error.response?.data || error.message);
+        triggerToast({
+          success: false,
+          title: "Delete Failed",
+          desc: "An error occurred while deleting the teacher.",
+        });
+      }
+      break;
       default:
         break;
         
@@ -125,19 +150,23 @@ export default function AlertDialogComponent({ open, selectedRow, onOpenChange, 
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialog open={open} onOpenChange={onOpenChange} >
+      {content ? React.cloneElement(content, { open ,handleDelete, selectedRow }) : 
       <AlertDialogContent>
-        <AlertDialogHeader>
+         
+       <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           {data.desc && <AlertDialogDescription>{data.desc}</AlertDialogDescription>}
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete}>
+          <AlertDialogAction onClick={handleDelete} >
             Continue
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
+      }
+      
     </AlertDialog>
   )
 }

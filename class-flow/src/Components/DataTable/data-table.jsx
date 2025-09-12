@@ -12,7 +12,7 @@ import {
 
 import { Settings2 } from "lucide-react";
 
-import { Input } from "@/Components/ui/input";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -20,10 +20,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/Components/ui/dropdown-menu";
-import { ComboBox } from "../ComboBox/comboBoxComponent";
-import { ContextMenu, ContextMenuTrigger } from "@/Components/ui/context-menu";
-import { ContextMenuComponent } from "../ContextMenu/contextMenuComponent";
+} from "@/components/ui/dropdown-menu";
+import { ComboBox } from "../ComboBox/ComboBoxComponent";
+import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
+import { ContextMenuComponent } from "../ContextMenu/ContextMenuComponent";
 import {
   Table,
   TableBody,
@@ -31,16 +31,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/Components/ui/table";
+} from "@/components/ui/table";
 import { Button } from "../ui/button";
 
 
 export function DataTable({
   columns,
+  source,
   data,
   filteredData,
   filterComboBoxes = [], // New prop for dynamic combo boxes, default to empty array
   addComponent,
+  onRefresh,
+  contextMenuDisable 
+  
 }) {
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState({});
@@ -110,6 +114,11 @@ export function DataTable({
   useEffect(() => {
     table.resetRowSelection();
   }, [table.getState().columnFilters, table]);
+
+  useEffect(() => {
+    console.log('context?',contextMenuDisable)
+  }, [contextMenuDisable])
+  
 
 
   return (
@@ -190,72 +199,80 @@ export function DataTable({
         </div>
       </div>
       <div className="overflow-hidden border rounded-md">
-        <Table>
-          <TableHeader className="bg-muted/70">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="!font-[500]">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
+        <ContextMenu>
+  <ContextMenuTrigger asChild disabled={contextMenuDisable}>
+    <div>
+      <Table>
+        <TableHeader className="bg-muted/70">
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id} className="!font-[500]">
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
                 ))}
               </TableRow>
-            ))}
-          </TableHeader>
-          <ContextMenu>
-            <ContextMenuTrigger asChild>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="h-24 text-center">
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </ContextMenuTrigger>
-            <ContextMenuComponent
-              selectedRows={table.getSelectedRowModel().rows}
-              allRowsCount={table.getFilteredRowModel().rows.length}
-              selectAllRows={() => {
-                const rows = comboBoxHasSelectedItem // Use filtered rows if a combo box is active
-                  ? table.getFilteredRowModel().rows
-                  : table.getCoreRowModel().rows;
-                rows.forEach((row) => row.toggleSelected(true));
-              }}
-              deselectAllRows={() => {
-                const rows = comboBoxHasSelectedItem // Use filtered rows if a combo box is active
-                  ? table.getFilteredRowModel().rows
-                  : table.getCoreRowModel().rows;
-                rows.forEach((row) => row.toggleSelected(false));
-              }}
-            />
-          </ContextMenu>
-        </Table>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  </ContextMenuTrigger>
+
+  <ContextMenuComponent
+    source={source}
+    selectedRows={table.getSelectedRowModel().rows}
+    allRowsCount={table.getFilteredRowModel().rows.length}
+    selectAllRows={() => {
+      const rows = comboBoxHasSelectedItem
+        ? table.getFilteredRowModel().rows
+        : table.getCoreRowModel().rows;
+      rows.forEach((row) => row.toggleSelected(true));
+    }}
+    deselectAllRows={() => {
+      const rows = comboBoxHasSelectedItem
+        ? table.getFilteredRowModel().rows
+        : table.getCoreRowModel().rows;
+      rows.forEach((row) => row.toggleSelected(false));
+    }}
+    onRefresh={onRefresh}
+  />
+</ContextMenu>
+
       </div>
 
       <div className="flex items-center justify-end space-x-2 pt-3">
         <div className="text-muted-foreground flex-1 text-sm">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredRowModel().rows.length} 
+          {contextMenuDisable ?   <span> row(s) </span> :   <span> row(s) selected.</span> }
+        
         </div>
         <Button
           variant="outline"

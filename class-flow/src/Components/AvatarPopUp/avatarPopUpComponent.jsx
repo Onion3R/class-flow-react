@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Avatar,
@@ -21,9 +21,9 @@ import {
 import { useTheme } from "@/components/theme-provider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import avatar from "@Assets/avatar.jpg";
-import { useAuth } from "@/context/authContext";
-import { doSignOut } from "@/firebase/auth";
-
+import { useAuth } from "@/app/context/authContext";
+import { doSignOut } from "@/app/firebase/auth";
+import { Navigate } from "react-router-dom";
 function AvatarPopUpComponent() {
   const { theme, setTheme } = useTheme();
   const { currentUser, userLoggedIn } = useAuth();
@@ -35,6 +35,14 @@ function AvatarPopUpComponent() {
             setTheme(value)
     }
   }
+
+  useEffect(() => {
+    if(!theme) {
+      setTheme('dark')
+    }
+  }, [])
+  
+
 
   const handleSignOut = async (e) => {
     e.preventDefault();
@@ -66,7 +74,7 @@ function AvatarPopUpComponent() {
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-2.5">
         <div>
-          <p className="px-2 my-2.5 text-sm font-medium">
+          <p className="px-2 my-2.5 text-sm   truncate font-semibold">
             {currentUser?.email || "anonymous@example.com"}
           </p>
 
@@ -84,8 +92,8 @@ function AvatarPopUpComponent() {
             <span>{isLoggingOut ? "Signing out..." : "Sign out"}</span>
             <LogOutIcon />
           </Button>
-
-          <div className="w-full flex items-center justify-between px-2.5 mt-2.5">
+          
+          <div className="w-full flex items-center justify-between px-2.5 mt-2.5 ">
             <span className="text-sm">Theme</span>
             <ToggleGroup
               type="single"
@@ -96,7 +104,6 @@ function AvatarPopUpComponent() {
             >
               <ToggleGroupItem value="light"><Sun className="size-4" /></ToggleGroupItem>
               <ToggleGroupItem value="dark"><Moon className="size-4" /></ToggleGroupItem>
-              <ToggleGroupItem value="system"><SunMoon className="size-4" /></ToggleGroupItem>
             </ToggleGroup>
           </div>
         </div>

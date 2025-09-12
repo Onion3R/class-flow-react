@@ -1,4 +1,4 @@
-import { getStrands } from '@/services/apiService';
+import { getStrands } from '@/app/services/apiService';
 import { useState, useEffect, useCallback } from 'react';
 
 /**

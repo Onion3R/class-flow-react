@@ -1,7 +1,7 @@
 // useSubjectStrandGetter.js
 
 import { useState, useEffect, useCallback } from 'react';
-import { getSubjectStrand } from '@/services/apiService';
+import { getSubjectStrand } from '@/app/services/apiService';
 
 /**
  * Custom hook to fetch and manage subject strand data.

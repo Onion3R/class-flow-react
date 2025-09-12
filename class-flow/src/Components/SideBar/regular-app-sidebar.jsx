@@ -29,7 +29,7 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
   SidebarMenuSub
-} from  "@/Components/ui/sidebar";
+} from  "@/components/ui/sidebar";
 
 
  const sidebarItems = [

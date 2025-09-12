@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { ChevronDown, Clipboard, ClipboardCheck, ExternalLink } from "lucide-react"
+import {  Clipboard, ClipboardCheck, ExternalLink } from "lucide-react"
 import { useState, useEffect } from "react"
 import {
   Dialog,
@@ -13,32 +13,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { Checkbox } from "@/Components/ui/checkbox"
-import {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from "@/components/ui/command"
+import TeacherRolePopover from "./TeacherRolePopover"
 
 export default function ShareDialog() {
   const roles = [
@@ -96,40 +71,7 @@ export default function ShareDialog() {
           <h3 className="text-sm font-medium">General access</h3>
           <DialogDescription className="text-[12px]">Copy the link above and share it with others.</DialogDescription>
           </div>
-          <Popover >
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="ml-2" >
-                { selectedRole ? selectedRole : 'Select Role' } <ChevronDown/>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-1">
-             <Command>
-            <CommandInput placeholder={`Search ...`} />
-            <CommandList>
-              <CommandEmpty>No subjects found.</CommandEmpty>
-              <CommandGroup>
-                {roles.map((role) => (
-                  <CommandItem
-                    key={role.value}
-                    value={role.value}
-                    onSelect={() => setSelectedRole(role.label)}
-                    className={`cursor-pointer rounded px-2 py-1 mb-1.5 ${
-                      selectedRole === role.label
-                        ? 'bg-destructive  dark:bg-secondary '
-                        : ''
-                    }`}
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">{role.label}</span>
-                      <span className="text-muted-foreground text-xs">{role.desc}</span>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-            </PopoverContent>
-          </Popover>
+          <TeacherRolePopover roles={roles} selectedRole={selectedRole} setSelectedRole={setSelectedRole}/>
         </div>
         <DialogFooter className="sm:justify-start">
           <DialogClose asChild>

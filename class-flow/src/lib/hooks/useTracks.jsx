@@ -1,9 +1,9 @@
-import { getTracks } from '@/services/apiService';
+import { getTracks } from '@/app/services/apiService';
 import { useState, useEffect, useCallback } from 'react';
 
 
 const useTrackGetter = () => {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null); // <-- NEW
 

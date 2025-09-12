@@ -2,14 +2,14 @@
 import React, { useEffect, useState } from "react";
 import { DataTable } from "./data-table"; // This is your shadcn-ui DataTable (Adjust path)
 import DialogComponent from "../Dialog/diaglogComponent"; // (Adjust path)
-import AlertDialogComponent from "../AlertDialog/alertDialogComponent";
+import AlertDialogComponent from "../AlertDialog/AlertDialogComponent";
 // This component acts as a wrapper, passing props from TabsComponent down to DataTable
 export default function DataTableComponent({
   data,
   getColumns,
   alertDialogData,
   filteredData,
-  filterComboBoxes = [], // Expect the new prop here, default to empty array
+  filterComboBoxes = [], 
   addComponent,
   onRefresh
 }) {
@@ -18,22 +18,28 @@ export default function DataTableComponent({
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState()
   const [label, setLabel] = useState('')
+
+  const [alertDialogCustomContent, setAlertDialogCustomContent] = useState()
+  const [contextMenuDisable, setContextMenuDisable] = useState(false)
   useEffect(() => {
     setTableData(data);
     console.log('this is the data',data)
   }, [data]);
 
-  const columns = getColumns({ openDialog, setOpenDialog, setOpenAlertDialog, setSelectedRow , setLabel });
+  const columns = getColumns({ openDialog, setOpenDialog, setOpenAlertDialog, setSelectedRow , setLabel, setAlertDialogCustomContent , setContextMenuDisable});
 
   return (
     <div className="container mx-auto">
       <DataTable
         columns={columns}
+        source={alertDialogData}
         data={tableData}
         filteredData={filteredData}
         // IMPORTANT: Pass the new prop here
         filterComboBoxes={filterComboBoxes}
         addComponent={addComponent}
+         onRefresh={onRefresh}
+         contextMenuDisable={contextMenuDisable}
       />
       <DialogComponent
         label={label}
@@ -49,6 +55,7 @@ export default function DataTableComponent({
         data={ alertDialogData }
         onOpenChange={setOpenAlertDialog}
         onRefresh={onRefresh}
+        content={alertDialogCustomContent}
       />
     </div>
   );

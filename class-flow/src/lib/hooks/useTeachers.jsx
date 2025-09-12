@@ -1,4 +1,5 @@
-import { getTeachers } from '@/services/apiService';
+// import { getTeachers } from '@/app/services/apiService';
+import { getTeachers } from '@/app/services/teacherService';
 import { useState, useEffect, useCallback } from 'react';
 
 /**

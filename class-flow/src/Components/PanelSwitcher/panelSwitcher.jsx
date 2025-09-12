@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { ChevronsUpDown, Lock, UnlockKeyhole } from "lucide-react"
-import { useAuth } from "@/context/authContext";
+import { useAuth } from "@/app/context/authContext";
 import { Link } from "react-router-dom";
 import {
   DropdownMenu,

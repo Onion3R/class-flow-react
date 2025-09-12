@@ -2,9 +2,6 @@ import { toast } from "sonner"
 import { CircleCheck, CircleX, Undo2 } from "lucide-react"
 
 
-const handleUndo = () => {
-  alert("Undo clicked")
-}
 
 
 
@@ -18,23 +15,14 @@ export const triggerToast = ({success, title, desc}) => {
         }
         <div className="text-sm">
           <p className="font-semibold">{title}</p>
-          <p className="text-muted-foreground text-xs">
+          <p className="text-muted-foreground text-xs truncate">
            {desc}
           </p>
         </div>
       </div>
 
       {/* Right side: Icon Button Action */}
-      <button
-        onClick={() => {
-          handleUndo()
-          toast.dismiss(t)
-        }}
-        className="p-2 rounded-full hover:bg-muted transition-colors"
-        title="Undo"
-      >
-        <Undo2 className={`w-4 h-4  ${success ? 'text-green-500 w-5 h-5' : 'text-red-500 w-5 h-5'}`} />
-      </button>
+   
     </div>
   ))
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/components/ui/button"
 import { triggerToast } from "@/lib/utils/toast"
 import {
   Dialog,
@@ -12,16 +12,16 @@ import {
 } from "@/components/ui/dialog"
 import { Separator } from '../ui/separator'
 import { AlertCircleIcon } from 'lucide-react'
-import {Input} from "@/Components/ui/input"
+import {Input} from "@/components/ui/input"
 import { Label } from '../ui/label'
-import { updateTrack } from '@/services/apiService'
+import { updateTrack } from '@/app/services/apiService'
 const toastInfo = {
   success: false, 
   title: 'Update Track',
   desc: 'Sucessfully updated'
 }
-import { Alert, AlertTitle } from "@/components/ui/alert"
-
+import { Alert, AlertTitle, AlertDescription} from "@/components/ui/alert"
+import { trackSchema } from '@/app/schema/schema'
 
 function TrackDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh}) {
  
@@ -43,12 +43,22 @@ function TrackDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh}) 
     if (!name || !code) { 
       setError({message: 'All fields are required'});
       return;
-    }
-    try {
-      const data = {
+    } else {
+       const data = {
         name, 
         code,
       }
+      try {
+        await trackSchema.validate(data, {abortEarly: false})
+      } catch (validationError) {
+        setError({message: Array.isArray(validationError.errors) ? validationError.errors[0] : validationError.errors})
+        return;
+      }
+    }
+
+
+    try {
+    
      await updateTrack(selectedRow.id, data);
      onRefresh();
      triggerToast({ ...toastInfo, success: true });
@@ -69,14 +79,15 @@ function TrackDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh}) 
             
           </DialogHeader>
             {error && (
-           <Alert variant="destructive" className="border-red-500 bg-red-100 dark:bg-red-900/30">
+           <Alert variant="destructive" className="border-red-500  bg-red-100 dark:bg-red-900/30">
               <AlertCircleIcon className="h-4 w-4" />
-              <AlertTitle className="!truncate-none !whitespace-normal !break-words ">
-                Error:
-                <span className="!text-sm font-normal ml-1">
-                  {error.message}
-                </span>
+              <AlertTitle className='className=" !break-words' >
+                Error: Failed to update track
               </AlertTitle>
+              <AlertDescription>
+                {error.message}
+              </AlertDescription>
+
             </Alert>
           )}
           <Separator/>

@@ -1,8 +1,8 @@
 import { BrowserRouter as Router } from "react-router-dom";
-import { ThemeProvider } from "./Components/theme-provider";
+import { ThemeProvider } from "./components/theme-provider";
 import { Toaster } from "sonner";
-import { AuthProvider } from "@/context/authContext"
-import AppRoutes from "./AppRoutes";
+import { AuthProvider } from "@/app/context/authContext"
+import AppRoutes from "./lib/routing/AppRoutes";
 
 const App = () => {
   return (

@@ -328,7 +328,7 @@
 
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { getFilteredScheduleById } from '@/services/apiService';
+import { getFilteredScheduleById } from '@/app/services/apiService';
 import { PulseLoader } from "react-spinners";
 // Assuming these are available from a component library like shadcn/ui
 const Table = ({ children }) => <table className="min-w-full text-left border-collapse">{children}</table>;
@@ -337,6 +337,9 @@ const TableCell = ({ children, className, colSpan, rowSpan }) => <td colSpan={co
 const TableHead = ({ children, className, colSpan, rowSpan }) => <th colSpan={colSpan} rowSpan={rowSpan} className={`border border-muted-foreground p-2 ${className}`}>{children}</th>;
 const TableHeader = ({ children }) => <thead >{children}</thead>;
 const TableRow = ({ children, className }) => <tr className={`border-b border-muted-foreground ${className}`}>{children}</tr>;
+
+let LOCAL_STORAGE_KEY = import.meta.env.VITE_SCHED_LOCAL_STORAGE_KEY
+
 
 // Main App component
 function ScheduleTableComponent({ scheduleId }) {
@@ -404,6 +407,7 @@ function ScheduleTableComponent({ scheduleId }) {
                     setAllScheduleData(classes);
                     console.log(classes)
                 } catch (err) {
+                     localStorage.removeItem(LOCAL_STORAGE_KEY)
                     console.error('Failed to fetch schedule:', err);
                     setError('Failed to load schedule. Please check your network connection.');
                     setAllScheduleData(null);

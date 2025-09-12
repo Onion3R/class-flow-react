@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent } from '@/Components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { PulseLoader } from 'react-spinners';
 
 function LoadingCard({ message, variant }) {

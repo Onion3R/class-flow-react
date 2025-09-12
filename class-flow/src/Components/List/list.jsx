@@ -27,7 +27,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { addSpecializationToTeacher } from '@/services/apiService';
+import { addSpecializationToTeacher } from '@/app/services/apiService';
 export default function SubjectList({teachersId, onRefresh}) {
   const [open, setOpen] = useState(false)
   const { data: subjects, isLoading } = useSubjectsGetter();
@@ -63,8 +63,8 @@ export default function SubjectList({teachersId, onRefresh}) {
         <Card className="bg-transparent border-none shadow-none m-0 w-full gap-4">
           <CardHeader className="px-4">
             <CardTitle>Subject</CardTitle>
-            <CardDescription>Add subjects to a teacher</CardDescription>
-            <CardAction><Button variant='default' onClick={() => setOpen(false)}>Cancel</Button></CardAction>
+            <CardDescription>Assign a subject to a teacher</CardDescription>
+            <CardAction><Button variant='secondary' onClick={() => setOpen(false)}>Cancel</Button></CardAction>
           </CardHeader>
 
           <CardContent className="px-2">
@@ -80,12 +80,12 @@ export default function SubjectList({teachersId, onRefresh}) {
                   ) : (
                     <CommandGroup className='px-2'>
                       {subjects.map((s) => (
-                        <CommandItem key={s.id} className="text-sm text-muted-foreground p-1 h-auto flex flex-col  !bg-transparent">
+                        <CommandItem key={s.id} className="text-xs text-muted-foreground p-1 h-auto flex flex-col  !bg-transparent">
                           <div className="flex justify-between items-center w-full">
-                            <span>
+                            <span className='max-w-[90%]'>
                               <span className="font-bold">{s.code}: </span> {s.title}
                             </span>
-                            <Button variant="outline" onClick={() => handleAssign(s.id)}>
+                            <Button variant="outline" className='w-8 h-7'  onClick={() => handleAssign(s.id)}>
                               <Plus />
                             </Button>
                           </div>

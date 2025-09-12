@@ -14,10 +14,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from '../ui/label'
 import useTrackGetter from '@/lib/hooks/useTracks'
 import SelectComponent from '../Select/selectComponent'
-import { updateStrand } from '@/services/apiService'
-import { Alert, AlertTitle } from "@/components/ui/alert"
+import { updateStrand } from '@/app/services/apiService'
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { Separator } from '../ui/separator'
-
+import { strandSchema } from '@/app/schema/schema'
 const toastInfo = {
   success: true,
   title: 'Update Strand',
@@ -28,7 +28,8 @@ function StrandDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh }
   const [name, setName] = useState("")
   const [code, setCode] = useState("")
   const [selectedTrack, setSelectedTrack] = useState("")
-  const { data: allTrackData, isLoading, error: errorTrack } = useTrackGetter()
+  const { data: allTrackData, isLoading: trackDataIsLoading, error: errorTrack } = useTrackGetter()
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
 
   // Initialize form fields when selectedRow changes
@@ -42,19 +43,33 @@ function StrandDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh }
   }, [selectedRow])
 
   async function handleUpdate(e) {
+    setIsLoading(true)
     e.preventDefault()
     if (!name || !code || !selectedTrack) {
       setError({ message: "All fields are required" })
       return
     }
+
+    
+
     if (allTrackData) {
-      try {
-        const data = {
+       const data = {
           name,
           code,
           track_id: allTrackData.find(t => t.name === selectedTrack)?.id || "",
           description: ''
         }
+
+      try {
+        await strandSchema.validate(data, {abortEarly: false})
+      } catch (validationError) {
+          setError({ message: Array.isArray(validationError.errors) ? validationError.errors[0]  : validationError.errors});
+          setIsLoading(false)
+          return
+      }
+
+      try {
+       
         await updateStrand(selectedRow?.id, data)
         triggerToast({ ...toastInfo, success: true })
         onConfirm()
@@ -62,6 +77,7 @@ function StrandDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh }
       } catch (error) {
         console.error("Error updating strand:", error)
       }
+      setIsLoading(false)
     }
   }
 
@@ -77,12 +93,12 @@ function StrandDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh }
         {error && (
           <Alert variant="destructive" className="border-red-500 bg-red-100 dark:bg-red-900/30">
             <AlertCircleIcon className="h-4 w-4" />
-            <AlertTitle className="!truncate-none !whitespace-normal !break-words ">
-              Error:
-              <span className="!text-sm font-normal ml-1">
+             <AlertTitle className='className=" !break-words' >
+                Error: Failed to update strand
+              </AlertTitle>
+              <AlertDescription>
                 {error.message}
-              </span>
-            </AlertTitle>
+              </AlertDescription>
           </Alert>
         )}
         <Separator />
@@ -122,10 +138,10 @@ function StrandDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh }
             </div>
           </div>
 
-          {isLoading && <p className="text-sm text-muted">Loading tracks...</p>}
+          {trackDataIsLoading && <p className="text-sm text-muted">Loading tracks...</p>}
           {errorTrack && <p className="text-sm text-red-500">Error loading tracks</p>}
 
-          {!isLoading && !errorTrack && (
+          {!trackDataIsLoading && !errorTrack && (
             <div>
               <Label
                 className={`mb-2 text-xs text-foreground/80 ${!selectedTrack && "text-red-600 font-semibold"}`}
@@ -149,7 +165,9 @@ function StrandDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh }
           <DialogClose asChild onClick={() => onOpenChange(false)}>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button variant="default" onClick={(e) => handleUpdate(e)}>Update</Button>
+          <Button variant="default" onClick={(e) => handleUpdate(e)} disabled={isLoading}>
+            {isLoading ? 'Loading...' : 'Update'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </form>

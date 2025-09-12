@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from 'react'
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/components/ui/button"
 import { triggerToast } from "@/lib/utils/toast"
 import {
   Dialog,
@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {Input} from "@/Components/ui/input"
+import {Input} from "@/components/ui/input"
 import SelectComponent from '../Select/selectComponent'
 import useSemesterGetter from '@/lib/hooks/useSemester'
 import useYearLevelsGetter from '@/lib/hooks/useYearLevels'
@@ -87,7 +87,7 @@ function SubjectDialogContent({ selectedRow, onConfirm ,onOpenChange}) {
                     htmlFor='code'
                     className={`mb-2 text-xs text-foreground/80 ${!code && "text-red-600 font-semibold"}`}
                   >
-                    Perminutes per week *
+                    Code *
                   </Label>
                 <Input id="code" placeholder='Subject Code' value={code} onChange={(e) => setCode(e.target.value)}
                 className={`!w-full !max-w-none ${!code && "border border-red-500 placeholder:text-red-400"}`}
@@ -98,7 +98,7 @@ function SubjectDialogContent({ selectedRow, onConfirm ,onOpenChange}) {
                     htmlFor='minutesPerWeek'
                     className={`mb-2 text-xs text-foreground/80 ${!minutesPerWeek && "text-red-600 font-semibold"}`}
                   >
-                    Perminutes per week *
+                    Minutes per week *
                   </Label>
                 <Input id="minutesPerWeek" placeholder='Minutes per week' value={minutesPerWeek} onChange={(e) => setMinutesPerWeek(e.target.value)} 
                 className={`!w-full !max-w-none ${!minutesPerWeek && "border border-red-500 placeholder:text-red-400"}`}
@@ -111,7 +111,7 @@ function SubjectDialogContent({ selectedRow, onConfirm ,onOpenChange}) {
               htmlFor='title'
               className={`mb-2 text-xs text-foreground/80 ${!title && "text-red-600 font-semibold"}`}
             >
-              Perminutes per week *
+              title *
             </Label>
             <Input id="title" placeholder='Subject Title' value={title} onChange={(e) => setTitle(e.target.value)}
             className={`!w-full !max-w-none ${!title && "border border-red-500 placeholder:text-red-400"}`}

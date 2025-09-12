@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { getFilteredScheduleById } from '@/services/apiService';
+import { getFilteredScheduleById } from '@/app/services/apiService';
 import { PulseLoader } from 'react-spinners';
 // Assuming these are available from a component library like shadcn/ui
 const Table = ({ children }) => <table className="min-w-full text-left border-collapse">{children}</table>;

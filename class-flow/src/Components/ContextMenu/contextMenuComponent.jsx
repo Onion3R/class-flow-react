@@ -3,20 +3,36 @@ import {
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuSeparator,
-} from "@/Components/ui/context-menu"
+} from "@/components/ui/context-menu"
 import { Trash2 } from "lucide-react"
 import { useState, useEffect } from "react"
-
-export function ContextMenuComponent({ selectedRows, allRowsCount,selectAllRows, deselectAllRows}) {
+import AlertDialogComponent from "../AlertDialog/AlertDialogComponent"
+export function ContextMenuComponent({ source,selectedRows, allRowsCount,selectAllRows, deselectAllRows, onRefresh}) {
+  const [openAlertDialog, setOpenAlertDialog] = useState(false);
+  
   const selectedCount = selectedRows.length
 
   const [allCount, setAllCount] = useState()
+  const [selectedRowData, setSelectedRowData] = useState()
   useEffect(() => {
     setAllCount(allRowsCount)
-  }, [allRowsCount])
+    setSelectedRowData(selectedRows.map(row => row.original))
+  }, [allRowsCount, selectedRows])
+
   
 
+  // useEffect(() => {
+  //   console.log('this is the selectedRow',selectedRows , 'and the source is', source)
+    
+   
+  // }, [selectedRows])
+  
+  // const handleDelete = () => {
+  //   console.log('these items will be deleted', selectedRows)
+  // }
+
   return (
+    <div>
     <ContextMenuContent>
       {/* <ContextMenuItem disabled={selectedCount === 0}>
         Bulk View ({selectedCount})
@@ -39,10 +55,19 @@ export function ContextMenuComponent({ selectedRows, allRowsCount,selectAllRows,
       <ContextMenuItem
         disabled={selectedCount === 0}
         className="p-0 cursor-pointer"
+        onClick={() => setOpenAlertDialog(true)}
       >
-        <span className=" h-full w-full px-[8px] py-[6px] hover:bg-red-100 dark:hover:bg-red-950/50 text-red-500 rounded-sm flex items-center justify-between">Delete <Trash2 className="text-red-400 h-[10px] w-[10px] " /></span>
+        <span className=" h-full w-full px-[8px] py-[6px] hover:bg-red-100 dark:hover:bg-red-950/50 text-red-500 rounded-sm flex items-center justify-between" >Delete <Trash2 className="text-red-400 h-[10px] w-[10px] " /></span>
         
       </ContextMenuItem>
     </ContextMenuContent>
+      <AlertDialogComponent
+        open={openAlertDialog}
+        selectedRow = {selectedRowData ?? null}
+        data={ source }
+        onOpenChange={setOpenAlertDialog}
+        onRefresh={onRefresh}
+           />
+    </div>
   )
 }

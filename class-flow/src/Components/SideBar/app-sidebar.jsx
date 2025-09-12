@@ -1,7 +1,7 @@
 
 import { 
   Calendar,
-  Home, 
+  LayoutDashboard, 
   CalendarCog ,
   CalendarPlus,
   Library, 
@@ -26,7 +26,7 @@ import {
   SidebarMenuSubButton,
   SidebarFooter,
   SidebarMenuSub
-} from  "@/Components/ui/sidebar";
+} from  "@/components/ui/sidebar";
 import { PanelSwitcher } from "../PanelSwitcher/panelSwitcher";
 const baseUrl = "schedules";
 const data2 = {
@@ -53,12 +53,12 @@ const data2 = {
   ],
   sidebarItems: [
       {
-        label: 'Application',
+        label: 'Home',
         items: [
             {
-                title: "Home",
+                title: "Dashboard",
                 url: "/admin",
-                icon: Home,
+                icon: LayoutDashboard,
               },
               {
                 title: "Teachers",

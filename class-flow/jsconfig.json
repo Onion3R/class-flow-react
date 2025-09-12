@@ -4,7 +4,7 @@
     "paths": {
       "@/*": ["src/*"],
       "@lib/*": ["src/lib/*"],
-      "@Components/*": ["src/Components/*"]
+      "@components/*": ["src/components/*"]
     }
   },
   "include": ["src"]

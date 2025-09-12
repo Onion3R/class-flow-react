@@ -1,141 +1,162 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { EllipsisVertical } from "lucide-react"
-import UserList from "@Components/List/list"
+import React from "react"
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card"
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { Avatar } from "@/components/ui/avatar"
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { useEffect, useState } from "react"
-import column from "@/Pages/RegularView/column"
-import { redirect } from "react-router-dom"
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+import { CornerDownRight , Copy} from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { useRandomBadgeColor } from "@/lib/hooks/useRandomBadgeColor"
 
+function TableComponent({ data, searchValue }) {
+  const { getColor } = useRandomBadgeColor()
 
+  const filteredData = data
+    .filter((e) => {
+      const fullName = `${e.teacher.first_name} ${e.teacher.last_name}`.toLowerCase()
+      const email = `${e.teacher.first_name}@gmail.com`.toLowerCase()
+      const sections = e.sections_taught.join(" ").toLowerCase()
 
-const users = [
-  { name: 'Alice Santos', avatar: '' },
-  { name: 'Mark Dela Cruz' },
-  { name: 'John Smith', avatar: 'https://i.pravatar.cc/150?img=4' },
-  { name: 'Maria Garcia', avatar: '' },
-  { name: 'David Lee', avatar: 'https://i.pravatar.cc/150?img=5' },
-  { name: 'Sophia Kim' },
-  { name: 'James Brown', avatar: 'https://i.pravatar.cc/150?img=6' },
-  { name: 'Emily Chen', avatar: 'https://i.pravatar.cc/150?img=7' },
-  { name: 'Carlos Mendoza' },
-  { name: 'Fatima Al-Farsi', avatar: '' },
-  { name: 'Liam O\'Connor', avatar: 'https://i.pravatar.cc/150?img=8' },
-  { name: 'Priya Patel' }
-];
-
-
-export function TableComponent({data, columns}) {
-  const [retrievedData, setRetrievedData] = useState([])
-  const [retrievedColumns, setRetrievedColumns] = useState([])
-  let  link = "https://meet.google.com/rhh-ayym-gzb?authuser=0";
-  useEffect(() => {
-    setRetrievedData(data)
-    setRetrievedColumns(columns)
-  }, [data])
-  
- const handleJoin = () => {
-    window.open(link, "_blank");
-  };
+      return (
+        fullName.includes(searchValue.toLowerCase()) ||
+        email.includes(searchValue.toLowerCase()) ||
+        sections.includes(searchValue.toLowerCase())
+      )
+    })
+    .slice(0, 16)
 
   return (
-    <Card className="overflow-x-auto bg-accent">
-      <Dialog >
-      <Table >
-        <TableHeader>
-          <TableRow>
-            {retrievedColumns.map((column, idx) => (
-              <TableHead key={idx} className={ column === "Link" ? "text-center" : "" } >{column}</TableHead>  
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {retrievedData.map((entry, idx) => (
-            <DialogTrigger asChild key={idx} >
-              <TableRow key={idx}>
-                <TableCell>{entry.time}</TableCell>
-                <TableCell>{entry.subject}</TableCell>
-                <TableCell>{entry.room}</TableCell>
-                <TableCell className="text-center">
-                  {entry.link ? (
-                    <a href={entry.link} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>
-                      <Button variant="link" className="text-blue-600">Join</Button>
-                    </a>
-                  ) : (
-                    "—"
-                  )}
+    <div className="w-full rounded-xl overflow-auto shadow border">
+      <ScrollArea className="h-[420px]">
+        <Table className="rounded-xl overflow-hidden">
+          <TableHeader className="dark:bg-neutral-900 bg-gray-300/20">
+            <TableRow className="sticky top-0 z-10 dark:bg-neutral-900">
+              <TableHead>Account</TableHead>
+              <TableHead>Sections</TableHead>
+              <TableHead className="text-center">Assigned Minutes</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredData.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={3} className="h-24 text-center">
+                  No matching records found.
                 </TableCell>
               </TableRow>
-            </DialogTrigger>
-          ))}
-          </TableBody>
-      </Table>
-      <DialogContent className=" w-full sm:w-[70%] h-[70vh] flex flex-col !min-h-[350px]">
-        <DialogHeader>
-          <DialogTitle className={"text-base"}>Calculus I</DialogTitle>
-          <DialogDescription className={"text-sm"}>BSIT - 3A</DialogDescription>
-        </DialogHeader>
+            )}
+            {filteredData.map((e, i) => {
+              const assignedSubLength = e.subjects_assigned.filter(
+                (value, index, self) => self.indexOf(value) === index
+              ).length
 
-        <div className="flex flex-1 h-[calc(100%-60px)] gap-5 ">
-          <div className="w-[70%]">
-             <Card className="h-full ">
-              <CardHeader>
-                <CardTitle className={"text-gray-500 text-sm"}>Student List</CardTitle>
-              </CardHeader>
-              <CardContent className=" h-full min-h-[100px] ">
-                <UserList users={users}/>
-              </CardContent>
-            </Card>
-          </div>
-          <div className="w-[30%]">
-           <Card className="p-1.5 gap-1">
-            <CardHeader className="p-1.5 flex w-full justify-between items-center">
-              <div className="flex items-center justify-center">
-                <img src="https://fonts.gstatic.com/s/i/productlogos/meet_2020q4/v6/web-48dp/logo_meet_2020q4_color_1x_web_48dp.png" alt="GoogleMeet"  className="w-6"/> 
-                <span className="font-bold text-muted-foreground ml-2 text-sm">Meet</span>
-             </div>
-              <Popover>
-                <PopoverTrigger>
-                <EllipsisVertical className="h-5"/>
-                </PopoverTrigger>
-                  <PopoverContent className={"w-auto p-1.5"}>
-                    <div >
-                      <Button variant="ghost" className="w-full" >Copy Link</Button>                      
+              const sections = e.sections_taught.filter(
+                (value, index, self) => self.indexOf(value) === index
+              )
+
+              const color = getColor(assignedSubLength + 2)
+
+              return (
+                <TableRow key={i} className="hover:bg-accent/50 p-2" >
+                  <TableCell className="font-medium">
+                    <div className="flex items-center justify-start">
+                      <Avatar className="w-10 h-10">
+                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                      <div className="ml-2">
+                        <h1 className="font-semibold flex items-center">
+                          {e.teacher.first_name} {e.teacher.last_name} <Copy className="ml-1 w-3 h-3" />
+                        </h1>
+                        <p className="font-normal text-muted-foreground flex items-center justify-start">
+                          <CornerDownRight className="w-4 h-4 mr-1" />
+                          {e.teacher.first_name}@gmail.com
+                        </p>
+                      </div>
                     </div>
-                  </PopoverContent>
-             </Popover>
-            </CardHeader>
-            <CardContent className="p-1.5">
-              <Button className="w-full" onClick={handleJoin}>Join</Button>
-            </CardContent>
-           </Card>
-          </div>
-        </div>
-      </DialogContent>
-      </Dialog>
-    </Card>
+                  </TableCell>
+                  <TableCell className="font-medium text-muted-foreground">
+                    {sections.slice(0, 2).join(", ")}
+                    {sections.length > 2 && (
+                      <HoverCard>
+                        <HoverCardTrigger>
+                          <Badge
+                            className="h-5 min-w-5 rounded-full px-1 font-medium ml-2 cursor-default"
+                            variant="outline"
+                          >
+                            +{sections.length - 2}
+                          </Badge>
+                        </HoverCardTrigger>
+                        <HoverCardContent className="grid grid-cols-3 w-auto gap-1">
+                          {sections.map((section, index) => (
+                            <p key={index} className="text-sm text-foreground">
+                              {section}
+                            </p>
+                          ))}
+                        </HoverCardContent>
+                      </HoverCard>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="ml-2 flex flex-col">
+                      <span className="text-muted-foreground">
+                        {e.total_minutes_assigned}
+                        <span className="ml-1">
+                          / <span className="font-semibold">{e.max_minutes_allowed}</span> mins
+                        </span>
+                      </span>
+                      <span className="font-semibold text-foreground mt-1">
+                        {e.utilization_percentage}%
+                        <Tooltip>
+                          <TooltipTrigger asChild className="cursor-default">
+                            <Badge className={`ml-2 dark:text-white ${color.bg} ${color.text}`}>
+                              {assignedSubLength} Assigned
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-muted dark:text-white text-foreground">
+                            <p>Number of subjects assigned to this teacher</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </ScrollArea>
+
+      <div className="text-sm text-muted-foreground p-4 flex justify-between">
+        <h1>
+          {/* List of teachers with their workload */}
+          Showing {filteredData.length} of {data.length} entries
+        </h1>
+        <h1>
+          {/* List of teachers with their workload */}
+          List of teachers with their workload
+        </h1>
+      </div>
+    </div>
   )
 }
+
+export default TableComponent

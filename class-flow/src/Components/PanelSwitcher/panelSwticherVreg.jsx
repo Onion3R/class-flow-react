@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Lock } from 'lucide-react'
-import { useAuth } from "@/context/authContext";
+import { useAuth } from "@/app/context/authContext";
 import { Link } from 'react-router-dom'
  function PanelSwticherVreg({panels}) {
    const [activePanels, setActivePanels] = React.useState([])
