@@ -13,7 +13,7 @@ export const addTeacher = async (data) => {
   return response.data;
 };
 
-export const updateTeacher = async (teachersId,data) => {
+export const updateTeacher = async (teachersId, data) => {
   const response = await api.put(`teachers/${teachersId}/`, data);
   return response.data;
 };

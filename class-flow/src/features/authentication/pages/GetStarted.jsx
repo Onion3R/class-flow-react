@@ -27,9 +27,10 @@ function GetStarted() {
           first_name: firstName,
             last_name: lastName,
             firstTime: false,
+            role: teacherData.role
         }
         try {
-        console.log('user login' , useLoggedIn)
+        console.log('Updating teacher with:', data)
          await updateTeacher(teacherData.id , data) 
          await teacherRefresh();
           navigate("/");

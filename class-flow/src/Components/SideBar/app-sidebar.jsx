@@ -82,23 +82,23 @@ const data2 = {
         label: 'Schedule',
         items: [
             {
-                title: "Create Schedule",
+                title: "New Schedule",
                 url: "create-schedule",
                 icon: CalendarPlus,
               },
             {
-                title: "Generate Schedule",
+                title: "Auto-Generate",
                 url: "generate-schedule",
                 icon: CalendarCog,
               },
               {
-                title: "Scedules",
+                title: "Schedule List",
                 url: "schedules",
                 icon: Calendar,
-                subLink: [
-                  { title: "Grade 11", url: `${baseUrl}/junior` },
-                  { title: "Grade 12", url: `${baseUrl}/senior` },
-                ]
+                // subLink: [
+                //   { title: "Grade 11", url: `${baseUrl}/junior` },
+                //   { title: "Grade 12", url: `${baseUrl}/senior` },
+                // ]
             },
         ]
       }

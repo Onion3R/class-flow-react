@@ -54,6 +54,7 @@ export function DataTable({
   const [columnFilters, setColumnFilters] = useState([]);
   const [comboBoxHasSelectedItem, setComboBoxHasSelectedItem] = useState(false); // Consider refining if multiple combo boxes
 
+  console.log("Data in DataTable:", data);
   useEffect(() => {
     if (filteredData && filteredData.columnId) {
       setFilteredColumn(filteredData.columnId);

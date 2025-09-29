@@ -9,15 +9,14 @@ import {
     TabsList,
     TabsTrigger,
 } from "@Components/ui/tabs";
-import LoadingCard from '../../../../../../components/LoadingCard/loadingCard';
+import LoadingCard from '@/components/LoadingCard/loadingCard';
 import { ExternalLink, CircleAlert } from 'lucide-react';
 import SubjectWithAssignmentFormPopover from '@/features/admin/pages/subjects/pages/SubjectPage/components/SubjectWithAssignmentFormPopover';
 import { Card, CardContent, CardDescription, CardTitle, CardHeader } from '@/components/ui/card';
 
 import useTracks from '@/lib/hooks/useTracks';
 import useStrands from '@/lib/hooks/useStrands';
-import useSubjectStrand from '../../../../../../lib/hooks/useSubjectStrand';
-
+import useSubjectStrandGetter from '@/lib/hooks/useSubjectStrand'
 const EmptyMessage = (
     <span className='flex'>
         This track doesn't have any strand and subjects. Go to
@@ -35,7 +34,7 @@ const NoDataMessage = (
 );
 
 function useSubjectPageState() {
-    const { data: allSubjectData, isLoading: subjectsIsLoading, refresh: refreshSubjectStrand } = useSubjectStrand();
+    const { data: allSubjectData, isLoading: subjectsIsLoading, refresh: refreshSubjectStrand } = useSubjectStrandGetter();
     const { data: allStrandData, isLoading: strandIsLoading } = useStrands();
     const { data: allTrackData, isLoading: trackIsLoading } = useTracks();
 

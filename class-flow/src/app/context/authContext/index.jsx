@@ -49,9 +49,9 @@ console.log(allTeacherData); // inspect the actual value
         setTeacherData(foundTeacher);
         setIsFirstTime(foundTeacher.firstTime ?? null);
 
-        const role = foundTeacher.status?.toLowerCase();
-        setIsAdmin(role === "admin");
-        setIsTeacher(role === "teacher");
+        const role = foundTeacher?.role
+        setIsAdmin(role === 1);
+        setIsTeacher(role === 2);
       } else {
         setTeacherData(null);
         setIsAdmin(false);

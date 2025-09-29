@@ -32,8 +32,8 @@ function TableComponent({ data, searchValue }) {
 
   const filteredData = data
     .filter((e) => {
-      const fullName = `${e.teacher.first_name} ${e.teacher.last_name}`.toLowerCase()
-      const email = `${e.teacher.first_name}@gmail.com`.toLowerCase()
+      const fullName = `${e.teacher_name} `.toLowerCase()
+      const email = `${e.teacher_name}@gmail.com`.toLowerCase()
       const sections = e.sections_taught.join(" ").toLowerCase()
 
       return (
@@ -45,11 +45,11 @@ function TableComponent({ data, searchValue }) {
     .slice(0, 16)
 
   return (
-    <div className="w-full rounded-xl overflow-auto shadow border">
+    <div className="w-full rounded-xl overflow-auto  border">
       <ScrollArea className="h-[420px]">
         <Table className="rounded-xl overflow-hidden">
           <TableHeader className="dark:bg-neutral-900 bg-gray-300/20">
-            <TableRow className="sticky top-0 z-10 dark:bg-neutral-900">
+            <TableRow className="sticky top-0 z-1 dark:bg-neutral-900">
               <TableHead>Account</TableHead>
               <TableHead>Sections</TableHead>
               <TableHead className="text-center">Assigned Minutes</TableHead>
@@ -68,9 +68,7 @@ function TableComponent({ data, searchValue }) {
                 (value, index, self) => self.indexOf(value) === index
               ).length
 
-              const sections = e.sections_taught.filter(
-                (value, index, self) => self.indexOf(value) === index
-              )
+            const sections = e.sections_taught.map(e => e.name)
 
               const color = getColor(assignedSubLength + 2)
 
@@ -84,11 +82,11 @@ function TableComponent({ data, searchValue }) {
                       </Avatar>
                       <div className="ml-2">
                         <h1 className="font-semibold flex items-center">
-                          {e.teacher.first_name} {e.teacher.last_name} <Copy className="ml-1 w-3 h-3" />
+                          {e.teacher_name} <Copy className="ml-1 w-3 h-3" />
                         </h1>
                         <p className="font-normal text-muted-foreground flex items-center justify-start">
                           <CornerDownRight className="w-4 h-4 mr-1" />
-                          {e.teacher.first_name}@gmail.com
+                          {e.operational_teacher.email ?? e.operational_teacher.last_name + '@gmail.com'}
                         </p>
                       </div>
                     </div>
@@ -124,7 +122,7 @@ function TableComponent({ data, searchValue }) {
                         </span>
                       </span>
                       <span className="font-semibold text-foreground mt-1">
-                        {e.utilization_percentage}%
+                        {Math.round(Math.abs(e.utilization_percentage))}%
                         <Tooltip>
                           <TooltipTrigger asChild className="cursor-default">
                             <Badge className={`ml-2 dark:text-white ${color.bg} ${color.text}`}>

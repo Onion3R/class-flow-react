@@ -100,7 +100,7 @@ export const createSchedule = async (scheduleData) => {
     const response = await api.post('schedules/', scheduleData);
     return response.data;
   } catch (error) {
-    console.error("Error creating main schedule:", error.response?.data || error.message);
+    console.error("Error creating main schedule:",  error);
     throw error;
   }
 };

@@ -1,84 +1,205 @@
-import { Button } from "@/components/ui/button"
-import {  Clipboard, ClipboardCheck, ExternalLink } from "lucide-react"
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Dialog,
-  DialogClose,
+  DialogTrigger,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
 } from "@/components/ui/dialog"
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert"
+import { triggerToast } from "@/lib/utils/toast"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Clipboard, ClipboardCheck, ExternalLink, RefreshCcw, PopcornIcon } from "lucide-react"
 import TeacherRolePopover from "./TeacherRolePopover"
+import useRolesGetter from "@/lib/hooks/useRoles"
+import { v4 as uuidv4 } from 'uuid';
 
 export default function ShareDialog() {
-  const roles = [
-    { value: 'admin', label: 'Admin', desc: 'Has full access to all features and settings.' },
-    { value: 'instrutor', label: 'Instructor', desc: 'Can edit content but not manage settings.' }
-    ]
-  const [selectedRole, setSelectedRole] = useState(roles[0].label)
+  const [retries, setRetries] = useState(1)
+  const [invite, setInvite] = useState(undefined)
+  const [selectedRole, setSelectedRole] = useState()
+  const [hasGeneratedUrl, setHasGeneratedUrl] = useState()
   const [copyLink, setCopyLink] = useState(false)
+  const [email, setEmail] = useState('')
+
+  const { data: allRoleData, isLoading: allRolesIsLoading } = useRolesGetter()
+
+  useEffect(() => {
+    if (allRoleData && allRoleData.length > 0 && !allRolesIsLoading) {
+      setSelectedRole(allRoleData[0].label)
+    }
+  }, [allRolesIsLoading, allRoleData])
 
   const handleCopyLink = () => {
-    setCopyLink(true)
-    navigator.clipboard.writeText("https://ui.shadcn.com/docs/installation")
+    if(invite) {
+      setCopyLink(true)
+      navigator.clipboard
+      .writeText(invite)
       .then(() => {
-        alert("Link copied to clipboard!")
-       
+          const toastInfo = {
+              success: true, 
+            title: 'Copy link',
+            desc: 'Copied the link to your clipboard'
+          }
+        triggerToast(toastInfo)
       })
-      .catch(err => {
-        console.error("Failed to copy link: ", err)
+      .catch((err) => {
+        const toastInfo = {
+                       success: false, 
+                     title: 'Fail to copy',
+                     desc: err
+                   }
+       triggerToast(toastInfo)
       })
+    } else {
+     const toastInfo = {
+  success: false,
+  title: 'Copy Failed',
+  desc: 'No invite link available to copy.'
+};
+
+        triggerToast(toastInfo)
+    }
+    
   }
+
+ 
+const handleCreateInvite = () => {
+  if ((!hasGeneratedUrl && email != '' ) || (hasGeneratedUrl && retries <= 2 && email != '')) {
+    alert(email)
+    const token = uuidv4();
+    setInvite(`http://localhost:5173/invites/${token}`);
+    setHasGeneratedUrl(true);
+  } else {
+   const toastInfo = {
+  success: false,
+  title: 'Email Required',
+  desc: 'Please provide a valid email address to continue.'
+};
+        triggerToast(toastInfo)
+
+
+  }
+};
+
+const handleRetries = () => {
+  if (retries <= 2) {
+    setRetries(prev => prev + 1);
+    handleCreateInvite(); // ✅ invoke the function
+  } else {
+ const toastInfo = {
+  success: false,
+  title: 'Retry Limit Reached',
+  desc: 'You’ve hit the maximum number of retry attempts.'
+};
+
+    triggerToast(toastInfo)
+  }
+}
+
+useEffect(() => {
+  console.log('tries', retries)
+}, [retries])
+
+  
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default" className="ml-2"> <ExternalLink/> Share</Button>
+        <Button variant="default" className="ml-2">
+          <ExternalLink className="mr-1" /> Share
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
+       
         <DialogHeader>
           <DialogTitle>Share link</DialogTitle>
           <DialogDescription>
-            Anyone who has this link will be able to view this.
+             Copy the link above and share it with others.
           </DialogDescription>
         </DialogHeader>
+    
         <div className="flex items-center gap-2">
           <div className="grid flex-1 gap-2">
             <Label htmlFor="link" className="sr-only">
               Link
             </Label>
             <div className="relative">
-            <Input
-              id="link"
-              defaultValue="https://ui.shadcn.com/docs/installation"
-              readOnly/>
-              <Button
+              <Input
+                id="link"
+                defaultValue={invite}
+                placeholder={invite ? invite: 'Click "Generate" to create an invite. '}
+                readOnly
+              />
+              {/* <Button
                 variant="ghost"
-                className="absolute right-0 top-0  rounded-l-none"
-                onClick={handleCopyLink}
+                aria-label="Copy share link"
+                className="absolute right-0 top-0 rounded-l-none bg-accent"
+                
               >
-                {copyLink ? <ClipboardCheck className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
-              </Button>
+                {copyLink ? (
+                  <ClipboardCheck className="h-4 w-4" />
+                ) : (
+                  <Clipboard className="h-4 w-4" />
+                )}
+              </Button> */}
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-between  ">
           <div>
-          <h3 className="text-sm font-medium">General access</h3>
-          <DialogDescription className="text-[12px]">Copy the link above and share it with others.</DialogDescription>
+                           <Label className='mb-2'>Email</Label>
+
+            <div className="flex">
+            <Input 
+              placeholder='olmida@gmail.com'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              />
+               {allRoleData?.length > 0 && (
+            <TeacherRolePopover
+              roles={allRoleData}
+              selectedRole={selectedRole}
+              setSelectedRole={setSelectedRole}
+            />
+          )}
+            </div>
+           
+        {/* <div className="flex items-center justify-between mt-4">
+          <div>
+            <h3 className="text-sm font-medium">General access</h3>
+            <DialogDescription className="text-[12px]">
+              Copy the link above and share it with others.
+            </DialogDescription>
           </div>
-          <TeacherRolePopover roles={roles} selectedRole={selectedRole} setSelectedRole={setSelectedRole}/>
-        </div>
-        <DialogFooter className="sm:justify-start">
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
+          {allRoleData?.length > 0 && (
+            <TeacherRolePopover
+              roles={allRoleData}
+              selectedRole={selectedRole}
+              setSelectedRole={setSelectedRole}
+            />
+          )}
+        </div> */}
+        
+</div>
+        <DialogFooter className="sm:justify-start !flex !items-center !justify-start w-full ">
+          <div className="flex gap-2 ">
+          <Button variant='secondary'  onClick={handleCreateInvite} disabled={hasGeneratedUrl} >Generate</Button>
+          <Button variant='secondary'  onClick={handleRetries}> <RefreshCcw className="h-4 w-4" /></Button>
+          <Button variant='secondary'  onClick={handleCopyLink}> <ClipboardCheck className="h-4 w-4" /></Button>
+          </div>
+          {/* <DialogClose asChild>
+            <Button type="button" variant="secondary" >
               Close
             </Button>
-          </DialogClose>
+          </DialogClose> */}
         </DialogFooter>
       </DialogContent>
     </Dialog>

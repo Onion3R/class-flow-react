@@ -188,3 +188,24 @@ body {
   --badge-bg-yellow: #fef9c3; /* Tailwind's bg-yellow-100 */
   --badge-text-yellow: #854d0e; /* Tailwind's text-yellow-800 */
 }
+
+/* Target the scrollbar track */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 8px;
+}
+
+/* Track (background) */
+::-webkit-scrollbar-track {
+  background: var(--background);
+  border-radius: 4px;
+}
+
+/* Thumb (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background-color: var(--muted-foreground);
+  border: solid 1px var(--muted-foreground);
+  border-radius: 5px;
+}
+
+/* On hover */

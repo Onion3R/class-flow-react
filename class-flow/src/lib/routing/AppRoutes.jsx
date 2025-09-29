@@ -13,7 +13,7 @@ const SubjectDetail = lazy(() => import("../../features/admin/pages/subjects/pag
 const Programs = lazy(() => import("../../features/admin/pages/programs/Programs"));
 const SchedulesPage = lazy(() => import("../../features/admin/pages/schedules/pages/SchedulePage/SchedulesPage"));
 const CreateSchedule = lazy(() => import("../../features/admin/pages/schedules/pages/CreateSchedulePage/CreateSchedule"));
-const GenerateSchedule = lazy(() => import("../../features/admin/pages/schedules/pages/GenerateSchedulePage/generateSchedule"));
+const GenerateSchedule = lazy(() => import("../../features/admin/pages/schedules/pages/GenerateSchedulePage/GenerateSchedule"));
 
 
 // import FreshmenSchedPage from "./Pages/Schedules/freshmenSchedPage";

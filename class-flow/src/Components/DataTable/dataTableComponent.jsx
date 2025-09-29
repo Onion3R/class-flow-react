@@ -29,7 +29,7 @@ export default function DataTableComponent({
   const columns = getColumns({ openDialog, setOpenDialog, setOpenAlertDialog, setSelectedRow , setLabel, setAlertDialogCustomContent , setContextMenuDisable});
 
   return (
-    <div className="container mx-auto">
+    <div >
       <DataTable
         columns={columns}
         source={alertDialogData}

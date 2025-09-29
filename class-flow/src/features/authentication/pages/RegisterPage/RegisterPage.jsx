@@ -65,6 +65,7 @@ function Register() {
     try {
       const result = await doSignInWithGoogle();
       const user = result.user;
+      const email = result.email;
       const idToken = await user.getIdToken();
       const info = getAdditionalUserInfo(result);
       const firebase_uid = user.uid;
@@ -73,7 +74,7 @@ function Register() {
         const response = await verifyToken(idToken); // ✅ pass the token here
         if (response?.success) {
           if (info?.isNewUser) {
-            const data = createData(firebase_uid);
+            const data = createData(firebase_uid, email);
             await addTeacher(data);
             await teacherRefresh();
           }
@@ -89,15 +90,17 @@ function Register() {
   };
 
 
-  function createData(firebase_uid) {
+  function createData(firebase_uid, email) {
     return {
-      first_name: "john",
-      last_name: "example",
+      first_name: "",
+      last_name: "",
+      email: email,
       is_active: false,
       firebase_uid,
       status: USER_STATUS,
       firstTime: true,
       base_max_minutes_per_week: 240,
+      role: 2,
     };
   }
 
