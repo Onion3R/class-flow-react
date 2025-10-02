@@ -156,7 +156,7 @@ function SubjectDialogContent({ selectedRow, onConfirm ,onOpenChange}) {
             </div>
            
           </div>
-          <DialogFooter>
+          <DialogFooter >
             <DialogClose asChild onClick={() => onOpenChange(false)}>
               <Button variant="outline">Cancel</Button>
             </DialogClose>

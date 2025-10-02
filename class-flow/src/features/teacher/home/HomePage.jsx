@@ -58,7 +58,7 @@ useEffect(() => {
                   <span className='h-13 flex items-center'>
                   {progress === 110 ? (
                    <TextRoll
-                    className='overflow-clip text-4xl font-bold text-muted-foreground dark:text-neutral-300'
+                    className='overflow-clip text-4xl font-bold '
                     variants={{
                       enter: {
                         initial: { y: 0 },
@@ -83,7 +83,7 @@ useEffect(() => {
                 <h1 class="text-3xl font-bold bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-600 text-transparent bg-clip-text inline-block">
                   Hello, John
                   </h1>
-                  <p className='font-bold text-foreground dark:text-neutral-300'>Welcome back to ClassFlow!</p>
+                  <p className='font-medium text-foreground dark:text-neutral-300'>Welcome back to ClassFlow!</p>
                   
                   </span>
                   )}

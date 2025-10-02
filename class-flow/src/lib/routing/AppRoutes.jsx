@@ -12,6 +12,7 @@ const SubjectPage = lazy(() => import("@/features/admin/pages/subjects/pages/Sub
 const SubjectDetail = lazy(() => import("../../features/admin/pages/subjects/pages/SubjectDetail/SubjectDetailPage"));
 const Programs = lazy(() => import("../../features/admin/pages/programs/Programs"));
 const SchedulesPage = lazy(() => import("../../features/admin/pages/schedules/pages/SchedulePage/SchedulesPage"));
+const CreatedScheduleDetails  = lazy(() => import("@/features/admin/pages/schedules/pages/CreateSchedulePage/pages/CreatedScheduleDetails"));
 const CreateSchedule = lazy(() => import("../../features/admin/pages/schedules/pages/CreateSchedulePage/CreateSchedule"));
 const GenerateSchedule = lazy(() => import("../../features/admin/pages/schedules/pages/GenerateSchedulePage/GenerateSchedule"));
 
@@ -79,8 +80,9 @@ const AppRoutes = () => {
       <Route path="subjects/detail/:id" element={<SubjectDetail />} />
       <Route path="teachers" element={<Teachers />} />
       <Route path="programs" element={<Programs />} />
-      <Route path="teachers/teacher-detail/:id" element={<InstructorDetail />} />
+      <Route path="teachers/details/:id" element={<InstructorDetail />} />
       <Route path="create-schedule" element={<CreateSchedule />} />
+      <Route path="create-schedule/details/:id" element={<CreatedScheduleDetails />} />
       <Route path="generate-schedule" element={<GenerateSchedule />} />
       <Route path="schedules">
         <Route index element={<SchedulesPage />} />

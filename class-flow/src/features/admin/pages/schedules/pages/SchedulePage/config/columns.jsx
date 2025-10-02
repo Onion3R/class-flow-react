@@ -55,7 +55,7 @@ export const getColumns = ({
   },
  {
   accessorKey: "name",
-  header: "Fullname",
+  header: "Full name",
   cell: ({ row }) => {
     return <div className="capitalize">{row.original.name || "N/A"}</div>;
   },
@@ -124,7 +124,7 @@ export const getColumns = ({
   accessorKey: "utilization_percentage",
   header: "Percentage",
   cell: ({ row }) => {
-    return <div className="ml-2 ">{row.original.utilization_percentage ?? "N/A"}%</div>;
+    return <div className="ml-2 ">{Math.round(row.original.utilization_percentage) ?? "N/A"}%</div>;
   },
 
    

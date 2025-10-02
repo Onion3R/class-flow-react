@@ -154,7 +154,7 @@ function SectionDialogContent({ selectedRow, onConfirm, onRefresh }) {
             </div>
           )}
 
-          <Card className='w-full p-0 mt-2  shadow-xs'>
+          <Card className='w-full p-0 mt-2   shadow-xs'>
             <div className='flex p-4 items-center'>
               <Label className="flex-col items-start gap-1">
                 <span className="text-sm p-0">Set Section Active?</span>
@@ -170,7 +170,7 @@ function SectionDialogContent({ selectedRow, onConfirm, onRefresh }) {
           </Card>
         </div>
 
-        <DialogFooter className="mt-6">
+        <DialogFooter >
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>

@@ -1,10 +1,15 @@
 // columns.js
 import {actions} from "./actions"
-import { MoreHorizontal, ArrowUpDown, ShieldUser, User } from "lucide-react"
+import { MoreHorizontal, ArrowUpDown,  Star} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@Components/ui/checkbox"
 import ContextMenuEffectWrapper from "@/features/admin/pages/schedules/pages/CreateSchedulePage/components/ContextMenuEffectWrapper/ContextMenuEffectWrapper"
 import DeleteDialogTeacher from "../component/DeleteDialogTeacher"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +20,7 @@ import {
 import { useNavigate } from "react-router-dom"
 import { Fragment } from "react"
 import { Badge } from "@/components/ui/badge"
+import ActiveBadge from "@/components/ActiveBadge/ActiveBadge"
 import { useRandomBadgeColor } from "@/lib/hooks/useRandomBadgeColor"
 export const getColumns = ( {
   setOpenDialog, 
@@ -53,6 +59,23 @@ export const getColumns = ( {
   {
     accessorKey: "name",
     header: "Name",
+    cell: ({row}) => {
+     const isAdmin = row.original.role === 'admin';
+     console.log(row)
+        console.log('Admin',isAdmin)
+      return(<div className="flex items-center gap-1">  { isAdmin &&  
+       <Tooltip>
+      <TooltipTrigger asChild>
+       <Star size={14} className="fill-amber-300 text-amber-300"/>
+      </TooltipTrigger>
+      <TooltipContent className='bg-accent text-accent-foreground'>
+        <p>Admin</p>
+      </TooltipContent>
+    </Tooltip>
+       }
+       {row.getValue('name')}
+        </div>
+    )}
   },
   {
    accessorKey: "email",
@@ -117,28 +140,53 @@ export const getColumns = ( {
     header: "Mins per week",
     cell:({row}) => <div><span className="ml-3">{row.getValue("maxLoad")}</span></div>
   },
+  // {
+  //  accessorKey: "role",
+  //   header: ({ column }) => {
+  //     return (
+  //       <Button
+  //         variant="ghost"
+  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+  //       >
+  //         Role
+  //         <ArrowUpDown />
+  //       </Button>
+  //     )
+  //   },
+  //   cell: ({ row }) => {
+  //   const role = row.getValue("role");
+  //   const Icon = role === "teacher" ? User : ShieldUser;
+
+  //   return (
+  //     <Badge variant="outline" className="capitalize ml-3 text-muted-foreground">
+  //       <Icon className="mr-1" />
+  //       {role}
+  //     </Badge>
+  //   );
+  // }
+
+  // },
   {
-   accessorKey: "role",
+   accessorKey: "status",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Role
+          Status
           <ArrowUpDown />
         </Button>
       )
     },
     cell: ({ row }) => {
-    const role = row.getValue("role");
-    const Icon = role === "teacher" ? User : ShieldUser;
+      // console.log('status:',row.original)
+    const status = row.getValue("status");
+    console.log('status:',status)
+    // const Icon = status === "teacher" ? User : ShieldUser;
 
     return (
-      <Badge variant="outline" className="capitalize ml-3 text-muted-foreground">
-        <Icon className="mr-1" />
-        {role}
-      </Badge>
+      <ActiveBadge status={status} />
     );
   }
 

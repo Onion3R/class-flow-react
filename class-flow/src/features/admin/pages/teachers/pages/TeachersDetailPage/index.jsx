@@ -19,7 +19,7 @@ function TeachersDetail() {
   
 
   useEffect(() => {
-    try {``
+    try {
       const bytes = CryptoJS.AES.decrypt(decodeURIComponent(id), SECRET_KEY)
       const originalId = bytes.toString(CryptoJS.enc.Utf8)
       setTeachersId(originalId)
@@ -61,7 +61,7 @@ function onRefresh() {
          
 
           <div className='flex bg-amber-30 h-full gap-7 lg:flex-row flex-col justify-between items-start'>
-            <ProfileInfo teacherDetail={teacherDetail} disable={disable} setDisable={setDisable} />
+            <ProfileInfo teacherDetail={teacherDetail} disable={disable} setDisable={setDisable}  onRefresh={getTeacher}/>
            
               <Specialization teacherDetail={teacherDetail} teachersId={teachersId} onRefresh={() => onRefresh()}/>
           </div>

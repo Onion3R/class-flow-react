@@ -1,13 +1,12 @@
 import React, {useState} from 'react'
-import { Button } from '@/components/ui/button'
-import Wizzard from './components/Wizzard'
+import Wizard from './components/Wizard'
 function GenerateSchedule() {
 
   // const [getStarted, setGetStarted] = useState(false)
 
   return (
     <div className='container p-4 mx-auto h-[calc(100%-45px)] flex items-center flex-col'>
-      <div className='h-[85%] w-[75%]'>
+      <div className='h-[90%] md:h-[85%] w-[95%] md:w-[75%]'>
        {/* {getStarted ?
         
       :
@@ -15,7 +14,7 @@ function GenerateSchedule() {
       <Button className='w-52 h-12' onClick={() => setGetStarted(true)}>Get Started</Button>
       </div>
       } */}
-       <Wizzard />
+       <Wizard />
       </div>
       
     </div>

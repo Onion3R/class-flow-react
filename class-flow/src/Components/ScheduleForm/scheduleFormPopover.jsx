@@ -67,7 +67,7 @@ function ScheduleFormPopover({ onRefresh }) {
       academic_year: academicYear,
       start_date: formattedStartDate,
       end_date: formattedEndDate,
-      is_active: false,
+      is_active: true,
     };
 
     try {

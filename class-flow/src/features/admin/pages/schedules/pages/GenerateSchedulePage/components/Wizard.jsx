@@ -9,10 +9,10 @@ import OverrideDialogGenerateSchedule from './OverrideDialogGenerateSchedule'
 import { generateSchedule } from '@/app/services/apiService'
 import { triggerToast } from "@lib/utils/toast"
 import { TextShimmer } from '@/components/motion-primitives/text-shimmer'
-import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
-
-function Wizzard() {
+import Step1 from './wizzard/step1'
+import Step2 from './wizzard/Step2'
+import Step3 from './wizzard/Step3'
+function Wizard() {
   const [currentPageIndex, setCurrentPageIndex] = useState(0)
   const { data: allScheduleData = [], isLoading: scheduleIsLoading } = useScheduleGetter()
   const { data: allGeneratedScheduleData = [], isLoading: generatedScheduleIsLoading } = useGeneratedScheduleGetter()
@@ -29,6 +29,7 @@ function Wizzard() {
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
   const [isOverride, setIsOverride] = useState(false)
+  const [isDoneGenerating, setIsDoneGenerating] = useState(false)  
 
   const nextPage = () => {
     if (currentPageIndex < pages.length - 1) {
@@ -68,7 +69,7 @@ function Wizzard() {
       data = {
         id: fallbackMatch.id,
         year: fallbackMatch.academic_year,
-        semester: fallbackMatch.semester.name,
+        semester: fallbackMatch.semester.id,
       }
     }
 
@@ -80,6 +81,7 @@ function Wizzard() {
   }, [selectedSchedule, allGeneratedScheduleData, allScheduleData])
 
   const generateName = (result) => {
+    console.log('result', result)
     let semester
     const academicYear = result.year
     // console.log(result)
@@ -115,6 +117,12 @@ function Wizzard() {
       setSelectedSchedule(null)
       setSelectedScheduleId(null)
     }
+
+    if(currentPageIndex === 2 && isDoneGenerating) {
+   
+      setSuccessMessage('')
+      setErrorMessage('')
+    } 
 
     //  console.log('user continue?', userContinue)
   }, [currentPageIndex, userContinue])
@@ -203,8 +211,10 @@ function Wizzard() {
       })
     } finally {
       setLoading(false)
+      setIsDoneGenerating(true)
     }
   }
+
 
   useEffect(() => {
     if (!dialogOpen && process === 'Existing schedule found.') {
@@ -264,129 +274,11 @@ function Wizzard() {
     //     </div>
     //   </div>
     // </section>,
-    <section className='flex h-full gap-5 items-center'>
-      <div className='h-full pt-[10%] w-[40%]'>
-        <h1 className='text-3xl font-bold'>Before You Generate</h1>
-        <p className='text-muted-foreground text-xl font-medium'>
-          Things to consider before generating a schedule
-        </p>
-      </div>
-      <div className='w-[60%] text-base flex flex-col gap-4'>
-        <div className='p-4 border border-gray-400 dark:border-accent rounded-2xl grid grid-cols-[30px_1fr] '>
-          <CircleDashed size={18} />
-          <div>
-            <p className='font-semibold'>
-              All year levels (e.g., Grade 11, Grade 12) in the selected schedule will be processed.
-            </p>
-            <span className='text-sm text-muted-foreground'>Check your data under Programs.</span>
-          </div>
-        </div>
-        <div className='p-4 border border-gray-400 dark:border-accent rounded-2xl grid grid-cols-[30px_1fr] '>
-          <CircleDashed size={18} />
-          <div>
-            <p className='font-semibold'>
-              Once a schedule is created, any changes made afterward will not be reflected in that schedule.
-            </p>
-            <span className='text-sm text-muted-foreground'>Review your inputs in "New Schedule".</span>
-          </div>
-        </div>
-        <div className='p-4 border border-gray-400 dark:border-accent rounded-2xl grid grid-cols-[30px_1fr] '>
-          <CircleDashed size={18} />
-          <div>
-            <p className='font-semibold'>
-              Generated schedules can be overridden. Verify your selections before proceeding.
-            </p>
-            <span className='text-sm text-muted-foreground'>Check your data under Programs.</span>
-          </div>
-        </div>
-        <div className='p-4 border border-gray-400 dark:border-accent rounded-2xl grid grid-cols-[30px_1fr] '>
-          <CircleDashed size={18} />
-          <div>
-            <p className='font-semibold'>The system will automatically generate a name for your schedule.</p>
-            <span className='text-sm text-muted-foreground'>
-              This name cannot be changed after creation.
-            </span>
-          </div>
-        </div>
-        </div>
-      </section>,
-   
-    
-    <section className='h-full flex-col w-full flex items-center justify-center'>
-      <div>
-        <div className='flex flex-col  items-center gap-4 justify-center '>
-          <div className=''>
-            <h1 className='text-3xl font-bold'>Generate</h1>
-            <p className='text-lg '>Choose a schedule to generate</p>
-          </div>
-          <SelectComponent
-            items={allScheduleData.map((s) => s.title)}
-            label="Schedules"
-            value={selectedSchedule}
-            onChange={setSelectedSchedule}
-            className="!max-w-none !w-full !min-w-none "
-          />
-        </div>
-        {loading &&
-          <div className='flex items-center just mt-2 gap-2'>
-            <MoonLoader loading={loading} color='#DDDDDD' size={14} />
-            <p className='text-muted-foreground text-sm '>
-              {process}
-            </p>
-          </div>
-        }
-        {userContinue &&
-          <p className='text-muted-foreground  mt-2 flex text-sm items-center '>
-            <CircleSmall size={14} className='fill-green-600  text-green-600 mr-1' />
-            Ready to generate your timetable.
-          </p>
-        }
-      </div>
-    </section>,
-    <section className='h-full flex-col w-full flex items-center justify-center'>
-      <div className='max-w-96'>
-        {userContinue &&
-          <p className='text-muted-foreground  mb-4 flex items-center '>
-            <CircleSmall size={14} className='fill-green-600 text-green-600 mr-1' />
-            Ready to generate your timetable.
-          </p>
-        }
-        {loading &&
-          <div className='flex items-center just mb-4 gap-2'>
-            <MoonLoader loading={loading} color='#DDDDDD' size={14} />
-            <p className='text-muted-foreground  '>
-              {process}
-            </p>
-          </div>
-        }
-        {successMessage &&
-          <p className='text-muted-foreground  mb-4 flex items-center '>
-            {/* <CircleSmall size={14} className='fill-green-600 text-green-600 mr-1' /> */}
-            {successMessage}
-          </p>
-        }
-        {errorMessage &&
-          <p className='text-muted-foreground  mb-4 flex items-center '>
-            {/* <CircleSmall size={14} className='fill-red-600 text-red-600 mr-1' /> */}
-            {errorMessage}
-          </p>
-        }
-        <p className='text-xl'><span className='font-bold '>NAME:</span> {scheduleName}</p>
-        <Button
-          variant='outline'
-          className='w-full mt-2'
-          size='lg'
-          onClick={() => handleGenerate()}
-          disabled={!selectedScheduleId || loading}
-        >
-          {loading
-            ? <TextShimmer duration={1.5} className="text-lg font-medium ">
-              Generating...
-            </TextShimmer>
-            : 'Generate'}
-        </Button>
-      </div>
-    </section>
+    <Step1 />
+    ,
+   <Step2 allScheduleData={allScheduleData} selectedSchedule={selectedSchedule} setSelectedSchedule={setSelectedSchedule} loading={loading} process={process} userContinue={userContinue}/>
+    ,
+    <Step3 userContinue={userContinue} loading={loading} process={process} successMessage={successMessage} errorMessage={errorMessage} scheduleName={scheduleName} selectedScheduleId={selectedScheduleId} isDoneGenerating={isDoneGenerating} handleGenerate={handleGenerate} />
   ]
 
   return (
@@ -396,7 +288,7 @@ function Wizzard() {
         setDialogOpen={setDialogOpen}
         handleDialogContinue={handleDialogContinue}
       />
-      <div className='h-full w-full'>
+      <div className='h-full w-full '>
         {pages[currentPageIndex]}
       </div>
       <div className='flex justify-between w-full mt-2'>
@@ -411,4 +303,4 @@ function Wizzard() {
   )
 }
 
-export default Wizzard
+export default Wizard

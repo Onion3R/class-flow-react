@@ -15,7 +15,7 @@ import { Fragment } from "react";
 import { actions } from "./actions";
 import DeleteDialogSchedule from "../components/DeleteDialogSchedule";
 import ContextMenuEffectWrapper from "../components/ContextMenuEffectWrapper/ContextMenuEffectWrapper";
-
+import ActiveBadge from "@/components/ActiveBadge/ActiveBadge";
 export const getColumns = ({
   setOpenDialog,
   setOpenAlertDialog,
@@ -81,10 +81,7 @@ export const getColumns = ({
     cell: ({ row }) => {
       const isActive = row.original.is_active;
       return (
-        <Badge variant='outline' className={`font-medium ${isActive ? "text-green-600 border-green-600" : "text-red-500   border-red-500"}`}>
-          {isActive ? <CircleDotDashed  /> : <CircleSlash/>}
-          {isActive ? "Active" : "Inactive"}
-        </Badge>
+        <ActiveBadge status={isActive}/>
       );
     },
   },

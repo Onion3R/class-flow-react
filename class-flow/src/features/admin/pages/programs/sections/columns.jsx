@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel
 } from "@/components/ui/dropdown-menu";
+import ActiveBadge from "@/components/ActiveBadge/ActiveBadge";
 import { Badge } from "@/components/ui/badge";
 
 import { useNavigate } from "react-router-dom";
@@ -132,10 +133,7 @@ export const getColumns = ({ setOpenDialog, setOpenAlertDialog ,  setSelectedRow
     cell: ({ row }) => {
       const isActive = row.original.is_active;
       return (
-       <Badge variant='outline' className={`font-medium ${isActive ? "text-green-600 border-green-600" : "text-red-500 border-red-500"}`}>
-          {isActive ? <CircleDotDashed  /> : <CircleSlash/>}
-          {isActive ? "Active" : "Inactive"}
-        </Badge>
+        <ActiveBadge status={isActive}/>
       );
     },
   },

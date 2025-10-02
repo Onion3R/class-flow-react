@@ -11,6 +11,7 @@ export function transformInstructorData(rawData) {
                  label: spec.subject_title  // Use subject_title for filtering (as per your filterFn)
                }))
              : [], // If no specializations, default to an empty array
-    role: teacher.role_details.value
+    role: teacher.role_details.value,
+    status: teacher.is_active
   }));
 }

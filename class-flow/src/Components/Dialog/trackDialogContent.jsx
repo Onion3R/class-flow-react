@@ -48,24 +48,38 @@ function TrackDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh}) 
         name, 
         code,
       }
-      try {
-        await trackSchema.validate(data, {abortEarly: false})
-      } catch (validationError) {
-        setError({message: Array.isArray(validationError.errors) ? validationError.errors[0] : validationError.errors})
-        return;
-      }
-    }
 
 
     try {
-    
-     await updateTrack(selectedRow.id, data);
-     onRefresh();
-     triggerToast({ ...toastInfo, success: true });
-      onConfirm();
+           await trackSchema.validate(data, {abortEarly: false})
+          } catch (validationError) {
+            setError({ message: Array.isArray(validationError.errors) ? validationError.errors[0] : validationError.errors })
+            return
+          }
+    try {
+      console.log("Updating track with data:", data)
+        await updateTrack(selectedRow.id, data);
+      onRefresh()
+      triggerToast({ ...toastInfo, success: true })
+      onConfirm()
     } catch (error) {
-      console.error("Error updating track:", error);
+      console.log("Error updating track:", error)
     }
+        }
+
+
+    // try {
+    // const data = {
+    //     name, 
+    //     code,
+    //   }
+    //  await updateTrack(selectedRow.id, data);
+    //  onRefresh();
+    //  triggerToast({ ...toastInfo, success: true });
+    //   onConfirm();
+    // } catch (error) {
+    //   console.error("Error updating track:", error);
+    // }
   }
   return (
     <form>

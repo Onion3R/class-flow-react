@@ -161,7 +161,7 @@ function StrandDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh }
           )}
         </div>
 
-        <DialogFooter className="mt-6">
+        <DialogFooter >
           <DialogClose asChild onClick={() => onOpenChange(false)}>
             <Button variant="outline">Cancel</Button>
           </DialogClose>

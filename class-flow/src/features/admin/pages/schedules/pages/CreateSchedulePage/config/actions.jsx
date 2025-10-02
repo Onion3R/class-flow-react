@@ -1,5 +1,8 @@
-import { PencilLine, Trash2, View } from "lucide-react";
+import { Trash2, View } from "lucide-react";
+import CryptoJS from "crypto-js";
+const SECRET_KEY = import.meta.env.VITE_SECRET_KEY
 
+import { CREATE_SCHEDULE_ROUTES } from "../../routes";
 export const actions = (navigate, setOpenDialog, setOpenAlertDialog, setSelectedRow) => [
   {
     id: 'view', // Unique ID for the action
@@ -7,8 +10,8 @@ export const actions = (navigate, setOpenDialog, setOpenAlertDialog, setSelected
     icon: <View className="h-[10px] w-[10px] " />,
     action: (rowData) => {
       console.log("Viewing program:", rowData.name);
-      // Example: Navigate to a detailed view page for the program
-      navigate(`/programs/${rowData.id}`);
+      const encryptedId = CryptoJS.AES.encrypt(rowData.id.toString(), SECRET_KEY).toString();
+      navigate(`${CREATE_SCHEDULE_ROUTES.DETAIL}${encodeURIComponent(encryptedId)}`);
     },
   },
   {

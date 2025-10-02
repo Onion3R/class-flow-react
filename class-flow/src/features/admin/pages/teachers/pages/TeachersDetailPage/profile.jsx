@@ -15,7 +15,7 @@ function Profile({ teacherDetail }) {
           {teacherDetail?.full_name} <br />
         </h1>
         <p className="text-sm text-muted-foreground">
-          {teacherDetail?.full_name}@gmail.com
+          {teacherDetail?.email}
         </p>
       </div>
     </div>
