@@ -7,7 +7,8 @@ import { useAuth } from "@/app/context/authContext";
 import Dashboard from "../../features/admin/pages/dashboard/Dashboard";                       
 // import Teachers from "../../features/admin/pages/teachers/pages/TeachersPage/Teachers";
 const Teachers = lazy(() => import("../../features/admin/pages/teachers/pages/TeachersPage/Teachers"));
-const InstructorDetail = lazy(() => import("../../features/admin/pages/teachers/pages/TeachersDetailPage"));
+
+const TeachersDetail = lazy(() => import("../../features/admin/pages/teachers/pages/TeachersDetailPage/TeachersDetailsPage"));
 const SubjectPage = lazy(() => import("@/features/admin/pages/subjects/pages/SubjectPage/Subject"));
 const SubjectDetail = lazy(() => import("../../features/admin/pages/subjects/pages/SubjectDetail/SubjectDetailPage"));
 const Programs = lazy(() => import("../../features/admin/pages/programs/Programs"));
@@ -27,7 +28,7 @@ const SeniorSchedPage = lazy(() => import("../../features/admin/pages/schedules/
 // import SubjectDetail from "../../features/admin/pages/subjects/pages/SubjectDetail/SubjectDetailPage";
 
 
-import TeacherView from "../../features/teacher/home/HomePage";
+import TeacherView from "../../features/teacher/HomePage";
 
 
 
@@ -80,7 +81,7 @@ const AppRoutes = () => {
       <Route path="subjects/detail/:id" element={<SubjectDetail />} />
       <Route path="teachers" element={<Teachers />} />
       <Route path="programs" element={<Programs />} />
-      <Route path="teachers/details/:id" element={<InstructorDetail />} />
+      <Route path="teachers/details/:id" element={<TeachersDetail />} />
       <Route path="create-schedule" element={<CreateSchedule />} />
       <Route path="create-schedule/details/:id" element={<CreatedScheduleDetails />} />
       <Route path="generate-schedule" element={<GenerateSchedule />} />

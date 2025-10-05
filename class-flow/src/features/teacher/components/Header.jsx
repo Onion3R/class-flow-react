@@ -2,9 +2,9 @@ import React from 'react'
 import { Button } from '@Components/ui/button'
 import AvatarPopUpComponent from '@/components/AvatarPopUp/AvatarPopUpComponent'
 
-import columns from "./column"
+import columns from "../config/column"
 
-import {data} from "./class-data"
+import {data} from "../config/class-data"
 import { MessageSquare, Search, Trash, Printer} from 'lucide-react'
 import { Separator } from '@Components/ui/separator'
 import  PanelSwticherVreg from '@/Components/PanelSwitcher/PanelSwticherVreg'

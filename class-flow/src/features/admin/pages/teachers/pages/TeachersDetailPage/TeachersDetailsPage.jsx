@@ -6,8 +6,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { getSpecificTeacher } from '@/app/services/apiService'
 import { useParams } from 'react-router-dom'
 import CryptoJS from 'crypto-js'
-import ProfileInfo from './profileInfo'
-import Specialization from './Specialization'
+import ProfileInfo from './components/ProfileInfo'
+import Specialization from './components/Specialization'
 const SECRET_KEY = import.meta.env.VITE_SECRET_KEY
 
 

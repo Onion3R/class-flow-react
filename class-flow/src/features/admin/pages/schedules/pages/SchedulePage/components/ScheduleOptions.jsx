@@ -10,6 +10,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog"
 import { Badge } from '@/components/ui/badge';
 import { X, ListFilter, Printer, FileSpreadsheet, XCircle, Maximize} from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -26,6 +36,8 @@ function ScheduleOptions({ selectedSchedule, setFilters }) {
   const [sections, setSections] = useState()
   const [strands, setStrands] = useState()
   const [yearLevels, setYearLevels] = useState()
+
+  const [openDialog, setOpenDialog] = useState(false)
 
   const [selectedTrack, setSelectedTrack] = useState(null);
   const [selectedSection, setSelectedSection] = useState('');
@@ -143,28 +155,28 @@ function ScheduleOptions({ selectedSchedule, setFilters }) {
 
   return (
 
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
+      <Dialog open={openDialog}  onOpenChange={setOpenDialog}>
+        <DialogTrigger asChild>
           <Button variant='outline'>
             <ListFilter className="mr-2 h-4 w-4" />
             Filter
           </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogCancel asChild className="absolute top-3 right-3">
+        </DialogTrigger>
+        <DialogContent>
+          {/* <DialogCancel asChild className="absolute top-3 right-3">
             <Button size='xs' variant='ghost' className='!bg-transparent border-none text-black shadow-none  dark:text-foreground'>
               <X />
             </Button>
-          </AlertDialogCancel>
+          </DialogCancel> */}
 
-          <AlertDialogHeader>
-            <AlertDialogTitle>Filters</AlertDialogTitle>
-            <AlertDialogDescription>
+          <DialogHeader>
+            <DialogTitle>Filters</DialogTitle>
+            <DialogDescription>
               You're setting filters for:
               <Badge className="text-green-500 dark:border-green-800 ml-1 dark:bg-green-950/80" variant="outline">
                 {selectedTrack?.name || "No track selected"}
               </Badge>
-            </AlertDialogDescription>
+            </DialogDescription>
 
             <div className='flex items-center justify-between mt-3 border p-1 rounded  border-dashed'>
               <div className='flex flex-wrap gap-1'>
@@ -228,9 +240,9 @@ function ScheduleOptions({ selectedSchedule, setFilters }) {
                 />
               </div>
             </div>
-          </AlertDialogHeader>
+          </DialogHeader>
 
-          <AlertDialogFooter>
+          <DialogFooter>
             <div className='w-full flex items-center justify-between'>
               <div className='flex gap-2'>
                 <Button variant='secondary' size='sm' className='text-xs'>
@@ -246,16 +258,19 @@ function ScheduleOptions({ selectedSchedule, setFilters }) {
                   View
                 </Button>
               </div>
-              <AlertDialogAction
-                onClick={() => setFilters(api)}
+              <Button
+                onClick={() => {
+                  setFilters(api)
+                  setOpenDialog(false)
+                }}
                 disabled={continueDisable}
               >
                 Continue
-              </AlertDialogAction>
+              </Button>
             </div>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
   );
 }
 
