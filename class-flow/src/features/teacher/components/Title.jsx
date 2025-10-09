@@ -35,7 +35,7 @@ function Title({progress, tabItems}) {
                   </TextRoll>
                   ) : (
                     <span className='py-4'>
-                <h1 class="text-3xl font-bold bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-600 text-transparent bg-clip-text inline-block">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-600 text-transparent bg-clip-text inline-block">
                   Hello, John
                   </h1>
                   <p className='font-medium text-foreground dark:text-neutral-300'>Welcome back to ClassFlow!</p>

@@ -278,7 +278,7 @@ function SubjectWithAssignmentFormPopover({ track, strand, strandId, onRefresh }
                   </AccordionTrigger>
                   <AccordionContent className="flex flex-col items-center">
                     <div className="gap-4 flex flex-col sm:w-[90%] w-[90%]">
-                      <div className="flex sm:flex-row flex-col gap-6 items-center justify-center mt-2">
+                      <div className="flex flex-row  gap-6 items-center justify-center mt-2">
                         <div className='w-full'>
                           <Label
                             htmlFor={`subjectCode-${idx}`}
@@ -333,7 +333,7 @@ function SubjectWithAssignmentFormPopover({ track, strand, strandId, onRefresh }
                           required
                         />
                       </div>
-                      <div className='flex w-full gap-6 sm:flex-row flex-col  '>
+                      <div className='flex w-full gap-6 flex-row   '>
                         {semesterIsLoading ? (
                           <div>Loading semesters...</div>
                         ) : (

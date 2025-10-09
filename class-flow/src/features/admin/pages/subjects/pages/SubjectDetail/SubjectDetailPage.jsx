@@ -127,14 +127,19 @@ function SubjectDetail() {
           <div className='p-2 gap-5 flex flex-col'>
             {assignedTeacher && assignedTeacher.length != 0 ? (
               assignedTeacher.map((teacher, teacherIndex) => (
-              <Card>
-                <CardContent className='flex flex-col lg:flex-row gap-5 bg-re'>
-                  <Avatar className="h-20 w-20">
+              <Card className='min-w-none lg:min-w-[492px]'>
+                <CardContent className='flex flex-col lg:flex-row gap-5 '>
+                  <Avatar className="h-20 w-20 hidden lg:block ">
                     <AvatarImage src="https://github.com/shadcn.png" />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
                   <div className='w-full  lg:border-t-0  border-t-2  lg:pt-0 pt-3  '>
                     <div className='flex justify-between'>
+                      <div className='flex items-center justify-center gap-2 '>
+                      <Avatar className="h-10 w-10  lg:h-20 lg:w-20  lg:hidden  ">
+                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
                       <div>
                         <CardTitle>
                           {teacher.full_name}
@@ -143,8 +148,9 @@ function SubjectDetail() {
                           {teacher.first_name} @gmail.com
                         </CardDescription>
                       </div>
+                      </div>
                       <CardAction>
-                        <Link to={`/admin/teachers/teacher-detail/${encodeURIComponent(CryptoJS.AES.encrypt(teacher.id.toString(), SECRET_KEY).toString())}`} >
+                        <Link to={`/admin/teachers/details/${encodeURIComponent(CryptoJS.AES.encrypt(teacher.id.toString(), SECRET_KEY).toString())}`} >
                           <Button variant="link" className="cursor-pointer" >
                             Check profile
                           </Button>
@@ -158,7 +164,7 @@ function SubjectDetail() {
                         const color = getColor(specIndex + teacherIndex + 2); // or use spec.subject_title for consistent mapping
                         return (
                           <Badge className={`${color.bg} ${color.text}`}>
-                            {spec.subject_title}
+                            {spec.subject_code}
                           </Badge>
                         );
                       })}

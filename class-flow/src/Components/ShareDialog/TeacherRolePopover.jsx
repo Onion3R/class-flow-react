@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/command"
 import { Button } from '../ui/button'
 import {  ChevronDown} from 'lucide-react'
-function TeacherRolePopover({roles, selectedRole, setSelectedRole, disabled}) {
+function TeacherRolePopover({roles, selectedRole, setSelectedRole, setRoleId, disabled}) {
  return (
     <Popover>
       <PopoverTrigger asChild>
@@ -39,7 +39,10 @@ function TeacherRolePopover({roles, selectedRole, setSelectedRole, disabled}) {
               <CommandItem
                 key={role.value}
                 value={role.value}
-                onSelect={() => setSelectedRole(role.label)}
+                onSelect={() => {
+                  setSelectedRole(role.label);
+                  setRoleId(role.id);
+                  }}
                 className={`cursor-pointer rounded px-2 py-1 mb-1.5 !hover:bg-red ${
                   selectedRole === role.label
                     ? 'bg-muted'

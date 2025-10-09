@@ -256,7 +256,7 @@ function SectionFormPopover({ onRefresh }) {
                           className={`!w-full !max-w-none ${((entryErrors[idx] && !entry.name) || (error && !entry.name)) && "border border-red-500 placeholder:text-red-400"}`}
                         />
                       </div>
-                      <div className="flex sm:flex-row flex-col items-center justify-between w-full gap-6">
+                      <div className="flex sm:flex-row flex-col items-center justify-between w-full gap-2 sm:gap-6">
                         {yearLevelIsLoading || !allYearlevelData ? (
                           <div>Loading year levels...</div>
                         ) : (

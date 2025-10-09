@@ -52,7 +52,7 @@ function Specialization({ teacherDetail, teachersId, onRefresh }) {
     };
 
     return (
-         <div className='lg:w-[50%] w-full sm:w-full' >
+         <div className='lg:w-[50%] w-full sm:w-full  md:min-w-[360px] ' >
         <Card className='shadow-none'>
             <CardHeader>
                 <CardTitle>Specialization</CardTitle>

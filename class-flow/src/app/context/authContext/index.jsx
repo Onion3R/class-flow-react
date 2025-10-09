@@ -72,7 +72,7 @@ console.log(allTeacherData); // inspect the actual value
   const logout = () => signOut(auth);
 
   const isLoading = isAuthLoading || isTeachersLoading;
-
+ 
   const value = {
     currentUser,
     userLoggedIn,

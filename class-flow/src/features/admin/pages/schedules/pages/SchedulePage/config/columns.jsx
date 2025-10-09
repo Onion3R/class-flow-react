@@ -1,26 +1,11 @@
-import { MoreHorizontal, CircleDotDashed, CircleSlash} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
-import { useNavigate } from "react-router-dom";
-import { Fragment } from "react";
-import { actions } from "./actions";
 import ContextMenuEffectWrapper from "../../CreateSchedulePage/components/ContextMenuEffectWrapper/ContextMenuEffectWrapper";
-
-
 export const getColumns = ({
   setOpenDialog,
   setOpenAlertDialog,

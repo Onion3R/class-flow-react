@@ -8,11 +8,11 @@ function ClassList({classesToday, dayName}) {
 
   
   return (
-    <div className='w-fit min-w-[596px] '>
+    <div className='w-full lg:w-fit '>
             <div className='flex justify-between'>
               <h1 className='text-xl font-bold'>Today's Classes</h1>
             </div>
-            <div className='space-y-2  mt-2 px-7 h-full  '>
+            <div className='space-y-2  mt-2 p-0 lg:px-7 h-full  '>
               {classesToday && classesToday.length > 0 ? (
                 classesToday.map(e => {
                   const color = getColor(e.id);
@@ -34,9 +34,10 @@ function ClassList({classesToday, dayName}) {
                             {e.start_time}
                             -
                             {e.end_time}
+                            <span className='block md:hidden'>-{dayName}</span>
                           </div>
                         </div>
-                        <div>
+                        <div className='hidden md:block'>
                           <p className='text-sm text-muted-foreground '>
                             {dayName}
                           </p>

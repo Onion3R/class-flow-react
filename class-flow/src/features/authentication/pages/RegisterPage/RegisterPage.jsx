@@ -72,6 +72,7 @@ function Register() {
 
       if (idToken) {
         const response = await verifyToken(idToken); // ✅ pass the token here
+        console.log('here auth response',response)
         if (response?.success) {
           if (info?.isNewUser) {
             const data = createData(firebase_uid, email);

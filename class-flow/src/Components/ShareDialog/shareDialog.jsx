@@ -24,12 +24,15 @@ import useRolesGetter from "@/lib/hooks/useRoles"
 import { v4 as uuidv4 } from 'uuid';
 
 export default function ShareDialog() {
+
   const [retries, setRetries] = useState(1)
+  const [roleId, setRoleId] = useState()
   const [invite, setInvite] = useState(undefined)
   const [selectedRole, setSelectedRole] = useState()
   const [hasGeneratedUrl, setHasGeneratedUrl] = useState()
   const [copyLink, setCopyLink] = useState(false)
   const [email, setEmail] = useState('')
+  const [token, setToken] = useState()
 
   const { data: allRoleData, isLoading: allRolesIsLoading } = useRolesGetter()
 
@@ -37,7 +40,11 @@ export default function ShareDialog() {
     if (allRoleData && allRoleData.length > 0 && !allRolesIsLoading) {
       setSelectedRole(allRoleData[0].label)
     }
-  }, [allRolesIsLoading, allRoleData])
+
+    if(!email) {
+      setInvite('')
+    }
+  }, [allRolesIsLoading, allRoleData, email])
 
   const handleCopyLink = () => {
     if(invite) {
@@ -75,10 +82,25 @@ export default function ShareDialog() {
  
 const handleCreateInvite = () => {
   if ((!hasGeneratedUrl && email != '' ) || (hasGeneratedUrl && retries <= 2 && email != '')) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+  const toastInfo = {
+      success: false,
+      title: 'Invalid email',
+      desc: 'Please enter a valid email address (e.g., user@gmail.com)'
+    };
+    triggerToast(toastInfo)
+      return;
+    }
     alert(email)
     const token = uuidv4();
+    setToken(token)
     setInvite(`http://localhost:5173/invites/${token}`);
     setHasGeneratedUrl(true);
+   const result =  generateInvitePayload ()
+    console.log('result',result);
+    
+
   } else {
    const toastInfo = {
   success: false,
@@ -90,6 +112,29 @@ const handleCreateInvite = () => {
 
   }
 };
+
+const generateInvitePayload  = () => {
+  const now = new Date();
+  const createdAt = now.toISOString().slice(0, 19).replace("T", " ");
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000)
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
+
+  const data = {
+    email,
+    role: roleId,
+    token,
+    invited_by: 'admin@gmail.com', // ideally from cookies or auth context
+    created_at: createdAt,
+    expires_at: expiresAt,
+  };
+
+  return data;
+};
+
+
+console.log('token',token)
 
 const handleRetries = () => {
   if (retries <= 2) {
@@ -109,6 +154,8 @@ const handleRetries = () => {
 useEffect(() => {
   console.log('tries', retries)
 }, [retries])
+
+
 
   
   return (
@@ -139,18 +186,6 @@ useEffect(() => {
                 placeholder={invite ? invite: 'Click "Generate" to create an invite. '}
                 readOnly
               />
-              {/* <Button
-                variant="ghost"
-                aria-label="Copy share link"
-                className="absolute right-0 top-0 rounded-l-none bg-accent"
-                
-              >
-                {copyLink ? (
-                  <ClipboardCheck className="h-4 w-4" />
-                ) : (
-                  <Clipboard className="h-4 w-4" />
-                )}
-              </Button> */}
             </div>
           </div>
         </div>
@@ -161,6 +196,7 @@ useEffect(() => {
             <Input 
               placeholder='olmida@gmail.com'
               value={email}
+              type='email'
               onChange={(e) => setEmail(e.target.value)}
               />
                {allRoleData?.length > 0 && (
@@ -168,6 +204,7 @@ useEffect(() => {
               roles={allRoleData}
               selectedRole={selectedRole}
               setSelectedRole={setSelectedRole}
+              setRoleId={setRoleId}
             />
           )}
             </div>

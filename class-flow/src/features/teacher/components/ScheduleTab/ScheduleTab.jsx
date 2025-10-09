@@ -11,7 +11,7 @@ function ScheduleTab({ teachingAnalytics, weeklySchedule, setActiveTab }) {
 
 
   const badgeTitles = [
-    'Printable','Exportable', 'Customizable', 'Design','Design-Friendly'
+    'Printable','Exportable', 'Customizable','Design-Friendly'
   ]
   const days = [
     'Sunday','Monday', 'Tuesday', 'Wednesday','Thursday','Friday', 'Saturday'
@@ -33,11 +33,11 @@ function ScheduleTab({ teachingAnalytics, weeklySchedule, setActiveTab }) {
       <div className='w-full'>
         
         {/* {JSON.stringify(teachingAnalytics, null, 2)} */}
-        <div className='flex'>
+        <div className='flex lg:flex-row flex-col'>
           <ClassList classesToday={classesToday} dayName={dayName} />
           <div>
-          <div className='h-65 '>
-           <div className='border flex flex-col items-center bg-accent-foreground dark:bg-transparent  h-45 rounded-xl justify-between p-5 my-4'>
+          <div className='min-h-none lg:min-h-75  xl:min-h-65'>
+           <div className='border flex flex-col items-center bg-accent-foreground dark:bg-transparent  lg:h-45 rounded-xl justify-between p-5 my-4'>
           <div className='flex w-full gap-5 items-center '>
             <div>
               <ChartNoAxesColumnDecreasing size={60}  className='text-accent dark:text-accent-foreground' />
@@ -48,30 +48,30 @@ function ScheduleTab({ teachingAnalytics, weeklySchedule, setActiveTab }) {
             </div>
           </div>
           <div className='flex items-center gap-3 h-full mt-4'>
-            <div className='border rounded-sm h-full w-full bg-card p-5'>
-              <h1 className='font-bold text-4xl'>{teachingAnalytics?.average_minutes_per_subject}</h1>
-              <p>Avg. mins per subject</p>
-               <p className='text-muted-foreground text-xs'>
+            <div className='border rounded-sm  h-full w-full bg-card p-5'>
+              <h1 className='font-bold text-2xl sm:text-4xl'>{teachingAnalytics?.average_minutes_per_subject}</h1>
+              <p className='text-xs xl:text-base'> Avg. mins per subject</p>
+               <p className='text-muted-foreground  text-xs'>
                 Average time spent teaching each subject.
               </p>
             </div>
-            <div className='border rounded-sm h-full w-full bg-card p-5'>
-              <h1 className='font-bold text-4xl'>
+            <div className='border rounded-sm  h-full w-full bg-card p-5'>
+              <h1 className='font-bold text-2xl sm:text-4xl'>
                 {teachingAnalytics?.total_subjects < 10
                   ? `0${teachingAnalytics?.total_subjects}`
                   : teachingAnalytics?.total_subjects}
               </h1>
-              <p>Total Subject</p>
-              <p className='text-muted-foreground text-xs'>Subjects you're currently handling</p>
+              <p className='text-xs xl:text-base'>Total Subject</p>
+              <p className='text-muted-foreground  text-xs'>Subjects you're currently handling</p>
             </div>
-            <div className='border rounded-sm h-full w-full bg-card p-5'>
-              <h1 className='font-bold text-4xl'>
+            <div className='border rounded-sm  h-full w-full bg-card p-5'>
+              <h1 className='font-bold  text-2xl sm:text-4xl'>
                 {teachingAnalytics?.total_sections < 10
                   ? `0${teachingAnalytics?.total_sections}`
                   : teachingAnalytics?.total_sections}
               </h1>
-              <p>Total Sections</p>
-              <p className='text-muted-foreground text-xs'>
+              <p className='text-xs xl:text-base'>Total Sections</p>
+              <p className='text-muted-foreground  text-xs'>
                 You have been assigned to {teachingAnalytics?.total_sections} in total.
               </p>
             </div>
@@ -79,13 +79,13 @@ function ScheduleTab({ teachingAnalytics, weeklySchedule, setActiveTab }) {
         </div>
         </div>
         <div className='bg-primary p-5 rounded-xl flex items-center justify-between'>
-          <div >
+          <div  >
           <h1 className='text-muted font text-2xl font-bold dark:text-white'>Timetable Overview</h1>
             <p className='text-accent text-sm dark:text-white'>A quick glance at your schedule features and analytics. Click to explore more.</p>
 
-           <div className='flex gap-2 mt-2'>
+           <div className='flex gap-2 mt-2 h-auto  flex-wrap '>
             {badgeTitles.map(e => 
-            <Badge variant='outline'key={e.id} className='text-accent dark:text-white dark:border-white'>{e}</Badge>
+            <Badge variant='outline' key={e} className='text-accent dark:text-white dark:border-white'>{e}</Badge>
             )}
           </div>
           </div>

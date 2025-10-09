@@ -60,7 +60,7 @@ function onRefresh() {
       <Card className='min-h-[calc(100vh-79px)] bg-transparent border-none shadow-none'>
          
 
-          <div className='flex bg-amber-30 h-full gap-7 lg:flex-row flex-col justify-between items-start'>
+          <div className='flex bg-amber-30 h-full gap-1  lg:gap-7 lg:flex-row flex-col justify-between items-start'>
             <ProfileInfo teacherDetail={teacherDetail} disable={disable} setDisable={setDisable}  onRefresh={getTeacher}/>
            
               <Specialization teacherDetail={teacherDetail} teachersId={teachersId} onRefresh={() => onRefresh()}/>

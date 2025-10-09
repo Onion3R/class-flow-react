@@ -9,7 +9,7 @@ import ParticleBackground from "@/features/authentication/components/ParticleBac
 import { TextShimmer } from "@/components/motion-primitives/text-shimmer";
 import { verifyToken } from "@/app/services/authService";
 
-const USER_STATUS = "teacher"; // or whatever value you need
+const USER_STATUS = 1; // or whatever value you need
 
 function FinishSignIn() {
   const navigate = useNavigate();
@@ -38,6 +38,7 @@ function FinishSignIn() {
 
           if (isFirstTime) {
             const data = createData(firebase_uid);
+            console.log(data)
             await addTeacher(data);
             await teacherRefresh();
           }
@@ -61,7 +62,7 @@ function FinishSignIn() {
       last_name: "example",
       is_active: false,
       firebase_uid,
-      status: USER_STATUS,
+      role: USER_STATUS,
       firstTime: true,
       base_max_minutes_per_week: 240,
     };

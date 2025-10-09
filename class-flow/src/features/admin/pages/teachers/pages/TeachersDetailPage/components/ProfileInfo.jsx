@@ -79,7 +79,7 @@ function ProfileInfo({ teacherDetail, disable, setDisable, onRefresh }) {
   }
 
   return (
-    <div className=' sm:w-[50%]  w-full space-y-4  '>
+    <div className='w-full lg:w-[50%]  space-y-4 md:min-w-[360px]  '>
       <div>
         <Profile teacherDetail={teacherDetail}/>
       </div>

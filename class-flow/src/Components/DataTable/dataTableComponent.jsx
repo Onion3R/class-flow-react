@@ -23,7 +23,6 @@ export default function DataTableComponent({
   const [contextMenuDisable, setContextMenuDisable] = useState(false)
   useEffect(() => {
     setTableData(data);
-    console.log('this is the data',data)
   }, [data]);
 
   const columns = getColumns({ openDialog, setOpenDialog, setOpenAlertDialog, setSelectedRow , setLabel, setAlertDialogCustomContent , setContextMenuDisable});
