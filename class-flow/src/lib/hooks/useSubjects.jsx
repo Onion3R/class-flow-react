@@ -1,51 +1,36 @@
-import { useState, useEffect, useCallback } from 'react';
 import { getSubjects } from '@/app/services/apiService';
+import { useState, useEffect, useCallback } from 'react';
 
-let refreshCallback = () => {};
+const useSubjectsGetter = () => {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-export const triggerSubjectsRefresh = () => {
-  refreshCallback();
-};
+  const refresh = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
 
-export default function useSubjectsGetter() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState([]);
-  const [refreshToken, setRefreshToken] = useState(0);
-
-  const refresh = useCallback(() => setRefreshToken((prev) => prev + 1), []);
+    try {
+      const fetchedData = await getSubjects();
+      if (!fetchedData || (Array.isArray(fetchedData) && fetchedData.length === 0)) {
+        setData([]);
+      } else {
+        setData(fetchedData);
+      }
+    } catch (err) {
+      console.error('Failed to fetch teachers data:', err);
+      setError(err);
+      setData([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    refreshCallback = refresh;
-    return () => {
-      refreshCallback = () => {};
-    };
+    refresh();
   }, [refresh]);
 
-  useEffect(() => {
-    let isMounted = true;
-    setIsLoading(true);
-    getSubjects()
-      .then((apiData) => {
-        if (isMounted) {
-          setData(Array.isArray(apiData) ? apiData : []);
-          if (!Array.isArray(apiData)) {
-            console.warn('getSubjects did not return an array. Received:', apiData);
-          }
-        }
-      })
-      .catch((err) => {
-        if (isMounted) {
-          setData([]);
-          console.error('Failed to fetch subjects:', err);
-        }
-      })
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
-    return () => {
-      isMounted = false;
-    };
-  }, [refreshToken]);
+  return { data, isLoading, error, refresh };
+};
 
-  return { data, isLoading };
-}
+export default useSubjectsGetter;

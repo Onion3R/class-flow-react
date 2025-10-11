@@ -9,23 +9,19 @@ import Dashboard from "../../features/admin/pages/dashboard/Dashboard";
 const Teachers = lazy(() => import("../../features/admin/pages/teachers/pages/TeachersPage/Teachers"));
 
 const TeachersDetail = lazy(() => import("../../features/admin/pages/teachers/pages/TeachersDetailPage/TeachersDetailsPage"));
-const SubjectPage = lazy(() => import("@/features/admin/pages/subjects/pages/SubjectPage/Subject"));
-const SubjectDetail = lazy(() => import("../../features/admin/pages/subjects/pages/SubjectDetail/SubjectDetailPage"));
+const Assignment = lazy(() => import("@/features/admin/pages/assignment/pages/Assignment/Assignment"));
+const Subject = lazy(() => import("@/features/admin/pages/subject/config/Subject"));
+const AssignmentDetail = lazy(() => import("../../features/admin/pages/assignment/pages/AssignmentDetail/AssignmentDetailPage"));
 const Programs = lazy(() => import("../../features/admin/pages/programs/Programs"));
 const SchedulesPage = lazy(() => import("../../features/admin/pages/schedules/pages/SchedulePage/SchedulesPage"));
 const CreatedScheduleDetails  = lazy(() => import("@/features/admin/pages/schedules/pages/CreateSchedulePage/pages/CreatedScheduleDetails"));
 const CreateSchedule = lazy(() => import("../../features/admin/pages/schedules/pages/CreateSchedulePage/CreateSchedule"));
 const GenerateSchedule = lazy(() => import("../../features/admin/pages/schedules/pages/GenerateSchedulePage/GenerateSchedule"));
 
-
-// import FreshmenSchedPage from "./Pages/Schedules/freshmenSchedPage";
-// import SophomoreSchedPage from "./Pages/Schedules/sophomoreSchedPage";
 const JuniorSchedPage = lazy(() => import("../../features/admin/pages/schedules/pages/SchedulePage/JuniorSchedPage"));
 const SeniorSchedPage = lazy(() => import("../../features/admin/pages/schedules/pages/SchedulePage/SeniorSchedPage"));
 
-// import JuniorSchedPage from "../../features/admin/pages/schedules/pages/SchedulePage/JuniorSchedPage";
-// import SeniorSchedPage from "../../features/admin/pages/schedules/pages/SchedulePage/SeniorSchedPage";
-// import SubjectDetail from "../../features/admin/pages/subjects/pages/SubjectDetail/SubjectDetailPage";
+
 
 
 import TeacherView from "../../features/teacher/HomePage";
@@ -77,8 +73,9 @@ const AppRoutes = () => {
   {isAdmin && (
     <Route path="/admin" element={<Layout />}>
       <Route index element={<Dashboard />} />
-      <Route path="subjects" element={<SubjectPage />} />
-      <Route path="subjects/detail/:id" element={<SubjectDetail />} />
+      <Route path="assignments" element={<Assignment />} />
+      <Route path="assignment/detail/:id" element={<AssignmentDetail />} />
+      <Route path="subjects" element={<Subject/>} />
       <Route path="teachers" element={<Teachers />} />
       <Route path="programs" element={<Programs />} />
       <Route path="teachers/details/:id" element={<TeachersDetail />} />

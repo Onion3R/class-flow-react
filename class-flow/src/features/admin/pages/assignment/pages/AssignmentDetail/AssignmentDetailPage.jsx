@@ -18,20 +18,21 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import useTeachersGetter from '@/lib/hooks/useTeachers';
 import { Link } from "react-router-dom";
-import DialogComponent from '@/components/Dialog/diaglogComponent';
+import DialogComponent from '@/components/Dialog/DiaglogComponent';
 import {Badge} from '@/components/ui/badge';
 import AlertDialogComponent from '@/components/AlertDialog/AlertDialogComponent';
 import { useRandomBadgeColor } from '@/lib/hooks/useRandomBadgeColor';
 
 const SECRET_KEY = import.meta.env.VITE_SECRET_KEY;
 
-function SubjectDetail() {
+function AssignmentDetail() {
 
   const {getColor} = useRandomBadgeColor()
    const navigate = useNavigate();
   const [assignedTeacher, setAssignedTeacher] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   
 
   const { data: allTeachersData } = useTeachersGetter()
@@ -63,7 +64,8 @@ function SubjectDetail() {
           console.error("Error fetching subject strand data:", error);
         });
     }
-  }, [subjectId]);
+  }, [subjectId, refreshKey]);
+
 
   useEffect(() => {
     if (data && allTeachersData?.length > 0) {
@@ -78,9 +80,8 @@ function SubjectDetail() {
     }
   }, [data, allTeachersData]);
 
-  function onRefresh() {
-    navigate(`/admin/subjects`);
-  }
+const onRefresh = () => setRefreshKey(prev => prev + 1);
+ 
 
   return (
     <div className='container mx-auto p-6'>
@@ -181,18 +182,18 @@ function SubjectDetail() {
         </div>
       </div>
        <DialogComponent
-              label={'subjects'}
+              label={'assign'}
               open={openDialog}
               selectedRow={data}
               onOpenChange={setOpenDialog}
               onConfirm={() => setOpenDialog(false)}
-              onRefresh={false}
+              onRefresh={onRefresh}
             />
           <AlertDialogComponent
               open={openAlertDialog}
               selectedRow = {data}
               data={ {
-                          id: 'subject',
+                          id: 'assignment',
                           desc: "This action cannot be undone. This will permanently delete this subject."
                         } }
               onOpenChange={setOpenAlertDialog}
@@ -202,4 +203,4 @@ function SubjectDetail() {
   );
 }
 
-export default SubjectDetail;
+export default AssignmentDetail;

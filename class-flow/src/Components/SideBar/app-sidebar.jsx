@@ -70,6 +70,11 @@ const data2 = {
                 url: "subjects",
                 icon: Library,
             },   
+              {
+                title: "Assignment",
+                url: "assignments",
+                icon: Library,
+            },   
             {
                 title: "Programs",
                 url: "programs",

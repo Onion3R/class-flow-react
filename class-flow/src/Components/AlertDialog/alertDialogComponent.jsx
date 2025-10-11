@@ -13,7 +13,6 @@ import {
 import { triggerToast } from "@lib/utils/toast"
 
 import { deleteStrand, deleteSection, deleteTrack, deleteSchedule, deleteSubject, deleteSubjectStrand } from "@/app/services/apiService"
-import useSubjectStrandGetter from "@/lib/hooks/useSubjectStrand"
 import { deleteTeacher } from "@/app/services/teacherService"
 const toastInfo = {
   success: true,
@@ -24,8 +23,8 @@ const toastInfo = {
 
 export default function AlertDialogComponent({ open, selectedRow, onOpenChange, data, onRefresh, content = null}) {
 
-  
-  const {data: allSubjectStrandData } = useSubjectStrandGetter()
+
+
   async function handleDelete() {
     const rows = Array.isArray(selectedRow) ? selectedRow : [selectedRow];
     switch (data.id) {
@@ -63,6 +62,38 @@ export default function AlertDialogComponent({ open, selectedRow, onOpenChange, 
         }
         onRefresh('strand');
         break;
+      case 'subject':
+        try {
+         for (const row of rows) {
+            await deleteSubject(row.id);
+          }
+          triggerToast(toastInfo);
+        } catch (error) {
+          console.error("Error deleting subject:", error.response?.data || error.message);
+          triggerToast({
+            success: false,
+            title: "Delete Failed",
+            desc: "An error occurred while deleting one or more subject.",
+          });
+        }
+        onRefresh();
+        break;
+      case 'assign':
+        try {
+         for (const row of rows) {
+            await deleteSubjectStrand(row.id);
+          }
+          triggerToast(toastInfo);
+        } catch (error) {
+          console.error("Error deleting assigned subject:", error.response?.data || error.message);
+          triggerToast({
+            success: false,
+            title: "Delete Failed",
+            desc: "An error occurred while deleting one or more assigned subject.",
+          });
+        }
+        onRefresh();
+        break;
       case 'section':
         try {
           for (const row of rows) {
@@ -94,43 +125,39 @@ export default function AlertDialogComponent({ open, selectedRow, onOpenChange, 
           });
         }
         break;
-      case 'subject':
+      // case 'subject':
         
-      try {
+      // try {
        
-      for (const row of rows) {
-          const count = allSubjectStrandData.filter(e => e.subject.id === row.subject.id);
-            if (count.length === 1) {
-        await deleteSubject(row.subject.id);  // <- add await here
+      // for (const row of rows) {
+      //     const count = allSubjectStrandData.filter(e => e.subject.id === row.subject.id);
+      //       if (count.length === 1) {
+      //   await deleteSubject(row.subject.id);  // <- add await here
         
-       } else {
-        const result = allSubjectStrandData.find(
-          a => a.subject.id === row.subject.id &&
-          a.strand.id === row.strand.id && 
-          a.year_level.id  === row.year_level.id
-        )
-        console.log('hello',result)
-        await deleteSubjectStrand(result.id)
+      //  } else {
+      //   const result = allSubjectStrandData.find(
+      //     a => a.subject.id === row.subject.id &&
+      //     a.strand.id === row.strand.id && 
+      //     a.year_level.id  === row.year_level.id
+      //   )
+      //   await deleteSubjectStrand(result.id)
         
-      }
-      console.log(row)
-          }
+      // }
+      //     }
         
-        //  console.log('this',count.length)
-      triggerToast(toastInfo);
-      onRefresh()
-      } catch (error) {
-      console.error("Error deleting subject:", error.response?.data || error.message);
-        triggerToast({
-          success: false,
-          title: "Delete Failed",
-          desc: "An error occurred while deleting the subject.",
-        });
-      }
-      break;
+      // triggerToast(toastInfo);
+      // onRefresh()
+      // } catch (error) {
+      // console.error("Error deleting subject:", error.response?.data || error.message);
+      //   triggerToast({
+      //     success: false,
+      //     title: "Delete Failed",
+      //     desc: "An error occurred while deleting the subject.",
+      //   });
+      // }
+      // break;
       case 'teacher':
         try {
-          console.log(selectedRow.id)
         await deleteTeacher(selectedRow.id)
       triggerToast(toastInfo);
       onRefresh()

@@ -3,7 +3,7 @@ import { Trash2, PencilLine, View } from "lucide-react";
     import CryptoJS from "crypto-js";
 
 const SECRET_KEY = import.meta.env.VITE_SECRET_KEY;
-const BASE_URL = '/admin/subjects';
+const BASE_URL = '/admin/assignment';
 export const actions = (navigate, setOpenDialog, setOpenAlertDialog, setSelectedRow) => [
   {
     id: 'view', // Unique ID for the action

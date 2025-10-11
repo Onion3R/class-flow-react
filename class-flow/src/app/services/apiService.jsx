@@ -322,7 +322,7 @@ export const updateSection = async (sectionId, updatedData) => {
 export const deleteSubject = async (subjectId) => {
   try {
     // Log the ID of the strand we are about to delete for debugging.
-    console.log("Deleting strand with ID:", subjectId);
+    console.log("Deleting subject with ID:", subjectId);
     
     // Use api.delete to send a DELETE request to the 'strands' endpoint
     // with the specific strand's ID appended to the URL.
@@ -332,7 +332,7 @@ export const deleteSubject = async (subjectId) => {
     return response;
   } catch (error) {
     // Log the full error response from the server if available.
-    console.error("Error deleting strand:", error.response?.strandId || error.message);
+    console.error("Error deleting subject:", error.response?.strandId || error.message);
     
     // Re-throw the error so it can be handled by the calling function.
     throw error;
@@ -346,6 +346,25 @@ export const deleteSubjectStrand = async (subjectId) => {
     // Use api.delete to send a DELETE request to the 'strands' endpoint
     // with the specific strand's ID appended to the URL.
     const response = await api.delete(`strand-subjects/${subjectId}/`);
+    
+    // Return the response from the server.
+    return response;
+  } catch (error) {
+    // Log the full error response from the server if available.
+    console.error("Error deleting strand:", error.response?.strandId || error.message);
+    
+    // Re-throw the error so it can be handled by the calling function.
+    throw error;
+  }
+};
+export const updateSubjectStrand = async (subjectId, updatedData) => {
+  try {
+    // Log the ID of the strand we are about to delete for debugging.
+    console.log("Deleting subject strand with ID:", subjectId);
+    
+    // Use api.delete to send a DELETE request to the 'strands' endpoint
+    // with the specific strand's ID appended to the URL.
+    const response = await api.put(`strand-subjects/${subjectId}/`,updatedData);
     
     // Return the response from the server.
     return response;

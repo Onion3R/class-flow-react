@@ -10,50 +10,96 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {Input} from "@/components/ui/input"
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover"
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from "@/components/ui/command"
+import { PulseLoader } from 'react-spinners'
 import SelectComponent from '../Select/selectComponent'
 import useSemesterGetter from '@/lib/hooks/useSemester'
 import useYearLevelsGetter from '@/lib/hooks/useYearLevels'
 import { Label } from '../ui/label'
-import { AlertCircleIcon } from 'lucide-react'
+import { AlertCircleIcon, ChevronDown, CheckIcon } from 'lucide-react'
+import { updateSubjectStrand } from '@/app/services/apiService'
 import { Alert, AlertTitle } from "@/components/ui/alert"
-
+import useSubjectsGetter from '@/lib/hooks/useSubjects'
+import { strandSubjectSchema } from '@/app/schema/schema'
 import { Separator } from '../ui/separator'
 const toastInfo = {
-  success: false, 
-  title: 'Update profile',
+  success: true, 
+  title: 'Update Assignment ',
   desc: 'Sucessfully updated'
 }
 
-function SubjectDialogContent({ selectedRow, onConfirm ,onOpenChange}) {
+
+function SubjectDialogContent({ selectedRow, onConfirm ,onOpenChange, onRefresh}) {
   const {data: allSemesterData} = useSemesterGetter()
   const {data: allYearLevelData} = useYearLevelsGetter()
+  const {data: allSubjectData} = useSubjectsGetter()
 
   const [error, setError] = useState(null)
-  const [selectedSemester, setSelectedSemester] = useState()
-  const [selectedYearLevel, setSelectedYearLevel] = useState()
-  const [code, setCode] = useState('')
-  const [title, setTitle] = useState('')
-  const [minutesPerWeek, setMinutesPerWeek] = useState('')
-  console.log(allSemesterData)
+  const [selectedSemester, setSelectedSemester] = useState('')
+  const [selectedYearLevel, setSelectedYearLevel] = useState('')
+  const [selectedSubjectCode, setSelectedSubjectCode] = useState('')  
+
+  const [isLoading, setIsLoading] = useState(false)
+
+
   
   useEffect(() => {
     if(selectedRow) {
       setSelectedSemester(selectedRow?.semester.name)
       setSelectedYearLevel(selectedRow?.year_level.name)
-      setTitle(selectedRow?.subject.title || '')
-      setCode(selectedRow?.subject.code || '')
-      setMinutesPerWeek(selectedRow?.subject.minutes_per_week || '')
+      setSelectedSubjectCode(selectedRow.subject.code )
       console.log("Selected Row:", selectedRow);
     }
       
   }, [selectedRow])
 
-  function handleSubmit() {
-    if (!code || !title || !selectedSemester || selectedYearLevel) {
+  const  handleSubmit = async () => {
+    if (!selectedSubjectCode || !selectedSemester || !selectedYearLevel) {
       setError({ message: "All fields are required" })
       return
     }
+ 
+    const data = {
+      strand_id: selectedRow?.strand?.id,
+      subject_id: allSubjectData.find(e => e.code === selectedSubjectCode)?.id ,
+      year_level_id: allYearLevelData.find(e => e.name === selectedYearLevel)?.id,
+      semester_id: allSemesterData.find(e => e.name === selectedSemester)?.id
+    }
+
+    console.log(data)
+
+   
+       try {
+        await strandSubjectSchema.validate(data, {abortEarly: false})
+      } catch (validationError) {
+          setError({ message: Array.isArray(validationError.errors) ? validationError.errors[0]  : validationError.errors});
+          setIsLoading(false)
+          return
+      }
+
+      try {
+       
+        await updateSubjectStrand(selectedRow?.id, data)
+        triggerToast({ ...toastInfo, success: true })
+        onConfirm()
+        onRefresh()
+      } catch (error) {
+        console.error("Error updating assignment:", error)
+      }
+      setIsLoading(false)
+    
     triggerToast(toastInfo);
      onConfirm();
   }
@@ -81,43 +127,50 @@ function SubjectDialogContent({ selectedRow, onConfirm ,onOpenChange}) {
           )}
           <Separator />
           <div className="grid gap-4 w-full px-2">
-            <div className='flex gap-4'>
-              <div>
-                <Label
-                    htmlFor='code'
-                    className={`mb-2 text-xs text-foreground/80 ${!code && "text-red-600 font-semibold"}`}
-                  >
-                    Code *
-                  </Label>
-                <Input id="code" placeholder='Subject Code' value={code} onChange={(e) => setCode(e.target.value)}
-                className={`!w-full !max-w-none ${!code && "border border-red-500 placeholder:text-red-400"}`}
-                required />
-              </div>
-              <div>
-                 <Label
-                    htmlFor='minutesPerWeek'
-                    className={`mb-2 text-xs text-foreground/80 ${!minutesPerWeek && "text-red-600 font-semibold"}`}
-                  >
-                    Minutes per week *
-                  </Label>
-                <Input id="minutesPerWeek" placeholder='Minutes per week' value={minutesPerWeek} onChange={(e) => setMinutesPerWeek(e.target.value)} 
-                className={`!w-full !max-w-none ${!minutesPerWeek && "border border-red-500 placeholder:text-red-400"}`}
-                required
-                />
-              </div>
-            </div>
-            <div>
+            <div >
               <Label
-              htmlFor='title'
-              className={`mb-2 text-xs text-foreground/80 ${!title && "text-red-600 font-semibold"}`}
-            >
-              title *
-            </Label>
-            <Input id="title" placeholder='Subject Title' value={title} onChange={(e) => setTitle(e.target.value)}
-            className={`!w-full !max-w-none ${!title && "border border-red-500 placeholder:text-red-400"}`}
-            required />
+                className={`mb-2 text-xs text-foreground/80`}
+              >
+                Subject *
+              </Label>
+             <Popover 
+            className='!w-full'>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className={` w-full justify-between font-norma` }>
+                {  selectedSubjectCode ?  selectedSubjectCode :  'Select a subject'}
+                <ChevronDown className='text-gray-600' />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent     align="start" className="p-0 pointer-events-auto w-[var(--radix-popover-trigger-width)]  ">
+                <Command className='!w-full'  >
+                  <CommandInput placeholder="Search subject code..."  />
+                  <CommandList >
+                    <CommandEmpty>No subject found.</CommandEmpty>
+                    <CommandGroup>
+                      {allSubjectData && allSubjectData.map(sub => (
+                        <CommandItem
+                          key={sub.code}
+                          value={sub.code}
+                          onSelect={() => {
+                          setSelectedSubjectCode(sub.code)
+                            setOpen(false)
+                          }}
+                          
+                        >
+                          <span>
+                          <span className='font-bold'> {sub.code}:</span>   {sub.title}</span>
+                          {selectedSubjectCode === sub.code && (
+                            <CheckIcon className="ml-auto h-4 w-4" />
+                          )}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+              
             </div>
-           
             <div className='flex gap-4  '>
              <div className=' lg:w-[50%] w-full'>
               <Label
@@ -160,7 +213,13 @@ function SubjectDialogContent({ selectedRow, onConfirm ,onOpenChange}) {
             <DialogClose asChild onClick={() => onOpenChange(false)}>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-           <Button variant="default" onClick={() => handleSubmit()}>Update</Button>
+            <Button  
+            variant="default" 
+            disabled={isLoading}
+            onClick={() => handleSubmit()}
+            >
+              {isLoading ? <PulseLoader size={8} color="#ffffff" /> : 'Update'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </form>

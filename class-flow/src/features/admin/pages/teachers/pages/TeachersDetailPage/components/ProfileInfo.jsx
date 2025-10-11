@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Pencil } from 'lucide-react'
-import ShareDialog from '@/components/ShareDialog/shareDialog' 
 import TeacherRolePopover from '@/components/ShareDialog/TeacherRolePopover'
 import useRolesGetter from '@/lib/hooks/useRoles'
 import { Card, CardContent, CardHeader, CardDescription, CardTitle, CardAction } from '@/components/ui/card'
@@ -11,8 +10,13 @@ import Profile from './Profile'
 import { Switch } from '@/components/ui/switch'
 import { updateTeacher } from '@/app/services/teacherService'
 import { triggerToast } from '@/lib/utils/toast'
-
+import AlertDialogComponent from '@/components/AlertDialog/AlertDialogComponent'
+import DeleteDialogTeacher from '../../TeachersPage/component/DeleteDialogTeacher'
+import { useNavigate } from 'react-router-dom'
 function ProfileInfo({ teacherDetail, disable, setDisable, onRefresh }) {
+
+  const navigate = useNavigate()
+
   const [selectedRole, setSelectedRole] = useState('')
   const {data: allRolesData, isLoading: allRolesIsLoading} = useRolesGetter()
   const [isActive, setIsActive] = useState('')
@@ -21,6 +25,7 @@ function ProfileInfo({ teacherDetail, disable, setDisable, onRefresh }) {
   const [minsPerWeek, setMinsPerWeek] = useState('')
   const [teacherId, setTeacherId] = useState('')
 
+  const [openAlertDialog, setOpenAlertDialog] = useState(false);
 
   useEffect(() => {
    
@@ -62,9 +67,7 @@ function ProfileInfo({ teacherDetail, disable, setDisable, onRefresh }) {
         desc: 'Update the teacher successfully'
       }
       triggerToast(toastInfo)
-      console.log('to be sent:',data)
     } catch (error) {
-     console.log(error) 
      const toastInfo = {
         success: false,
         title: 'Update Failed',
@@ -76,6 +79,10 @@ function ProfileInfo({ teacherDetail, disable, setDisable, onRefresh }) {
       onRefresh()
     }
     
+  }
+
+   function onRefresh() {
+    navigate(`/admin/teachers`);
   }
 
   return (
@@ -141,7 +148,11 @@ function ProfileInfo({ teacherDetail, disable, setDisable, onRefresh }) {
               <Button variant='outline' onClick={() => setDisable(!disable)}>
               Edit
               </Button>
-              <Button variant='destructive' className='!bg-red-500'>
+              <Button 
+              variant='destructive' 
+              className='!bg-red-500'
+              onClick={() => setOpenAlertDialog(true)}
+              >
               Delete
               </Button>
               </div>
@@ -155,6 +166,17 @@ function ProfileInfo({ teacherDetail, disable, setDisable, onRefresh }) {
         </div>
       </div>
       </div>
+       <AlertDialogComponent
+                    open={openAlertDialog}
+                    selectedRow = {teacherDetail}
+                    data={ {
+                                id: 'teacher',
+                                desc: "This action cannot be undone. This will permanently delete this subject."
+                              } }
+                    onOpenChange={setOpenAlertDialog}
+                    onRefresh={() => onRefresh()}
+                     content={<DeleteDialogTeacher/>}
+                  />
     </div>
   )
 }

@@ -18,11 +18,7 @@ import { updateStrand } from '@/app/services/apiService'
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { Separator } from '../ui/separator'
 import { strandSchema } from '@/app/schema/schema'
-const toastInfo = {
-  success: true,
-  title: 'Update Strand',
-  desc: 'Successfully updated',
-}
+
 
 function StrandDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh }) {
   const [name, setName] = useState("")
@@ -69,12 +65,22 @@ function StrandDialogContent({ selectedRow, onConfirm, onOpenChange, onRefresh }
       }
 
       try {
-       
+       const toastInfo = {
+          success: true,
+          title: 'Update Strand',
+          desc: 'Successfully updated',
+        }
         await updateStrand(selectedRow?.id, data)
-        triggerToast({ ...toastInfo, success: true })
+        triggerToast(toastInfo)
         onConfirm()
         onRefresh()
       } catch (error) {
+        const toastInfo = {
+          success: false,
+          title: 'Update Strand',
+          desc: 'Successfully updated',
+        }
+          triggerToast(toastInfo)
         console.error("Error updating strand:", error)
       }
       setIsLoading(false)

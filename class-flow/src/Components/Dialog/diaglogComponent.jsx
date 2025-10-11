@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react"
 import { Dialog } from "@/components/ui/dialog"
 
-import SubjectDialogContent from "./subjectDialogContent"
-import TrackDialogContent from "./trackDialogContent"
-import StrandDialogContent from "./strandDialogContent"
-import SectionDialogContent from "./sectionDialogContent"
+import SubjectDialogContent from "./SubjectDialogContent"
+import TrackDialogContent from "./TrackDialogContent"
+import StrandDialogContent from "./StrandDialogContent"
+import SectionDialogContent from "./SectionDialogContent"
+import TestDialogContent from "./testDialogContent"
 export default function DialogComponent({ label, open, onOpenChange, selectedRow, onConfirm, onRefresh}) {
   const [dialogContent, setDialogContent] = useState(null)
 
   useEffect(() => {
     switch (label) {
-      case 'subjects':
+      case 'assign':
         setDialogContent(<SubjectDialogContent selectedRow={selectedRow} onConfirm={onConfirm} onOpenChange={onOpenChange} onRefresh={onRefresh} />)
+        break
+      case 'subject':
+        setDialogContent(<TestDialogContent selectedRow={selectedRow} onConfirm={onConfirm} onOpenChange={onOpenChange} onRefresh={onRefresh} />)
         break
       case 'strands':
         setDialogContent(<StrandDialogContent selectedRow={selectedRow} onConfirm={onConfirm} onOpenChange={onOpenChange} onRefresh={onRefresh} />)

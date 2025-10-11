@@ -11,7 +11,7 @@ import {
 } from "@Components/ui/tabs";
 import LoadingCard from '@/components/LoadingCard/loadingCard';
 import { ExternalLink, CircleAlert } from 'lucide-react';
-import SubjectWithAssignmentFormPopover from '@/features/admin/pages/subjects/pages/SubjectPage/components/SubjectWithAssignmentFormPopover';
+import AssignStrandDialog from './components/AssignStrandDialog';
 import { Card, CardContent, CardDescription, CardTitle, CardHeader } from '@/components/ui/card';
 
 import useTracks from '@/lib/hooks/useTracks';
@@ -174,7 +174,7 @@ function SubjectPage() {
                 >
                     <div className="flex items-center sm:items-center justify-between mb-4 sm:mb-none  ">
                         <div className="flex sm:flex-row sm:gap-5 gap-2 sm:items-center items-start flex-col ">
-                            <h1 className="text-2xl font-bold">Subjects</h1>
+                            <h1 className="text-2xl font-bold">Assignments</h1>
                             <Separator orientation="vertical" className="!h-6 !w-[2px] sm:block hidden " />
                             {!overallLoading && allTrackData?.length > 0 && (
                                 <TabsList className="rounded shadow border border-dashed bg-muted dark:bg-transparent">
@@ -200,9 +200,9 @@ function SubjectPage() {
                             strandsForCurrentTrack.length > 0 ? (
                                 <Card className="bg-transparent !gap-2">
                                     <CardHeader>
-                                        <CardTitle>Add Subjects</CardTitle>
+                                        <CardTitle>Add Assignments</CardTitle>
                                         <CardDescription>
-                                            You can manage sections here.
+                                            You can manage assignments here.
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
@@ -212,8 +212,8 @@ function SubjectPage() {
                                                     data={flattenedSubjects}
                                                     getColumns={getColumns}
                                                     alertDialogData={{
-                                                        id: 'subject',
-                                                        desc: "This action cannot be undone. This will permanently delete your account and remove your data from our servers."
+                                                        id: 'assign',
+                                                        desc: "The subject itself will remain available, but it will no longer be linked to this strand or program."
                                                     }}
                                                     filteredData={{ columnId: "subjectTitle", label: "Title" }}
                                                     filterComboBoxes={[
@@ -231,10 +231,9 @@ function SubjectPage() {
                                                     onRefresh={handleRefresh}
                                                     tabList={strandsForCurrentTrack.map(s => ({ value: s.code, label: s.code }))}
                                                     addComponent={
-                                                        <SubjectWithAssignmentFormPopover
-                                                            track={currentTrack?.name || null}
-                                                            strand={selectedStrandCode}
-                                                            strandId={selectedStrandId}
+                                                        <AssignStrandDialog
+                                                            track={{code: currentTrack?.name, id: currentTrack?.id} }
+                                                            strand={{code: selectedStrandCode, id: selectedStrandId}}
                                                             onRefresh={refreshSubjectStrand}
                                                         />
                                                     }

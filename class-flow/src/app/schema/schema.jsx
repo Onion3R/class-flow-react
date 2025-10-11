@@ -12,6 +12,23 @@ export const trackSchema = yup.object().shape({
     .matches(/^[a-zA-Z0-9 ]+$/, "Only letters, numbers, and spaces are allowed"),
 });
 
+export const subjectSchema = yup.object().shape({
+ 
+  code: yup
+    .string()
+    .required("Code is required"), // Removed .matches() to allow special characters
+  title: yup
+    .string()
+    .required("Title is required")
+    .matches(/^[a-zA-Z0-9 ]+$/, "Only letters, numbers, and spaces are allowed"),
+  minutes_per_week: yup
+    .number()
+    .typeError("Minutes per week must be a number")
+    .required("Minutes per week is required")
+    .positive("Minutes must be greater than zero")
+    .integer("Minutes must be a whole number"),
+});
+
 export const strandSchema = yup.object().shape({
   name: yup
     .string()
@@ -24,6 +41,21 @@ export const strandSchema = yup.object().shape({
   track_id: yup
     .number()
     .required("Track is required")
+});
+export const strandSubjectSchema = yup.object().shape({
+  strand_id: yup
+     .number()
+    .required("Track is required"),
+  subject_id: yup
+     .number()
+    .required("Subject is required"),
+  year_level_id: yup
+    .number()
+    .required("Year level is required"),
+  semester_id: yup
+    .number()
+    .required("Semester is required")
+  
 });
 
 export const sectionSchema = yup.object().shape({

@@ -10,7 +10,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import AssignedCountCell from "../components/AssignedCountCell";
+import AssignedCountCell from "../../assignment/pages/Assignment/components/AssignedCountCell";
 import { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 export const getColumns = ({
@@ -42,7 +42,7 @@ export const getColumns = ({
         enableHiding: false,
     },
     {
-        accessorKey: "subjectCode",
+        accessorKey: "code",
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -53,12 +53,11 @@ export const getColumns = ({
             </Button>
         ),
         cell: ({ row }) => {
-            const subjectCode = row.original.subjectCode;
-            return <div className="font-medium">{subjectCode}</div>;
+            return <div className="font-medium">{row.getValue('code')}</div>;
         },
     },
     {
-        accessorKey: "subjectTitle",
+        accessorKey: "title",
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -68,43 +67,13 @@ export const getColumns = ({
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) =>  <AssignedCountCell subjectTitle={row.original.subjectTitle} />
+        cell: ({ row }) =>  <div>{row.getValue('title')}</div>
     },
     {
-        accessorKey: "yearLevelName",
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-                Year Level
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => <div className="ml-4">{row.getValue("yearLevelName")}</div>,
-    },
-    {
-        accessorKey: "semesterName",
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-                Semester
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => {
-            const semesterName = row.original.semesterName;
-            return <div className="ml-3">{semesterName}</div>;
-        },
-    },
-    {
-        accessorKey: "minutesPerWeek",
+        accessorKey: "minutes_per_week",
         header: "Minutes Per Week",
         cell: ({ row }) => {
-            const minutes = row.original.minutesPerWeek;
-            return <div className="ml-2">{minutes || "N/A"}</div>;
+            return <div className="ml-2">{row.getValue('minutes_per_week')}</div>;
         },
     },
     {
@@ -134,7 +103,7 @@ export const getColumns = ({
                                     <DropdownMenuItem
                                         onClick={() => {
                                             action(rowData);
-                                            setLabel("subjects");
+                                            setLabel("subject");
                                         }}
                                         className="w-full justify-between"
                                     >

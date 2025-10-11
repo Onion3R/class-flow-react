@@ -8,42 +8,39 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";  
+} from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Alert, AlertTitle } from "@/components/ui/alert"
+
+import { triggerToast } from '@/lib/utils/toast';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash ,AlertCircleIcon} from "lucide-react";
+import { Plus, Trash , AlertCircleIcon} from "lucide-react";
 import { PulseLoader } from "react-spinners";
-import { Alert, AlertTitle } from "@/components/ui/alert"
-import { Label } from '../../../../../components/ui/label';
+import {Label} from "@/components/ui/label";
 // Import the API function provided by you
-import { createTrack } from '@/app/services/apiService';
-import { triggerToast } from '@/lib/utils/toast'; 
-import { trackSchema } from '@/app/schema/schema';
 
+import { subjectSchema } from '@/app/schema/schema';
+import { addSubject } from '../../assignment/pages/services/subjectService';
+function AddSubjectDialog({ onRefresh }) {
 
-
-// This component now accepts an 'onRefresh' function as a prop.
-// We no longer need to import the global triggerTrackRefresh function.
-function TrackFormPopover({ onRefresh }) {
-
-   const [openAccordionItem, setOpenAccordionItem] = useState("");
   const [entries, setEntries] = useState([
-    { name: '', code: '' },
+    { code: '', title: '' , minutes_per_week: ''},
   ]);
-
-  const [entryErrors, setEntryErrors] = useState(() => ({ [entries.length]: true }));
-  const [error, setError] = useState(null);
+  
   // State to manage the Dialog's open/closed state
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [openAccordionItem, setOpenAccordionItem] = useState("");
 
   // State for API call feedback
   const [isLoading, setIsLoading] = useState(false);
+  const [entryErrors, setEntryErrors] = useState({})
+  const [error, setError] = useState();
 
   const handleChange = (index, e) => {
     const { name, value } = e.target;
@@ -54,26 +51,31 @@ function TrackFormPopover({ onRefresh }) {
     });
   };
 
+ 
+
   const handleAddEntry = () => {
-     if (error) {
+    if (error) {
       setError({ message: "Please complete all fields, then click Done." });
     } else {
-      if (!(entries[entries.length - 1].code )) {
+      if (!(entries[entries.length - 1].title )) {
         setError({ message: "Ensure all fields are filled in." });
       } else {
-        setEntries((prev) => [...prev, { code: '', name: '' }]);
+        setEntries((prev) => [
+          ...prev,
+          { code: '', title: '', minutes_per_week: '' },
+          ]);
         setEntryErrors((prev) => ({ ...prev, [entries.length]: '' }));
         console.log('nadara',entries.length)
       }
     }
-    
   };
 
-  const handleDoneClick = (e , idx) => {
+  const handleDoneClick = (e, idx) => {
     e.preventDefault();
     if (
       entries[idx].code &&
-      entries[idx].name  
+      entries[idx].title &&
+      entries[idx].minutes_per_week
     ) {
       setEntryErrors(prev => {
         const { [idx]: _, ...others } = prev
@@ -95,7 +97,8 @@ const handleSubmit = async (e) => {
   // ✅ Validate all entries before sending
   for (const entry of entries) {
     try {
-      await trackSchema.validate(entry, { abortEarly: false });
+      console.log(entry)
+      await subjectSchema.validate(entry, { abortEarly: false });
     } catch (validationError) {
       console.log(validationError.errors)
       setError({ message: Array.isArray(validationError.errors) ? validationError.errors[0]  : validationError.errors});
@@ -106,37 +109,38 @@ const handleSubmit = async (e) => {
 
   // ✅ If validation passed, continue API calls
   for (const entry of entries) {
-    const trackData = {
-      name: entry.name,
+    const subjectData = {
       code: entry.code,
+      title: entry.title,
+      minutes_per_week: entry.minutes_per_week,
     };
 
-    console.log("Payload being sent to API:", trackData);
+    console.log("Payload being sent to API:", subjectData);
 
     try {
-      await createTrack(trackData);
+      await addSubject(subjectData);
       triggerToast({
         success: true,
-        title: "Track added",
-        desc: `The track "${entry.name}" has been successfully added.`,
+        title: "Subjects added",
+        desc: `The subject "${entry.title}" has been successfully added.`,
       });
 
       onRefresh();
     } catch (error) {
-      console.error("Failed to submit one or more tracks:", error);
+      console.error("Failed to submit one or more subejcts:", error);
       setError({message: error.response.data.code} || { message: "An unexpected error occurred." });
       setIsLoading(false);
       return;
     }
   }
 
-  console.log("All tracks submitted successfully!");
+  console.log("All Subjectss submitted successfully!");
   setIsLoading(false);
-  setEntries([{ name: "", code: "" }]);
+  setEntries([{ title: "", code: "" , minutes_per_week:""}]);
   setIsDialogOpen(false);
 };
 
-   const handleDeleteEntry = (index) => {
+    const handleDeleteEntry = (index) => {
     if (entries.length > 1) {
       setEntries((prev) => prev.filter((_, i) => i !== index));
     }
@@ -156,6 +160,7 @@ const handleSubmit = async (e) => {
   return (
     // The Dialog's open state is now controlled by a state variable
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen} className='gap-0'>
+  
         <DialogTrigger asChild>
           <Button variant="default" className="ml-2" onClick={() => setIsDialogOpen(true)}>
             <Plus /> Add
@@ -163,21 +168,22 @@ const handleSubmit = async (e) => {
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Track</DialogTitle>
-            <DialogDescription>You are about to add a new track.</DialogDescription>
+            <DialogTitle>Add Subject</DialogTitle>
+            <DialogDescription>You are about to add a new subject.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="flex flex-col w-full">
             {/* Display error message if present */}
              {error && (
            <Alert variant="destructive" className="border-red-500  mb-4  bg-red-100 dark:bg-red-900/30">
               <AlertCircleIcon className="h-4 w-4" />
-              <AlertTitle className=" !break-words ">
+              <AlertTitle className="!truncate-none !whitespace-normal !break-words ">
                 Error:
                 <span className="!text-sm font-normal ml-1">
                   {error.message}
                 </span>
               </AlertTitle>
-            </Alert> ) }
+            </Alert>
+          )}
             
             {entries.map((entry, idx) => {
               const itemId = `entry-${idx}`;
@@ -191,54 +197,72 @@ const handleSubmit = async (e) => {
                   key={idx}
                 >
                   <AccordionItem value={itemId}>
-                    <AccordionTrigger
+                   <AccordionTrigger
                     className={
                       entryErrors[idx] || (error && !entry.code)
                         ? "text-red-600 font-semibold"
                         : "text-black dark:text-muted-foreground"
                     }
                   >
-                    {entry.name || `Track information`}
+                    {entry.code || `Subject information`}
                   </AccordionTrigger>
                     <AccordionContent className="flex flex-col text-balance items-center justify-center">
                       <div className="gap-2 flex flex-col items-center justify-center w-[95%]">
-                        <div className="flex gap-6 items-center justify-between mt-2">
-                            <div>
+                        <div className="flex flex-row  gap-6 items-center justify-center mt-2">
+                        <div className='w-full'>
                           <Label
-                            htmlFor={`name-${idx}`}
-                            className={`mb-2 text-xs text-foreground/80 ${((entryErrors[idx] && !entry.name) || (error && !entry.name)) && "text-red-600 font-semibold"}`}
+                            htmlFor={`code-${idx}`}
+                            className={`mb-2 text-xs text-foreground/80 ${((entryErrors[idx] && !entry.code) || (error && !entry.code)) && "text-red-600 font-semibold"}`}
                           >
-                            Track Name *
+                            Subject Code *
                           </Label>
                           <Input
-                            name='name'
-                            id={`name-${idx}`}
-                            value={entry.name}
-                            onChange={(e) => handleChange(idx, e)}
-                            placeholder="Arts and Design Track"
-                            className={`!w-full !max-w-none ${((entryErrors[idx] && !entry.name) || (error && !entry.name)) && "border border-red-500 placeholder:text-red-400"}`}
-                            required
-                          />
-                          </div>
-                          <div>
-                            <Label
-                              htmlFor={`code-${idx}`}
-                              className={`mb-2 text-xs text-foreground/80 ${((entryErrors[idx] && !entry.code) || (error && !entry.code)) && "text-red-600 font-semibold"}`}
-                            >
-                              Track Code *
-                            </Label>
-                          <Input
-                            name='code'
                             id={`code-${idx}`}
+                            name="code"
                             value={entry.code}
                             onChange={(e) => handleChange(idx, e)}
-                            placeholder="A&D"
+                            placeholder="PEH-01"
                             className={`!w-full !max-w-none ${((entryErrors[idx] && !entry.code) || (error && !entry.code)) && "border border-red-500 placeholder:text-red-400"}`}
                             required
                           />
-                          </div>
                         </div>
-                        
+                        <div className='w-full'>
+                          <Label
+                            htmlFor={`minutes_per_week-${idx}`}
+                            className={`mb-2 text-xs text-foreground/80 ${((entryErrors[idx] && !entry.minutes_per_week) || (error && !entry.minutes_per_week)) && "text-red-600 font-semibold"}`}
+                          >
+                            Minutes per week *
+                          </Label>
+                          <Input
+                            id={`minutes_per_week-${idx}`}
+                            name="minutes_per_week"
+                            type="number"
+                            value={entry.minutes_per_week}
+                            onChange={(e) => handleChange(idx, e)}
+                            placeholder="240"
+                            min="0"
+                            className={`!w-full !max-w-none ${((entryErrors[idx] && !entry.minutes_per_week) || (error && !entry.minutes_per_week)) && "border border-red-500 placeholder:text-red-400"}`}
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className='w-full'>
+                        <Label
+                          htmlFor={`title-${idx}`}
+                          className={`mb-2 text-xs text-foreground/80 ${((entryErrors[idx] && !entry.title) || (error && !entry.title)) && "text-red-600 font-semibold"}`}
+                        >
+                          Subject Title *
+                        </Label>
+                        <Input
+                          id={`title-${idx}`}
+                          name="title"
+                          value={entry.title}
+                          onChange={(e) => handleChange(idx, e)}
+                          placeholder="P. E. & Health 11"
+                          className={`!w-full !max-w-none ${((entryErrors[idx] && !entry.title) || (error && !entry.title)) && "border border-red-500 placeholder:text-red-400"}`}
+                          required
+                        />
+                      </div>
                         <div className="flex w-full items-center justify-center mt-4 gap-7">
                           <Button
                             variant="outline"
@@ -250,7 +274,7 @@ const handleSubmit = async (e) => {
                           {/* Only show the delete button if there's more than one entry */}
                           {entries.length > 1 && (
                             <Button
-                              onClick={(e) => handleDeleteEntry(idx)}
+                              onClick={() => handleDeleteEntry(idx)}
                               className="bg-red-600 hover:bg-red-500"
                             >
                               <Trash className="text-red-200" />
@@ -277,16 +301,16 @@ const handleSubmit = async (e) => {
             </div>
 
             <DialogFooter className="flex gap-2 justify-end mt-2">
-                <Button type="button" variant="secondary" onClick={() => setIsDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" variant="default" disabled={isLoading}>
-                  {isLoading ? (
-                    <PulseLoader size={8} color="#ffffff" />
-                  ) : (
-                    'Submit All'
-                  )}
-                </Button>
+              <Button type="button" variant="secondary" onClick={() => setIsDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="default" disabled={isLoading}>
+                {isLoading ? (
+                  <PulseLoader size={8} color="#ffffff" />
+                ) : (
+                  'Submit All'
+                )}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -294,4 +318,4 @@ const handleSubmit = async (e) => {
   );
 }
 
-export default TrackFormPopover;
+export default AddSubjectDialog;

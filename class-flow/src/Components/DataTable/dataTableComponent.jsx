@@ -1,7 +1,7 @@
 // src/Components/DataTable/dataTableComponent.jsx
 import React, { useEffect, useState } from "react";
 import { DataTable } from "./data-table"; // This is your shadcn-ui DataTable (Adjust path)
-import DialogComponent from "../Dialog/diaglogComponent"; // (Adjust path)
+import DialogComponent from "../Dialog/DiaglogComponent"; // (Adjust path)
 import AlertDialogComponent from "../AlertDialog/AlertDialogComponent";
 // This component acts as a wrapper, passing props from TabsComponent down to DataTable
 export default function DataTableComponent({

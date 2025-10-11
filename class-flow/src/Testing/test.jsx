@@ -34,22 +34,20 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { addTeacher } from '@/app/services/teacherService'
+import { addSubject } from '@/features/admin/pages/assignment/pages/services/subjectService'
 export default function Test() {
 
   const handleSubmit = () => {
    const  data = {
-      first_name: "john",
-      last_name: "example",
-      is_active: false,
-      firebase_uid: 'test',
-      role: 1,
-      firstTime: true,
-      base_max_minutes_per_week: 240,
+    code: 'test',
+     title: 'test',
+     minutes_per_week: 240,
+     
     }
 
     const submit = async () =>{
       try {
-        await addTeacher(data)
+        await addSubject(data)
         console.log('guamana yehey')
       } catch (error) {
         console.log(error)
