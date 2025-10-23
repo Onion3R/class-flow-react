@@ -51,7 +51,7 @@ export const getColumns = ({
   {
     accessorKey: "title",
     header: "Schedule Title",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("title")}</div>,
+    cell: ({ row }) => <div className="capitalize]  max-w-[450px] truncate ">{row.getValue("title")}</div>,
   },
   {
     accessorKey: "academic_year",

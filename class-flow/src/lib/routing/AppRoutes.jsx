@@ -4,7 +4,8 @@ import { useAuth } from "@/app/context/authContext";
 // import LoginFormComponent from "../../components/LoginForm/loginFormComponent";
 
 // Pages
-import Dashboard from "../../features/admin/pages/dashboard/Dashboard";                       
+import Dashboard from "@/features/admin/pages/dashboard/Dashboard";             
+    
 // import Teachers from "../../features/admin/pages/teachers/pages/TeachersPage/Teachers";
 const Teachers = lazy(() => import("../../features/admin/pages/teachers/pages/TeachersPage/Teachers"));
 
@@ -18,14 +19,11 @@ const CreatedScheduleDetails  = lazy(() => import("@/features/admin/pages/schedu
 const CreateSchedule = lazy(() => import("../../features/admin/pages/schedules/pages/CreateSchedulePage/CreateSchedule"));
 const GenerateSchedule = lazy(() => import("../../features/admin/pages/schedules/pages/GenerateSchedulePage/GenerateSchedule"));
 
-const JuniorSchedPage = lazy(() => import("../../features/admin/pages/schedules/pages/SchedulePage/JuniorSchedPage"));
-const SeniorSchedPage = lazy(() => import("../../features/admin/pages/schedules/pages/SchedulePage/SeniorSchedPage"));
+const View = lazy(() => import("@/features/view/View"));
+const ViewTeacher = lazy(() => import("@/features/view/ViewTeacher"));
 
 
-
-
-import TeacherView from "../../features/teacher/HomePage";
-
+const TeacherView = lazy(() => import("@/features/teacher/HomePage"));
 
 
 // import LoginPage from "./Pages/loginPage";
@@ -45,13 +43,12 @@ import GetStarted from "../../features/authentication/pages/GetStarted";
 import RequiredAuth from "./RequiredAuth";
 import FinishSignIn from "./FinishSignIn";
 import FirstTimeOnlyRoute from "./FirstTimeOnlyRoute";
-
+import Invite from "@/features/admin/invite/Invite";
 
 
 const AppRoutes = () => {
   const { isAdmin, isTeacher, isLoading } = useAuth();
   const { id } = useParams();
-  console.log(isAdmin, isTeacher)
 
   if (isLoading) return null; // Optional spinner here
   
@@ -63,6 +60,8 @@ const AppRoutes = () => {
       </Route> 
       <Route path="/finish-sign-in/:id" element={<FinishSignIn />} />
       <Route path="/test" element={<Test />} />
+      <Route path="/invites/:id" element={<Invite />} />
+      
 
     <Route path="/" element={<RequiredAuth />}>
       <Route path="/complete-sign-up" element={<FirstTimeOnlyRoute />}>
@@ -71,6 +70,7 @@ const AppRoutes = () => {
 
 
   {isAdmin && (
+    <>
     <Route path="/admin" element={<Layout />}>
       <Route index element={<Dashboard />} />
       <Route path="assignments" element={<Assignment />} />
@@ -82,12 +82,11 @@ const AppRoutes = () => {
       <Route path="create-schedule" element={<CreateSchedule />} />
       <Route path="create-schedule/details/:id" element={<CreatedScheduleDetails />} />
       <Route path="generate-schedule" element={<GenerateSchedule />} />
-      <Route path="schedules">
-        <Route index element={<SchedulesPage />} />
-        <Route path="junior" element={<JuniorSchedPage />} />
-        <Route path="senior" element={<SeniorSchedPage />} />
-      </Route>
+      <Route path="schedules" element={<SchedulesPage />} />
     </Route>
+ 
+
+    </>
   )}
 
   {(isTeacher || isAdmin) && (
@@ -96,6 +95,9 @@ const AppRoutes = () => {
     </Route>
   )}
 </Route>
+
+   <Route path="views/:scheduleId" element={<View />} />
+   <Route path="views/teacher/:teacherId/:scheduleId" element={<ViewTeacher />} />
 
       <Route path="*" element={<Test/>}/>
     </Routes>

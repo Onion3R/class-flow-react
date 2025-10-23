@@ -23,7 +23,6 @@ import { AlertCircleIcon } from 'lucide-react';
 // import { addTeacher } from '@/app/services/apiService';
 import { addTeacher } from '@/app/services/teacherService';
 
-const USER_STATUS = 'teacher';
 
 function Register() {
   const [email, setEmail] = useState("");
@@ -34,6 +33,19 @@ function Register() {
   const { teacherRefresh } = useAuth();
   const uniqueId = crypto.randomUUID(); // or use uuid library
 
+  const [id, setId] = useState(null);
+
+console.log('role id',id)
+
+   useEffect(() => {
+    const data = sessionStorage.getItem("inviteRole");
+    if (data) {
+      const parsedData =JSON.parse(data) 
+      setId(parsedData)
+      window.localStorage.setItem("inviteId", parsedData);
+    }
+  }, []);
+
 
 
    const actionCodeSettings = {
@@ -42,11 +54,13 @@ function Register() {
   };
 
   const handleLogin = async (e) => {
+
     e.preventDefault();
     if (!email) return;
     setIsLoading(true);
 
     try {
+   
       await sendSignInLinkToEmail(auth, email, actionCodeSettings);
       window.localStorage.setItem("emailForSignIn", email);
       setVerify(true);
@@ -59,16 +73,25 @@ function Register() {
 
   const onGoogleSignIn = async (e) => {
     e.preventDefault();
-    if (isLoading) return;
+    if (isLoading ) return;
 
     setIsLoading(true);
     try {
       const result = await doSignInWithGoogle();
       const user = result.user;
-      const email = result.email;
+      const email = user.email;
       const idToken = await user.getIdToken();
       const info = getAdditionalUserInfo(result);
       const firebase_uid = user.uid;
+
+      if (info?.isNewUser && !id) {
+      setAlertMessage({
+        type: "error",
+        message: "You must be invited to create an account.",
+      });
+      await user.delete(); // ❌ delete unauthorized Firebase user
+      return;
+    }
 
       if (idToken) {
         const response = await verifyToken(idToken); // ✅ pass the token here
@@ -86,6 +109,7 @@ function Register() {
       setAlertMessage({ type: "error", message: err.message });
     } finally {
       setIsLoading(false);
+      sessionStorage.removeItem("inviteRole");
       window.localStorage.removeItem("emailForSignIn");
     }
   };
@@ -95,16 +119,16 @@ function Register() {
     return {
       first_name: "",
       last_name: "",
-      email: email,
-      is_active: false,
+      email,
+      is_active: true,
       firebase_uid,
-      status: USER_STATUS,
       firstTime: true,
       base_max_minutes_per_week: 240,
-      role: 2,
+      role: id,
     };
   }
 
+  
   return (
     <div >
       {alertMessage && (

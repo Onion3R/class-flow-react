@@ -8,15 +8,12 @@ function RequiredAuth() {
   const { userLoggedIn, isAdmin, isTeacher, isLoading, isFirstTime } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  console.log('is first time?',isFirstTime)
   useEffect(() => {
     if (isLoading) return;
 
     if (userLoggedIn && location.pathname === "/") {
-      console.log("Is first time:", isFirstTime);
 
       if (isFirstTime) {
-        console.log("Redirecting to complete sign-up");
         navigate("/complete-sign-up", { replace: true });
       } else if (isAdmin & !isFirstTime) {
         navigate("/admin", { replace: true });

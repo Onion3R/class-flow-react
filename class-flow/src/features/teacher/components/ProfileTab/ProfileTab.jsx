@@ -4,10 +4,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ProfileInfoTab from './ProfileInfoTab';
 import useProfileInfoGetter from '../../hooks/useProfileInfo';
 import WorkloadTab from './WorkloadTab';
-function ProfileTab({workloadMetrics, teachingAnalytics }) {
-  const [profileData, setProfileData] = useState()
-  const [profileAnalytics, setProfileAnalytics] = useState()
-  const {data, isLoading } = useProfileInfoGetter()
+function ProfileTab({analyticsData, profileData,teachingAnalytics }) {
+  // const [profileData, setProfileData] = useState()
+  // const [profileAnalytics, setProfileAnalytics] = useState()
+  // const {data, isLoading } = useProfileInfoGetter()
  const tabItems = [
   {
     value: 'account',
@@ -27,13 +27,12 @@ function ProfileTab({workloadMetrics, teachingAnalytics }) {
 ];
 
  
- useEffect(() => {
-   if(data && !isLoading) {
-    setProfileData(data.profile)
-    setProfileAnalytics(data.analytics)
-   }
- }, [data, isLoading])
-
+//  useEffect(() => {
+//    if(data && !isLoading) {
+//     setProfileData(data.profile)
+//     setProfileAnalytics(data.analytics)
+//    }
+//  }, [data, isLoading])
 
   return (
     <div className='flex items-center justify-center'>
@@ -56,10 +55,10 @@ function ProfileTab({workloadMetrics, teachingAnalytics }) {
          <ProfileInfoTab profileData={profileData} />
         </TabsContent>
       <TabsContent value="password">
-          <AnalyticsTab teachingAnalytics={teachingAnalytics}  profileAnalytics={profileAnalytics}/>
+          <AnalyticsTab teachingAnalytics={teachingAnalytics}  profileAnalytics={analyticsData}/>
       </TabsContent>
       <TabsContent value="workload">
-          <WorkloadTab profileAnalytics={profileAnalytics} />
+          <WorkloadTab profileAnalytics={analyticsData} />
       </TabsContent>
       </div>
       </div>

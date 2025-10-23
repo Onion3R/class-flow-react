@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Avatar,
   AvatarFallback,
@@ -18,18 +18,25 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+
 import { useTheme } from "@/components/theme-provider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import avatar from "@Assets/avatar.jpg";
 import { useAuth } from "@/app/context/authContext";
 import { doSignOut } from "@/app/firebase/auth";
 import { Navigate } from "react-router-dom";
+const SECRET_KEY = import.meta.env.VITE_SECRET_KEY;
+import CryptoJS from "crypto-js";
+import { TEACHER_ROUTES } from "@/features/admin/pages/teachers/routes";
+
 function AvatarPopUpComponent() {
   const { theme, setTheme } = useTheme();
-  const { currentUser, userLoggedIn } = useAuth();
+  const { currentUser, userLoggedIn, teacherData } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
 
+  const encryptedId = CryptoJS.AES.encrypt(teacherData.id.toString(), SECRET_KEY).toString();
+     
   function handleThemeChange(value) { 
     if (value != theme && value) {
             setTheme(value)
@@ -78,8 +85,13 @@ function AvatarPopUpComponent() {
             {currentUser?.email || "anonymous@example.com"}
           </p>
 
-          <Button size="sm" variant="ghost" className="w-full flex justify-between">
+          <Button size="sm" variant="ghost" className='w-full'>
+            <Link to={`${TEACHER_ROUTES.DETAIL}${encodeURIComponent(encryptedId)}`}
+            className="w-full flex justify-between"
+            >
             <span>Account</span> <UserRound />
+            </Link>
+            
           </Button>
 
           <Button

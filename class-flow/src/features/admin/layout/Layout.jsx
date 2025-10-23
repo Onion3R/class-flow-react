@@ -1,29 +1,20 @@
-// import React from 'react'
-// import { Outlet } from 'react-router-dom'
-// import NavBar from './Components/NavBar.jsx'
-// function Layout() {
-//   return (
-//    <>
-//     <NavBar  />
-//     <main className='container bg-blue-50'>
-//       <Outlet />
-//     </main>
-//    </>
-//   )
-// }
 
-// export default Layout
+
+import { lazy, Suspense } from "react";
 
 
 import { SidebarProvider, SidebarTrigger } from "../../../components/ui/sidebar"
 import { AppSidebar } from "../../../components/SideBar/app-sidebar"
 import { Outlet } from "react-router-dom";
-import AvatarPopUpComponent from "../../../components/AvatarPopUp/AvatarPopUpComponent";
 import BreadCrumbComponent from "@/components/BreadCrumb/BreadCrumbComponent"
 import { Separator } from "@Components/ui/separator";
 import { Button } from "../../../components/ui/button";
 import { MessageSquare } from "lucide-react";
 import { MotionWrapper } from "../../../lib/routing/animation/MotionWrapper";
+
+const AvatarPopUpComponent = lazy(() =>
+  import("../../../components/AvatarPopUp/AvatarPopUpComponent")
+);
 export default function Layout() {
   return (
     <MotionWrapper>

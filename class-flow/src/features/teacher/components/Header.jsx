@@ -8,6 +8,7 @@ import {data} from "../config/class-data"
 import { MessageSquare, Search, Trash, Printer} from 'lucide-react'
 import { Separator } from '@Components/ui/separator'
 import  PanelSwticherVreg from '@/Components/PanelSwitcher/PanelSwticherVreg'
+import ThemeToggle from '@/components/TemeToggle/ThemeToggle'
 import { SidebarTrigger,  useSidebar,} from "@/components/ui/sidebar";
 
 function Header() {
@@ -20,12 +21,13 @@ function Header() {
           <Separator orientation='vertical' className="mx-4 !h-[70%] "/>
           <PanelSwticherVreg panels={data.panels}/>
           </div>
-          <div className=' sm:flex hidden items-center justify-between min-w-48'  >
+          <div className=' sm:flex hidden items-center justify-between min-w-40'  >
             <Button variant='outline' size='sm'>
               <MessageSquare />
               Feedback
             </Button>
-           <AvatarPopUpComponent />
+           <ThemeToggle />
+
           </div>
         </div>
   )

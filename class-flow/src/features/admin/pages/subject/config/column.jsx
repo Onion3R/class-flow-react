@@ -67,7 +67,7 @@ export const getColumns = ({
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) =>  <div>{row.getValue('title')}</div>
+        cell: ({ row }) =>  <div className="min-w-[400px] ">{row.getValue('title')}</div>
     },
     {
         accessorKey: "minutes_per_week",

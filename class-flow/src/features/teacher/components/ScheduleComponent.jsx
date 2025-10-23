@@ -59,7 +59,7 @@ const flattenTimetableGrid = (timetableGrid) => {
 
 
 // Main App component
-function ScheduleTableComponent({id, setTableData, filters  }) {
+function ScheduleTableComponent({teacherId, setTableData, filters, scheduleId }) {
     const [allScheduleData, setAllScheduleData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -115,33 +115,27 @@ function ScheduleTableComponent({id, setTableData, filters  }) {
     // Effect to fetch data from the API and flatten it
     useEffect(() => {
         const fetchData = async () => {
-            if (filters && filters !== '') {
-                setIsLoading(true);
-                setError(null);
-                try {
-                    // Assuming getFilteredScheduleById now returns the object containing timetable_grid
-                    const result = await getTeacherSchedule(id,filters);
-                    const timetableGrid = result.timetable_grid || [];
-
-                    // Flatten the new grid data into the old expected array format
-                    const classes = flattenTimetableGrid(timetableGrid);
-                    
-                 
-                    setTableData(classes)
-                    setAllScheduleData(classes);
-                } catch (err) {
-                    localStorage.removeItem(LOCAL_STORAGE_KEY)
-                    console.error('Failed to fetch schedule:', err);
-                    setError('Failed to load schedule. Please check your network connection.');
-                    setAllScheduleData(null);
-                } finally {
-                    setIsLoading(false);
-                }
+            if (!teacherId) return; // don’t run until we have a teacher ID
+            setIsLoading(true);
+            setError(null);
+            try {
+            const result = await getTeacherSchedule(teacherId, filters || '', scheduleId);
+            const timetableGrid = result.timetable_grid || [];
+            const classes = flattenTimetableGrid(timetableGrid);
+            if (setTableData) setTableData(classes);
+            setAllScheduleData(classes);
+            } catch (err) {
+            localStorage.removeItem(LOCAL_STORAGE_KEY);
+            console.error('Failed to fetch schedule:', err);
+            setError('Failed to load schedule. Please check your network connection.');
+            setAllScheduleData(null);
+            } finally {
+            setIsLoading(false);
             }
         };
         fetchData();
+        }, [teacherId, scheduleId, filters]);
 
-    }, [filters]);
 
 
     // Effect to process the fetched data when it changes (THIS IS THE ORIGINAL LOGIC)

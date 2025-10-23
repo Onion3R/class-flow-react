@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import useTeacherWorkloadGetter from "@/lib/hooks/useTeacherWorkload";
 
-function useTransformedTeacherData() {
+function useTransformedTeacherData(scheduleId) {
+  
   const {
     data: rawData,
     isLoading: teacherWorkloadIsLoading,
     error,
-  } = useTeacherWorkloadGetter();
+  } = useTeacherWorkloadGetter(scheduleId);
 
   const [transformedData, setTransformedData] = useState({});
 

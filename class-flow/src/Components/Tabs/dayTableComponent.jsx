@@ -2,12 +2,22 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { getFilteredScheduleById } from '@/app/services/apiService';
 import { PulseLoader } from 'react-spinners';
 // Assuming these are available from a component library like shadcn/ui
-const Table = ({ children }) => <table className="min-w-full text-left border-collapse">{children}</table>;
-const TableBody = ({ children }) => <tbody>{children}</tbody>;
-const TableCell = ({ children, className, colSpan, rowSpan }) => <td colSpan={colSpan} rowSpan={rowSpan} className={`border border-gray-200 p-2 ${className}`}>{children}</td>;
-const TableHead = ({ children, className, colSpan, rowSpan }) => <th colSpan={colSpan} rowSpan={rowSpan} className={`border border-gray-200 p-2 ${className}`}>{children}</th>;
-const TableHeader = ({ children }) => <thead >{children}</thead>;
-const TableRow = ({ children, className }) => <tr className={`border-b border-gray-200 ${className}`}>{children}</tr>;
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+// const Table = ({ children }) => <table className="min-w-full text-left border-collapse">{children}</table>;
+// const TableBody = ({ children }) => <tbody>{children}</tbody>;
+// const TableCell = ({ children, className, colSpan, rowSpan }) => <td colSpan={colSpan} rowSpan={rowSpan} className={`border border-gray-200 p-2 ${className}`}>{children}</td>;
+// const TableHead = ({ children, className, colSpan, rowSpan }) => <th colSpan={colSpan} rowSpan={rowSpan} className={`border border-gray-200 p-2 ${className}`}>{children}</th>;
+// const TableHeader = ({ children }) => <thead >{children}</thead>;
+// const TableRow = ({ children, className }) => <tr className={`border-b border-gray-200 ${className}`}>{children}</tr>;
 
 // Main App component
 function DayTableComponent({ scheduleId }) {
@@ -240,14 +250,14 @@ function DayTableComponent({ scheduleId }) {
           <Table className="min-w-full">
             <TableHeader>
               <TableRow>
-                <TableHead rowSpan={4} className="text-left font-semibold border-r border-gray-200">Time</TableHead>
+                <TableHead rowSpan={4} className="text-center font-semibold border-r border-gray-200">Time</TableHead>
                 {grade11SectionsCount > 0 && (
-                  <TableHead colSpan={grade11SectionsCount * daysOfWeek.length} className="text-center font-bold text-lg border-b-2 border-gray-200">
+                  <TableHead colSpan={grade11SectionsCount * daysOfWeek.length} className="text-center font-bold text-2xl border-b-2 border-gray-200">
                     Grade 11
                   </TableHead>
                 )}
                 {grade12SectionsCount > 0 && (
-                  <TableHead colSpan={grade12SectionsCount * daysOfWeek.length} className="text-center font-bold text-lg border-b-2 border-gray-200">
+                  <TableHead colSpan={grade12SectionsCount * daysOfWeek.length} className="text-center font-bold text-2xl border-b-2 border-gray-200">
                     Grade 12
                   </TableHead>
                 )}
@@ -277,12 +287,12 @@ function DayTableComponent({ scheduleId }) {
               <TableRow>
                 {grade11Data && Object.values(grade11Data.strandSections).flatMap(sections => sections).map(sectionName => (
                   daysOfWeek.map(day => (
-                    <TableHead key={`g11-day-${sectionName}-${day}`} className="text-center text-xs font-semibold uppercase">{getDayAbbreviation(day)}</TableHead>
+                    <TableHead key={`g11-day-${sectionName}-${day}`} className="text-center text-xs font-semibold uppercase  border-l border-r border-gray-200">{getDayAbbreviation(day)}</TableHead>
                   ))
                 ))}
                 {grade12Data && Object.values(grade12Data.strandSections).flatMap(sections => sections).map(sectionName => (
                   daysOfWeek.map(day => (
-                    <TableHead key={`g12-day-${sectionName}-${day}`} className="text-center text-xs font-semibold uppercase">{getDayAbbreviation(day)}</TableHead>
+                    <TableHead key={`g12-day-${sectionName}-${day}`} className="text-center text-xs font-semibold uppercase border-r border-gray-200">{getDayAbbreviation(day)}</TableHead>
                   ))
                 ))}
               </TableRow>
@@ -298,7 +308,7 @@ function DayTableComponent({ scheduleId }) {
                         <p className="text-sm font-semibold">{formatTime(specialEvent.start_time)}</p>
                         <p className="text-xs text-gray-600">to {formatTime(specialEvent.end_time)}</p>
                       </TableCell>
-                      <TableCell colSpan={totalCols} className="bg-muted">
+                      <TableCell colSpan={totalCols} className="bg-muted border-t border-b border-gray-300">
                           <div className="text-center font-bold text-lg text-muted-foreground w-full h-full flex items-center justify-center">
                             {specialEvent.title}
                           </div>
@@ -308,7 +318,7 @@ function DayTableComponent({ scheduleId }) {
                 }
 
                 return (
-                  <TableRow key={time}>
+                  <TableRow key={time} className=''>
                     <TableCell className="font-medium text-center border-r border-gray-200">
                       <p className="text-sm font-semibold">{formatTime(time)}</p>
                       <p className="text-xs text-gray-500">
@@ -327,11 +337,12 @@ function DayTableComponent({ scheduleId }) {
                         const colors = subjectColorMap[subjectKey] || { bg: 'bg-gray-100', text: 'text-gray-800' };
 
                         return (
-                          <TableCell key={`g11-${sectionName}-${time}-${day}`} className="align-top border-l border-r border-gray-200 p-0 text-xs h-full">
+                          <TableCell key={`g11-${sectionName}-${time}-${day}`} className="align-top border-l border-r border-gray-200 p-1 text-xs h-full">
                             {classForDay ? (
-                              <div className="flex flex-col space-y-2 p-2 w-full h-full">
-                                <div className={`flex flex-col p-2 rounded-lg ${colors.bg} ${colors.text} shadow-sm transition-transform transform hover:scale-105 h-full justify-center items-center text-center`}>
-                                  <p className="font-bold leading-tight text-sm">{classForDay.subject_title}</p>
+                            <div className="flex flex-col w-full min-h-[96px]">
+                                <div className={`flex flex-col flex-1 p-2 rounded ${colors.bg} ${colors.text} shadow-sm transition-transform transform hover:scale-105 justify-center items-center text-center `}>
+
+                                  <p className="font-bold leading-tight text-sm   break-words whitespace-normal">{classForDay.subject_title}</p>
                                   <p className={`text-xs ${colors.text}`}>({classForDay.subject_code})</p>
                                   <p className={`text-xs ${colors.text}`}>{classForDay.teacher_name}</p>
                                 </div>
@@ -357,11 +368,12 @@ function DayTableComponent({ scheduleId }) {
                         const colors = subjectColorMap[subjectKey] || { bg: 'bg-gray-100', text: 'text-gray-800' };
 
                         return (
-                          <TableCell key={`g12-${sectionName}-${time}-${day}`} className="align-top border-l border-r border-gray-200 p-0 text-xs h-full">
+                          <TableCell key={`g12-${sectionName}-${time}-${day} `} className="align-top border-l border-r border-gray-200 p-1 text-xs h-full">
                             {classForDay ? (
-                              <div className="flex flex-col space-y-2 p-2 w-full h-full">
-                                <div className={`flex flex-col p-2 rounded-lg ${colors.bg} ${colors.text} shadow-sm transition-transform transform hover:scale-105 h-full justify-center items-center text-center`}>
-                                  <p className="font-bold leading-tight text-sm">{classForDay.subject_title}</p>
+                                <div className="flex flex-col w-full min-h-[96px]">
+                                    <div className={`flex flex-col flex-1 p-2 rounded ${colors.bg} ${colors.text} shadow-sm transition-transform transform hover:scale-105 justify-center items-center text-center `}>
+
+                                  <p className="font-bold leading-tight text-sm break-words whitespace-normal">{classForDay.subject_title}</p>
                                   <p className={`text-xs ${colors.text}`}>({classForDay.subject_code})</p>
                                   <p className={`text-xs ${colors.text}`}>{classForDay.teacher_name}</p>
                                 </div>

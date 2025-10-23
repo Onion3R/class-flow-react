@@ -7,6 +7,10 @@ export const getTeacherWorkLoad = async () => {
   const response = await api.get('teacher-workloads/');
   return response.data;
 };
+export const getTeacherWorkLoadByGeneratedId = async (id) => {
+  const response = await api.get(`teacher-workloads/?generated_schedule_id=${id}`,);
+  return response.data;
+};
 
 export const addTeacher = async (data) => {
   const response = await api.post('teachers/',data);

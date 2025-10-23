@@ -46,7 +46,7 @@ function TableComponent({ data, searchValue }) {
 
   return (
     <div className="w-full rounded-xl overflow-auto  border">
-      <ScrollArea className="h-[420px]">
+      <ScrollArea className="h-[440px]">
         <Table className="rounded-xl overflow-hidden">
           <TableHeader className="dark:bg-neutral-900 bg-gray-300/20">
             <TableRow className="sticky top-0 z-1 dark:bg-neutral-900">

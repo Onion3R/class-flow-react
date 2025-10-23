@@ -94,6 +94,14 @@ export const getGeneratedSchedules = async () => {
   const response = await api.get('generated-schedules/');
   return response.data;
 };
+export const updateGeneratedSchedules = async (id, data) => {
+  const response = await api.patch(`generated-schedules/${id}/`,data);
+  return response.data;
+};
+export const getSpecificGeneratedSchedule = async (id ) => {
+  const response = await api.get(`generated-schedules/${id}/`);
+  return response.data;
+};
 
 export const createSchedule = async (scheduleData) => {
   try {

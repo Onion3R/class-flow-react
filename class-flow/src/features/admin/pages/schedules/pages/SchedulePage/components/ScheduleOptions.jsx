@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+
 import {
   Dialog,
   DialogClose,
@@ -23,12 +13,11 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { X, ListFilter, Printer, FileSpreadsheet, XCircle, Maximize} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
+import ExportButton from './ExportButton';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import SelectComponent from '@/components/Select/selectComponent';
 import { getTimetableFilters } from '@/app/services/timetableService';
-
 function ScheduleOptions({ selectedSchedule, setFilters }) {
 
 
@@ -52,7 +41,8 @@ function ScheduleOptions({ selectedSchedule, setFilters }) {
 
   useEffect(() => {
    
-   async function getFilters() {
+   const getFilters = async () => {
+    if (!selectedSchedule.id) return;
     try {
       const filters = await getTimetableFilters(selectedSchedule.id)
       const { tracks , strands, year_levels, sections} = filters
@@ -60,85 +50,100 @@ function ScheduleOptions({ selectedSchedule, setFilters }) {
       setStrands(strands)
       setYearLevels(year_levels)
       setSections(sections)
+      setSelectedTrack(prev => prev ?? tracks[0]);
     } catch (error) {
       console.error(error)
     }
    }
 
-    if(selectedSchedule.id) {
-   getFilters()
-    }
+    getFilters()
   }, [selectedSchedule])
   
 
-  useEffect(() => {
-    if (tracks && tracks.length > 0) {
-      setSelectedTrack(prev => prev ?? tracks[0]);
-    }
-  }, [tracks]);
-
-  const handleCheckboxChange = (id, checked) => {
-    const strand = strands.find((s) => s.id === id);
+  const handleCheckboxChange = (id, checked, name) => {
+    setSelectedYearLevel('');
+    setSelectedSection('');
     setCheckedStrands((prev) => ({
       ...prev,
       [id]: {
         checked,
-        id: strand.id,
-        name: strand.name,
+        id: id,
+        name: name,
       },
     }));
-  };
-
-  useEffect(() => {
-    const activeStrands = Object.values(checkedStrands).filter((s) => s.checked);
-
-    if (activeStrands.length > 0) {
-      setContinueDisable(false);
-      setYearLevelDisabled(false);
-      const apiEdit = `${selectedSchedule.id}&track_id=${selectedTrack.id}&strand_ids=${activeStrands.map(s => s.id).join(',')}`;
-      setApi(apiEdit);
-    } else {
-      setYearLevelDisabled(true);
-      setSelectedYearLevel('');
-      setContinueDisable(true);
-    }
-
-    setSelectedSection('');
-    setSelectedYearLevel('');
 
     
-
-    const filtered = activeStrands.flatMap((strand) =>
-      sections.filter((section) => section.strand_name === strand.name)
-    );
-    setFilteredSections(filtered);
-  }, [checkedStrands]);
+  };
 
 
 
-  useEffect(() => {
+useEffect(() => {
+  if (!selectedSchedule || !selectedTrack) return;
+
+  let api = `${selectedSchedule.id}&track_id=${selectedTrack.id}`;
+
+  const activeStrands = Object.values(checkedStrands).filter((s) => s.checked);
+  const filtered = activeStrands.flatMap((strand) =>
+    sections.filter((section) => section.strand_name === strand.name)
+  );
+  setFilteredSections(filtered);
+
+  if (activeStrands.length > 0) {
+    setContinueDisable(false);
+    setYearLevelDisabled(false);
+
+    const strandIds = activeStrands.map((s) => s.id).join(',');
+    api += `&strand_ids=${strandIds}`;
+
     if (selectedYearLevel) {
       setSectionDisabled(false);
+      const yearLevelId = yearLevels.find((a) => a.name === selectedYearLevel)?.id;
+      if (yearLevelId) {
+        api += `&year_level_ids=${yearLevelId}`;
+      }
     } else {
       setSectionDisabled(true);
-      setSelectedSection('');
     }
-  }, [selectedYearLevel]);
+
+    if (selectedSection) {
+      const sectionId = sectionsByYearLevel.find((a) => a.name === selectedSection)?.id;
+      if (sectionId) {
+        api += `&section_ids=${sectionId}`;
+      }
+    }
+  } else {
+    setYearLevelDisabled(true);
+    setSectionDisabled(true);
+  }
+
+  setApi(api);
+}, [
+  checkedStrands,
+  selectedYearLevel,
+  selectedTrack,
+  selectedSection,
+  selectedSchedule,
+  yearLevels,
+  sections,
+  sectionsByYearLevel,
+]);
+
+
+
 
   const handleYearLevelChange = (value) => {
+    setSelectedSection('');
+    setSelectedYearLevel(value);
     const filtered = filteredSections.filter(e => e.year_level_name === value);
     setSectionsByYearLevel(filtered);
-    setSelectedYearLevel(value);
-    setYearLevelDisabled(false);
-    const yearLevelId = yearLevels.find(a => a.name === value)?.id;
-    setApi(`${api}&year_level_ids=${yearLevelId}`);
+    
   };
 
   const handleSectionChange = (value) => {
     setSelectedSection(value);
-    const sectionId = sectionsByYearLevel.find(a => a.name === value)?.id;
-    setApi(`${api}&section_ids=${sectionId}`);
+    
   };
+
 
   const handleClearFilters = () => {
     setCheckedStrands({});
@@ -150,8 +155,16 @@ function ScheduleOptions({ selectedSchedule, setFilters }) {
     setContinueDisable(true);
     setYearLevelDisabled(true);
     setSectionDisabled(true);
+    setFilters( `${selectedSchedule.id}&track_id=${selectedTrack?.id}`);
   };
 
+
+  const handleContinue = () => {  
+      setFilters(api)
+      setOpenDialog(false)
+  }
+
+  console.log(checkedStrands)
 
   return (
 
@@ -214,7 +227,7 @@ function ScheduleOptions({ selectedSchedule, setFilters }) {
                       <Checkbox
                         id={`strand-${e.id}`}
                         checked={!!checkedStrands[e.id]?.checked}
-                        onCheckedChange={(checked) => handleCheckboxChange(e.id, checked)}
+                        onCheckedChange={(checked) => handleCheckboxChange(e.id, checked, e.name)}
                       />
                       <Label htmlFor={`strand-${e.id}`}>{e.name}</Label>
                     </div>
@@ -227,7 +240,7 @@ function ScheduleOptions({ selectedSchedule, setFilters }) {
                   items={yearLevels?.map((a) => a.name)}
                   label="Year Levels"
                   value={selectedYearLevel}
-                  onChange={handleYearLevelChange}
+                  onChange={(e) => handleYearLevelChange(e)}
                   className='w-full max-w-none'
                 />
                 <SelectComponent
@@ -245,24 +258,25 @@ function ScheduleOptions({ selectedSchedule, setFilters }) {
           <DialogFooter>
             <div className='w-full flex items-center justify-between'>
               <div className='flex gap-2'>
-                <Button variant='secondary' size='sm' className='text-xs'>
-                  <FileSpreadsheet className="!w-3 !h-3 " />
-                  Export
-                </Button>
-                <Button variant='secondary' size='sm' className='text-xs'>
+                <ExportButton  scheduleId={selectedSchedule.id} filters={api}  disabled={!Object.values(checkedStrands).some(strand => strand.checked)}/>
+                  
+                <Button variant='secondary' size='sm' className='text-xs' disabled={!selectedSection}>
                   <Printer className="!w-3 !h-3 " />
                   Print
                 </Button>
-                <Button variant='secondary' size='sm' className='text-xs'>
-                  <Maximize className="!w-3 !h-3 " />
-                  View
-                </Button>
+                <Button
+                      variant='secondary'
+                      size='sm'
+                      className='text-xs'
+                      onClick={() => window.open(`/views/${encodeURIComponent(api)}`, '_blank')}
+                      disabled={!selectedSection}
+                    >
+                      <Maximize className="!w-3 !h-3 " />
+                      View
+                    </Button>
               </div>
               <Button
-                onClick={() => {
-                  setFilters(api)
-                  setOpenDialog(false)
-                }}
+                onClick={() => handleContinue()}
                 disabled={continueDisable}
               >
                 Continue
@@ -275,3 +289,4 @@ function ScheduleOptions({ selectedSchedule, setFilters }) {
 }
 
 export default ScheduleOptions;
+

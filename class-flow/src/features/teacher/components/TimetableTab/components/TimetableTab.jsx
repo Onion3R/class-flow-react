@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 const FilterDialog = lazy(() => import('./FilterDialog'));
 const API = '&view_format'
 
-function TimetableTab({id,timetableFilters}) {
+function TimetableTab({teacherId, activeSchedule,timetableFilters}) {
   const [tableData, setTableData] = useState()
   const [filters, setFilters] = useState({})
   const [filterUrl, setFilterUrl] = useState()
@@ -50,6 +50,11 @@ useEffect(() => {
     setselectedYearLevel(e)
     setHasSelectedYear(true)
     setSelectedSection('')
+    const sample = `&filter_strand=${checkedItems
+          .filter(e => e.checked === true)
+          .map(e => e.id)
+          .join(',')}`
+    setFinalFilterUrl(API + `&filter_grade=${e}`+ sample)
   }
 
   const handleSectionChange = (e) => {
@@ -121,13 +126,19 @@ useEffect(() => {
       console.log('year level:', year_level)
       console.log('allowed strands:', allowedStrands)
 
-      const result = Array.from(new Set(tableData.filter(data =>
+      if(selectedYearLevel) {
+        const result = Array.from(new Set(tableData.filter(data =>
         data.year_level === year_level &&
         allowedStrands.includes(data.strand_name)
       ).map(e => e.section_name)))
 
+        setFilteredSections(result)
       console.log('filtered sections:', result)
-      setFilteredSections(result)
+
+      }
+      
+
+    
     }
 
   }, [tableData, allowedStrands, checkedItems, selectedYearLevel])
@@ -135,6 +146,10 @@ useEffect(() => {
   const handleFilter = () => {
     setFinalFilterUrl(filterUrl)
   }
+
+  console.log('url',finalFilterUrl)
+
+  console.log(activeSchedule)
 
   return (
     <section className='flex flex-col lg:flex-row gap-5'>
@@ -206,21 +221,28 @@ useEffect(() => {
             <Printer className="!w-3 !h-3 " />
             Print
           </Button>
-          <Button 
-          variant='outline' 
-          size='sm' 
-          className='text-xs  bg-transparent'
-          >
-            <Maximize className="!w-3 !h-3 " />
-            View
-          </Button>
+           <Button 
+              variant='outline' 
+              size='sm' 
+              className='text-xs  bg-transparent'
+         onClick={() =>
+  window.open(
+    `/views/teacher/${encodeURIComponent(teacherId)}/${encodeURIComponent(activeSchedule)}`,
+    '_blank'
+  )
+}
+                  >
+                    <Maximize className="!w-3 !h-3 " />
+                    View
+                  </Button>
         </div>
       </div>
       <div className='w-full'>
-        <ScheduleTableComponent  id={id} setTableData={setTableData} filters={finalFilterUrl} />
+        <ScheduleTableComponent  teacherId={teacherId} setTableData={setTableData} filters={finalFilterUrl} scheduleId={activeSchedule} />
       </div>
     </section>
   )
 }
 
 export default TimetableTab
+

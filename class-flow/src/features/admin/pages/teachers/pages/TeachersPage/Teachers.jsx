@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react'
 import { PulseLoader } from 'react-spinners';
 import {getColumns} from './config/column'
 import DataTableComponent from '@/components/DataTable/dataTableComponent'
-import  ShareDialog  from '@/components/ShareDialog/ShareDialog'
+import  ShareDialog  from '@/features/admin/pages/teachers/pages/TeachersPage/component/ShareDialog'
 import { transformInstructorData } from './config/transformInstructorData'
 import useTeachersGetter from '@/lib/hooks/useTeachers';
 import AlertComponent from '@/components/Alert/AlertComponent';

@@ -19,14 +19,13 @@ import { Link } from 'react-router-dom'
    
   return (
   <DropdownMenu>
-  <DropdownMenuTrigger className="text-sm border-dashed border px-3.5 py-1.5 flex items-center justify-between w-[160px] font-[500]">Instructor Panel <ChevronDown size={14}/></DropdownMenuTrigger>
+  <DropdownMenuTrigger className="text-sm border-dashed border px-3.5 py-1.5 flex items-center justify-between w-[160px] font-[500]">Teacher Panel <ChevronDown size={14}/></DropdownMenuTrigger>
   <DropdownMenuContent
              className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
              align="start"
             
            >
              <DropdownMenuLabel className="text-muted-foreground text-xs">
-               IT Department
              </DropdownMenuLabel>
              {panels.map((panel, index) => (
                <DropdownMenuItem
@@ -34,20 +33,22 @@ import { Link } from 'react-router-dom'
                  onClick={() => setActivePanels(panel)}
                  className="gap-2 p-2  flex justify-between"
                >
-                 <div className='flex items-center justify-between'>
-                 <div className="flex size-6 items-center justify-center mr-1.5 rounded-md border">
-                   <panel.logo className="size-3.5 shrink-0 " />
-                 </div>
-                  <Link
+                <Link
                    key={index}
                    to={isAdmin || panel.role !== "Admin" ? panel.url : "#"}
                    className={`flex items-center gap-2 ${
                      !isAdmin && panel.role === "Admin" ? "pointer-events-none text-muted-foreground" : ""
                    }`}
                  >
-                   {panel.name}
-                 </Link>
+                 <div className='flex items-center justify-between'>
+                 <div className="flex size-6 items-center justify-center mr-1.5 rounded-md border">
+                   <panel.logo className="size-3.5 shrink-0 " />
                  </div>
+                  
+                   {panel.name}
+                 
+                 </div>
+                 </Link>
                  {  !isAdmin && panel.role === "Admin"?
                   <Lock  className="size-3"/>  
                  :  <UnlockKeyhole  className="size-3"/>

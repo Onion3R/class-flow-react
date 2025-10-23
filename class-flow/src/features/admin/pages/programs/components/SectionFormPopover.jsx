@@ -235,7 +235,7 @@ function SectionFormPopover({ onRefresh }) {
                         : "text-black dark:text-muted-foreground"
                     }
                   >
-                    {entry.name || `Subject information`}
+                    {entry.name || `Section information`}
                   </AccordionTrigger>
                   <AccordionContent className="flex flex-col text-balance items-center justify-center">
                     <div className="gap-2 flex flex-col items-center justify-center w-[95%]">

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 const ScheduleDrawer = lazy(() => import('./components/ScheduleDrawer'));
 import { CircleSmall  } from 'lucide-react';
 import { PulseLoader } from 'react-spinners';
+import { useAuth } from '@/app/context/authContext';
 
 function SchedulesPage() {
   const { data: allGeneratedScheduleData, isLoading: generatedSchedulesIsLoading } = generatedScheduleGetter();
@@ -12,6 +13,7 @@ function SchedulesPage() {
   const [schedFetch, setSchedFetch] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const selectedScheduleName = selectedSchedule?.name || '';
+  const {teacherData} =useAuth()
 
   if (generatedSchedulesIsLoading) return <p>Loading...</p>;
   if (!allGeneratedScheduleData || allGeneratedScheduleData.length === 0) {
@@ -46,7 +48,7 @@ function SchedulesPage() {
     }, 3000);
   };
 
-
+console.log('id', selectedSchedule)
 
   return (
     <div className='container relative flex-col items-center justify-center flex h-[calc(100vh-45px)]  mx-auto'>
@@ -77,13 +79,16 @@ function SchedulesPage() {
            }
         </div>
       </div>
+      {selectedSchedule && 
       <Suspense fallback={<div className="text-sm absolute right-4 top-2 text-muted-foreground mt-2"><PulseLoader size={6} loading={true} color={'#808080'}/></div>}>
         <ScheduleDrawer
           openDrawer={openDrawer}
           setOpenDrawer={setOpenDrawer}
           selectedSchedule={selectedSchedule}
         />
-      </Suspense>
+      </Suspense> 
+      
+      }
     </div>
   );
 }

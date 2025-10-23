@@ -1,12 +1,12 @@
 // import { getTeachers } from '@/app/services/apiService';
-import { getTeacherWorkLoad } from '@/app/services/teacherService';
+import { getTeacherWorkLoadByGeneratedId } from '@/app/services/teacherService';
 import { useState, useEffect, useCallback } from 'react';
 
 /**
  * Custom hook to fetch and manage teachers data.
  * It returns the data, a loading state, an error state, and a refresh function.
  */
-const useTeacherWorkloadGetter = () => {
+const useTeacherWorkloadGetter = (id) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null); // Added state for error handling
@@ -19,7 +19,7 @@ const useTeacherWorkloadGetter = () => {
 
     try {
       // Call your actual data fetching function for teachers
-      const fetchedData = await getTeacherWorkLoad();
+      const fetchedData = await getTeacherWorkLoadByGeneratedId(id);
 
       // Check for empty or invalid data
       if (!fetchedData || (Array.isArray(fetchedData) && fetchedData.length === 0)) {
@@ -34,7 +34,7 @@ const useTeacherWorkloadGetter = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []); // The empty dependency array means this function is created only once.
+  }, [id]); // The empty dependency array means this function is created only once.
 
   // Use useEffect to trigger the initial data fetch when the component mounts.
   // Since 'refresh' is memoized, this effect will only run once on mount.

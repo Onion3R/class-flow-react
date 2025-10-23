@@ -2,11 +2,20 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from './components/Header';
 import Title from './components/Title';
+import useGeneratedScheduleGetter from '@/lib/hooks/useGeneratedSchedules';
+
 import useProfileInfoGetter from './hooks/useProfileInfo';
 // Lazy-loaded tabs
 const TimetableTab = lazy(() => import('./components/TimetableTab/components/TimetableTab'));
+
 const ScheduleTab = lazy(() => import('./components/ScheduleTab/ScheduleTab'));
 const ProfileTab = lazy(() => import('./components/ProfileTab/ProfileTab'));
+
+const NoActiveSchedule = lazy(() => import('./components/NoActiveSchedule'));
+
+const NoDataFetch = lazy(() => import('./components/NoDataFetch'));
+
+
 
 const tabItems = [
   {
@@ -26,20 +35,36 @@ const tabItems = [
 
 
 function TeacherView() {
-  const {data, isLoading} = useProfileInfoGetter()
+
+  const {data: allGeneratedSchedules, loading: generatedSchedulesIsLoading} = useGeneratedScheduleGetter()
+  const [activeSchedule, setActiveSchedule] = useState()
+
+  const {data, isLoading, teacherData} = useProfileInfoGetter(activeSchedule?.id)
 const [progress, setProgress] = useState(0);
 const [activeTab, setActiveTab] = useState('schedule');
 
 const [profileInfo, setProfileInfo] = useState()
-const [id, setId] = useState()
+const [teacherId, setTeacherId] = useState()
 const [currentWeek, setCurrentWeek] = useState()
+
 const [workloadMetrics, setWorkloadMetrics] = useState()
 const [weeklySchedule, setWeeklySchedule] = useState()
+
+// for profile tab
+const [profileData, setProfileData] = useState()
+const [analyticsData, setAnalyticsData] = useState()
 const [teachingAnalytics, setTeachingAnalytics] = useState()
+
 
 
 const [timetableFilters, setTimetableFilters] = useState()
 
+useEffect(() => {
+  if(!generatedSchedulesIsLoading && allGeneratedSchedules) {
+    const active = allGeneratedSchedules.find(e => e.is_active)
+    setActiveSchedule(active)
+  }
+}, [generatedSchedulesIsLoading, allGeneratedSchedules])
 
 useEffect(() => {
   const interval = setInterval(() => {
@@ -59,8 +84,7 @@ useEffect(() => {
   if(data && !isLoading) {
    const  dashboardData = data.teacherDashboardInfo
    const timeTableFilters = data.timeTableFilters
-   const id = data.id
-   console.log('filters',timeTableFilters)
+   const teacherId = data.id
    const { teacher_info, current_week, workload_metrics, weekly_schedule, teaching_analytics} = dashboardData
    setProfileInfo(teacher_info)
    setCurrentWeek(current_week)
@@ -70,12 +94,19 @@ useEffect(() => {
    
 
    setTimetableFilters(timeTableFilters)
+   const profileData = data.profile
+   const analyticsData = data.analytics
 
-   setId(id)
-   console.log('this is the id',id)
+   setProfileData(profileData)
+   setAnalyticsData(analyticsData)
+
+   setTeacherId(teacherId)
   }
 
 }, [data, isLoading])
+
+
+
 
 
 
@@ -85,9 +116,12 @@ useEffect(() => {
         
         <div className='min-h-screen  dark:bg-neutral-900'>
             <Tabs value={activeTab} onValueChange={setActiveTab}  >
-              <Header/>
-              <Title progress={progress} tabItems={tabItems} />
-              <div className='h-full container mx-auto mt-5  mb-10 sm:p-0   p-5 '>
+              <Header />
+              <Title progress={progress} tabItems={tabItems} active={activeSchedule} teacherData={teacherData} />
+              { activeSchedule ?  
+              (
+                 data ? (
+                <div className='h-full container mx-auto mt-5  mb-10 sm:p-0   p-5 '>
               <TabsContent value='schedule'>
                 <Suspense fallback={<div>Loading Schedule...</div>}>
                   <ScheduleTab
@@ -101,7 +135,8 @@ useEffect(() => {
               <TabsContent value='timetable'>
                 <Suspense fallback={<div>Loading Timetable...</div>}>
                   <TimetableTab  
-                  id={id}
+                  teacherId={teacherId}
+                  activeSchedule={activeSchedule.id}
                   timetableFilters={timetableFilters} />
                 </Suspense>
               </TabsContent>
@@ -109,13 +144,26 @@ useEffect(() => {
               <TabsContent value='profile'>
                 <Suspense fallback={<div>Loading Profile...</div>}>
                   <ProfileTab
-                    profileInfo={profileInfo}
-                    workloadMetrics={workloadMetrics}
+                    analyticsData={analyticsData}
+                    profileData={profileData}
                     teachingAnalytics={teachingAnalytics}
                   />
                 </Suspense>
               </TabsContent>
+              </div> 
+              ) : (
+                  <div className='h-full container mx-auto mt-5  mb-10 sm:p-0   p-5 '>
+               <NoDataFetch />
               </div>
+              )
+              )
+              
+              :
+              <div className='h-full container mx-auto mt-5  mb-10 sm:p-0   p-5 '>
+               <NoActiveSchedule />
+              </div>
+              }
+             
             </Tabs>
         </div>
       

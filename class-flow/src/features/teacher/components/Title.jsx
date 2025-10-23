@@ -2,7 +2,7 @@ import React from 'react'
 import { Progress } from '@/components/ui/progress'
 import { TextRoll } from '@/components/ui/text-roll'
 import { TabsList, TabsTrigger, } from '@/components/ui/tabs'
-function Title({progress, tabItems}) {
+function Title({progress, tabItems, active, teacherData}) {
   return (
     <div className='   border-dashed border-b-2 relative sm:p-0  p-5'>
                 {progress != 110 && 
@@ -36,7 +36,7 @@ function Title({progress, tabItems}) {
                   ) : (
                     <span className='py-4'>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-600 text-transparent bg-clip-text inline-block">
-                  Hello, John
+                  Hello, {teacherData.first_name}
                   </h1>
                   <p className='font-medium text-foreground dark:text-neutral-300'>Welcome back to ClassFlow!</p>
                   
@@ -48,7 +48,7 @@ function Title({progress, tabItems}) {
               <TabsList className={"mt-6 border-dashed border "}>
                 {
                   tabItems.map(({key, label}) => (
-                     <TabsTrigger value={key} key={key}>{label}</TabsTrigger>
+                     <TabsTrigger value={key} key={key} disabled={!active}>{label}</TabsTrigger>
                   ))
                 }
                

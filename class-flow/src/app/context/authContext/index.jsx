@@ -35,16 +35,12 @@ export function AuthProvider({ children }) {
 
   // Match Firebase user with teacher data
   useEffect(() => {
-    console.log("allTeacherData:", allTeacherData);
 
     if (currentUser && allTeacherData?.length > 0) {
-        console.log(Array.isArray(allTeacherData)); // should be true
-console.log(allTeacherData); // inspect the actual value
 
       const foundTeacher = allTeacherData.find(
         (t) => t.firebase_uid === currentUser.uid
       );
-      console.log("Matched teacher:", foundTeacher);
       if (foundTeacher) {
         setTeacherData(foundTeacher);
         setIsFirstTime(foundTeacher.firstTime ?? null);

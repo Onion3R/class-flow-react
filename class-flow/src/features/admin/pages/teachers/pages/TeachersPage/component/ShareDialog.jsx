@@ -9,36 +9,33 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog"
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert"
+
 import { triggerToast } from "@/lib/utils/toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Clipboard, ClipboardCheck, ExternalLink, RefreshCcw, PopcornIcon } from "lucide-react"
-import TeacherRolePopover from "./TeacherRolePopover"
+import {  ClipboardCheck, ExternalLink, RefreshCcw } from "lucide-react"
+import TeacherRolePopover from "../../../../../../../components/ShareDialog/TeacherRolePopover"
 import useRolesGetter from "@/lib/hooks/useRoles"
 import { v4 as uuidv4 } from 'uuid';
-
+import { handleCreateInvite } from "../handlers/inviteHandler"
 export default function ShareDialog() {
+  const { data: allRoleData, isLoading: allRolesIsLoading } = useRolesGetter()
 
   const [retries, setRetries] = useState(1)
   const [roleId, setRoleId] = useState()
   const [invite, setInvite] = useState(undefined)
   const [selectedRole, setSelectedRole] = useState()
   const [hasGeneratedUrl, setHasGeneratedUrl] = useState()
-  const [copyLink, setCopyLink] = useState(false)
   const [email, setEmail] = useState('')
   const [token, setToken] = useState()
 
-  const { data: allRoleData, isLoading: allRolesIsLoading } = useRolesGetter()
 
+  
   useEffect(() => {
     if (allRoleData && allRoleData.length > 0 && !allRolesIsLoading) {
       setSelectedRole(allRoleData[0].label)
+      setRoleId(allRoleData[0].id)
     }
 
     if(!email) {
@@ -48,7 +45,7 @@ export default function ShareDialog() {
 
   const handleCopyLink = () => {
     if(invite) {
-      setCopyLink(true)
+    
       navigator.clipboard
       .writeText(invite)
       .then(() => {
@@ -79,68 +76,28 @@ export default function ShareDialog() {
     
   }
 
- 
-const handleCreateInvite = () => {
-  if ((!hasGeneratedUrl && email != '' ) || (hasGeneratedUrl && retries <= 2 && email != '')) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-  const toastInfo = {
-      success: false,
-      title: 'Invalid email',
-      desc: 'Please enter a valid email address (e.g., user@gmail.com)'
-    };
-    triggerToast(toastInfo)
-      return;
-    }
-    alert(email)
-    const token = uuidv4();
-    setToken(token)
-    setInvite(`http://localhost:5173/invites/${token}`);
-    setHasGeneratedUrl(true);
-   const result =  generateInvitePayload ()
-    console.log('result',result);
-    
-
-  } else {
-   const toastInfo = {
-  success: false,
-  title: 'Email Required',
-  desc: 'Please provide a valid email address to continue.'
-};
-        triggerToast(toastInfo)
-
+  const callInviteHandler = () => {
+    handleCreateInvite({
+      email,
+      hasGeneratedUrl,
+      retries,
+      setToken,
+      setInvite,
+      setHasGeneratedUrl,
+      roleId,
+    })
 
   }
-};
-
-const generateInvitePayload  = () => {
-  const now = new Date();
-  const createdAt = now.toISOString().slice(0, 19).replace("T", " ");
-  const expiresAt = new Date(Date.now() + 15 * 60 * 1000)
-    .toISOString()
-    .slice(0, 19)
-    .replace("T", " ");
-
-  const data = {
-    email,
-    role: roleId,
-    token,
-    invited_by: 'admin@gmail.com', // ideally from cookies or auth context
-    created_at: createdAt,
-    expires_at: expiresAt,
-  };
-
-  return data;
-};
 
 
-console.log('token',token)
+
 
 const handleRetries = () => {
   if (retries <= 2) {
     setRetries(prev => prev + 1);
-    handleCreateInvite(); // ✅ invoke the function
+    callInviteHandler(); // ✅ invoke the function
   } else {
+    
  const toastInfo = {
   success: false,
   title: 'Retry Limit Reached',
@@ -228,8 +185,8 @@ useEffect(() => {
 </div>
         <DialogFooter className="sm:justify-start !flex !items-center !justify-start w-full ">
           <div className="flex gap-2 ">
-          <Button variant='secondary'  onClick={handleCreateInvite} disabled={hasGeneratedUrl} >Generate</Button>
-          <Button variant='secondary'  onClick={handleRetries}> <RefreshCcw className="h-4 w-4" /></Button>
+          <Button variant='secondary'  onClick={callInviteHandler} disabled={hasGeneratedUrl} >Generate</Button>
+          <Button variant='secondary'   onClick={handleRetries} disabled={!hasGeneratedUrl}> <RefreshCcw className="h-4 w-4" /></Button>
           <Button variant='secondary'  onClick={handleCopyLink}> <ClipboardCheck className="h-4 w-4" /></Button>
           </div>
           {/* <DialogClose asChild>

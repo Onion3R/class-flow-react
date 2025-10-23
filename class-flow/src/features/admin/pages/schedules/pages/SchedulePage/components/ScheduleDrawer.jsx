@@ -20,8 +20,13 @@ import DayTableComponent from '@/components/Tabs/dayTableComponent';
 import { Separator } from '@/components/ui/separator';
 import { Toggle } from "@/components/ui/toggle"
 import useOperationalDataGetter from '../../CreateSchedulePage/config/useOperationalData';
-function ScheduleDrawer({openDrawer, setOpenDrawer, selectedSchedule, }) {
-  const { transformedData, isLoading } = useTransformedTeacherData();
+import useGeneratedScheduleGetter from '@/lib/hooks/useGeneratedSchedules';
+
+import { triggerToast } from '@/lib/utils/toast';
+import { updateGeneratedSchedules , getSpecificGeneratedSchedule} from '@/app/services/apiService';
+function ScheduleDrawer({openDrawer, setOpenDrawer, selectedSchedule}) {
+  const { transformedData, isLoading } = useTransformedTeacherData(selectedSchedule?.id);
+  const { data: allGeneratedScheduleData, isLoading: allGeneratedScheduleIsLoading, refresh } = useGeneratedScheduleGetter();
    const {data, isLoading: operationalDataIsLoading}= useOperationalDataGetter(selectedSchedule?.schedule_id)
   const [datatableData, setDatatableData] = useState({})
   const [api, setApi] = useState();
@@ -29,7 +34,10 @@ function ScheduleDrawer({openDrawer, setOpenDrawer, selectedSchedule, }) {
   const [schedule, setSchedule] = useState(false)
   const [showTable, setShowTable] = useState(false)
 
-  console.log('selected',selectedSchedule)
+  
+  const [isThereSelectedSchedu, setIsThereSelectedSchedule] = useState(false)
+ 
+
 
   // this is for changing the schedule table component
   const [hasSelectedSection , setHasSelectedSection ] = useState(false); 
@@ -44,20 +52,59 @@ function ScheduleDrawer({openDrawer, setOpenDrawer, selectedSchedule, }) {
       setApi(filters);
     }
   }, [filters])
+
+
   
 useEffect(() => {
-  if(isLoading) return;
+  if(isLoading && !allGeneratedScheduleData && allGeneratedScheduleIsLoading) return;
+
+  
 
    if(selectedSchedule && selectedSchedule.id) { 
     setApi(selectedSchedule.id)
-  
+    // this si the schedule id not the generated shcedule id
+    
+     const checkIfSelectedScheduleIsSet = async() => {
+      
+        const result = await getSpecificGeneratedSchedule(selectedSchedule.id)
+
+    
+
+        const resultIfThereIsSelectedScehdule = allGeneratedScheduleData.some( e => e.is_active === true)
+
+      
+        if(resultIfThereIsSelectedScehdule) {
+          setIsThereSelectedSchedule(true)
+        } else {
+          setIsThereSelectedSchedule(false)
+        }
+        
+        if(result && result.id > 0) {
+           const isSet = result.id === selectedSchedule.id && result.is_active === true
+         
+              if(isSet) {
+                setSchedule(true)
+              } else {
+                setSchedule(false)
+              }
+     
+        }
+        }
+       
+         checkIfSelectedScheduleIsSet()
+        
    } 
 
    if(transformedData && transformedData.length > 0 && selectedSchedule) {
   const result = transformedData.filter(e => e.id === selectedSchedule.id)
     setDatatableData(result)
   }
-}, [transformedData,selectedSchedule, isLoading])
+}, [transformedData,selectedSchedule, isLoading, allGeneratedScheduleData, allGeneratedScheduleIsLoading])
+
+
+
+
+
 
 const handleShowTable = (pressed) => {
   if(pressed) {
@@ -68,6 +115,56 @@ const handleShowTable = (pressed) => {
   }
 }
 
+
+const handleSetSchedule = async () => {
+
+  if(!selectedSchedule.id) return
+
+  if(isThereSelectedSchedu && !schedule) {
+    triggerToast({
+      success: false,
+      title: 'Action Blocked',
+      desc: 'Only one schedule can be selected at a time.',
+    });
+    return
+  }
+
+  
+  try {
+  const isActivating = !schedule;
+  const data = { is_active: isActivating };
+
+  await updateGeneratedSchedules(selectedSchedule.id, data);
+  setSchedule(isActivating);
+
+  const toastInfo = {
+    success: true,
+    title: isActivating
+      ? 'Schedule Activated'
+      : 'Schedule Deactivated',
+    desc: isActivating
+      ? 'You have successfully selected this schedule.'
+      : 'You have successfully deselected this schedule.',
+  };
+
+
+
+  triggerToast(toastInfo);
+} catch (error) {
+  console.error(error);
+
+  const toastInfo = {
+    success: false,
+    title: 'Failed to update schedule',
+    desc: `${error}`,
+  };
+
+  triggerToast(toastInfo);
+}  finally {
+  refresh()
+}
+  
+}
 
 
 
@@ -101,7 +198,7 @@ const handleShowTable = (pressed) => {
            </div>
               <div className='flex items-center gap-3'>
              <ScheduleOptions selectedSchedule={selectedSchedule} setFilters={setFilters}/>
-             <Button onClick={() => setSchedule(true)} disabled={schedule} variant={`${schedule ? 'outline' : 'default' }`}>Set Schedule</Button>
+             <Button onClick={() => handleSetSchedule()}  variant={`${schedule ? 'outline' : 'default' }`}>{schedule ? 'Remove Selection' : 'Confirm  Selection' }</Button>
              </div>
             </div>
           </DrawerHeader>

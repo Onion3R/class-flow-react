@@ -9,6 +9,7 @@ import {
   AudioWaveform,
   MessageSquare,
   GalleryVerticalEnd,
+  LayoutList,
   ChartNoAxesGantt} from "lucide-react"
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
@@ -44,11 +45,11 @@ const data2 = {
       role: "Admin" 
     },
     {
-      name: "Instructor Panel",
+      name: "Teacher Panel",
       logo: AudioWaveform,
       plan: "Startup",
       url: "/dashboard",
-      role: "Instructor"
+      role: "Teacher"
     },
   ],
   sidebarItems: [
@@ -65,6 +66,12 @@ const data2 = {
                 url: "teachers",
                 icon: Users,
               },
+               {
+                title: "Programs",
+                url: "programs",
+                icon: ChartNoAxesGantt,
+            } ,
+           
               {
                 title: "Subjects",
                 url: "subjects",
@@ -73,13 +80,8 @@ const data2 = {
               {
                 title: "Assignment",
                 url: "assignments",
-                icon: Library,
+                icon: LayoutList,
             },   
-            {
-                title: "Programs",
-                url: "programs",
-                icon: ChartNoAxesGantt,
-            } ,
            
           ]
       },

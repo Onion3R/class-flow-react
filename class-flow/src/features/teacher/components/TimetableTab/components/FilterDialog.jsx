@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import SelectComponent from '@/components/Select/selectComponent'
 import { Button } from '@/components/ui/button'
+import { Link } from 'react-router-dom'
 function FilterDialog({filters, checkedStrands, handleCheckboxChange, hasSelectedStrand, selectedYearLevel, handleYearLevelChange, handleFilter, hasSelectedYear, filteredSections, selectedSection, handleSectionChange, className}) {
 
 
@@ -88,10 +89,12 @@ function FilterDialog({filters, checkedStrands, handleCheckboxChange, hasSelecte
           variant='outline' 
           size='sm' 
           className='text-xs  bg-transparent'
-          >
-            <Maximize className="!w-3 !h-3 " />
-            View
-          </Button>
+         onClick={() => window.open(`/views/teacher/${encodeURIComponent(api)}`, '_blank')}
+                               disabled={!selectedSection}
+                             >
+                               <Maximize className="!w-3 !h-3 " />
+                               View
+                             </Button>
         </div>
            <Button 
             className=' mt-1' 
